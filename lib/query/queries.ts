@@ -1,3 +1,18 @@
+export const CREATE_USER = `
+INSERT INTO users (id, user_name, password) VALUES (?, ?, ?)`;
+
+export const CHECK_USER_EXISTS = `
+  SELECT COUNT(*) as count
+  FROM users
+  WHERE id = ?
+`;
+
+export const LOGIN_USER = `
+  SELECT user_id, id, user_name, password, photo_url, role
+  FROM users
+  WHERE id = ? AND password = ? 
+`;
+
 export const GET_CATEGORY_ROOMS = `
 SELECT 
     c.category_id,
@@ -6,10 +21,11 @@ SELECT
         JSON_OBJECT(
             'chat_id', cr.chat_id,
             'room_name', cr.room_name,
+            'user_id', cr.user_id,
             'active_users', (
                 SELECT COUNT(*) 
                 FROM room_members rm 
-                WHERE rm.chat_id = cr.chat_id AND rm.is_connected = TRUE
+                WHERE rm.chat_id = cr.chat_id  
             )
         )
     ) AS rooms
@@ -29,7 +45,7 @@ export const CREATE_CATEGORY = `
   `;
 
 export const CREATE_CHAT_ROOM = `
-    INSERT INTO chat_rooms (category_id, room_name) VALUES (?, ?)
+    INSERT INTO chat_rooms (category_id, room_name, user_id) VALUES (?, ?, ?)
   `;
 
 export const GET_MESSAGE = `
@@ -61,14 +77,27 @@ LIMIT 50;
 `;
 
 export const GET_MESSAGE_AFTER = `
-SELECT m.*
-     FROM messages m
-     JOIN room_members rm ON m.chat_id = rm.chat_id
-     WHERE m.chat_id = ? AND rm.user_id = ? AND m.sent_at >= rm.joined_at
-     ORDER BY m.sent_at DESC
-     LIMIT 50
-`
-
+SELECT 
+    m.message_id,
+    m.chat_id,
+    m.content,
+    m.sent_at,
+    m.message_type,
+    u.user_name,
+    u.user_id
+FROM 
+    messages m
+LEFT JOIN 
+    users u ON m.user_id = u.user_id
+JOIN 
+    room_members rm ON m.chat_id = rm.chat_id AND rm.user_id = ?
+WHERE 
+    m.chat_id = ? 
+    AND m.sent_at >= rm.last_joined_at
+ORDER BY 
+    m.sent_at ASC
+LIMIT 50;
+`;
 
 export const SENT_MESSAGE = `
 INSERT INTO messages (user_id, chat_id, content) 
@@ -112,8 +141,7 @@ JOIN
 JOIN 
     categories c ON cr.category_id = c.category_id
 WHERE 
-    rm.user_id = ? 
- 
+    rm.user_id = ?;
 `;
 
 // 유저의 역할을 조회
@@ -125,9 +153,16 @@ SELECT role FROM users WHERE user_id = ?;`;
 // UPDATE room_members SET is_connected = false WHERE chat_id = ? AND user_id = ?`
 
 export const LEAVE_ROOM = `
-DELETE FROM room_members WHERE chat_id = ? AND user_id = ?;`
-
+DELETE FROM room_members WHERE chat_id = ? AND user_id = ?;`;
 
 // 유저가 접속되어있는지
 export const IS_USER_CONNECTED = `
-SELECT COUNT(*) as count FROM room_members WHERE chat_id = ? AND user_id = ?;`
+SELECT COUNT(*) as count FROM room_members WHERE chat_id = ? AND user_id = ?;`;
+
+// 채팅방 삭제
+export const DELETE_MESSAGES = `
+DELETE FROM  WHERE chat_id = ? AND user_id = ?;`;
+export const DELETE_ROOM_MEMBERS = `
+DELETE FROM room_members WHERE chat_id = ?;`;
+export const DELETE_CHAT_ROOM = `
+DELETE FROM chat_rooms WHERE chat_id = ?;`;

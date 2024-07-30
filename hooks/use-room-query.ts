@@ -1,29 +1,26 @@
-
-import {  useQuery } from "@tanstack/react-query";
-import { useSocketStore } from "./use-store";
+import { useQuery } from "@tanstack/react-query";
+import { useStore } from "./use-store";
+import { CategoriesType, RoomsType } from "@/types";
 
 export const useRoomQuery = ({
-  categoryId,
+  categories,
   userId,
 }: {
-  categoryId?: number;
+  categories?: CategoriesType;
   userId?: number;
 }) => {
-  const { isConnected } = useSocketStore();
-
   const {
     data: categoryData,
     isError: isCategoryError,
     isLoading: isCategoryLoading,
-  } = useQuery({
-    queryKey: ["categoryRooms", categoryId],
+  } = useQuery<RoomsType[]>({
+    queryKey: ["categoryRooms", categories?.category_id],
   });
 
   const getJoinRoom = async () => {
     try {
       const response = await fetch(`/api/socket/user/${userId}`);
       const data = await response.json();
-      // setSelected=data[0];
       return data;
     } catch (error) {
       console.log(error);

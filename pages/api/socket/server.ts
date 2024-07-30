@@ -24,6 +24,14 @@ const ServerHandler = (req: NextApiRequest, res: NextApiResponseServerIo) => {
     io.on("connection", (socket) => {
       console.log("서버 connection");
 
+      socket.on("joinRoom", ({ chatId }: { chatId: string }) => {
+        socket.join(`chatRoom:${chatId}`);
+      });
+
+      socket.on("joinRoomList", ({ userId }: { userId: string }) => {
+        socket.join(`userRoom:${userId}`);
+      });
+
       socket.on("disconnect", () => {
         console.log("서버 disconnected");
       });

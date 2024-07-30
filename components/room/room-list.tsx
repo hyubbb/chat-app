@@ -1,33 +1,35 @@
 "use client";
-import React, { use, useEffect, useState } from "react";
-import { useRoomStore } from "@/hooks/use-room.store";
-import { RoomsType } from "@/types";
+import React, { useState } from "react";
+import { useRoomStore } from "@/hooks/use-room-store";
+import { defaultCategories, RoomsType } from "@/types";
 import { useRouter } from "next/navigation";
 import { useRoomQuery } from "@/hooks/use-room-query";
+import { Trash } from "lucide-react";
+import { useUserQuery } from "@/hooks/use-user-query";
+import axios from "axios";
 
 export const RoomList = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
   // const [rooms, setRooms] = useState<RoomsType[]>();
   const [selectedRoom, setSelectedRoom] = useState<RoomsType | null>(null);
   const { selected: roomsInCategory, setSelectedChat } = useRoomStore();
-  const {
-    categoryData: rooms,
-    isCategoryError,
-    isCategoryLoading,
-  } = useRoomQuery({ categoryId: roomsInCategory?.category_id });
-
+  const { data: user } = useUserQuery();
   const router = useRouter();
-  const toggleDarkMode = () => setIsDarkMode(!isDarkMode);
-  const handleRoomClick = (chat_id: RoomsType) => {
-    // console.log(room);
-    setSelectedChat(chat_id);
-    router.push(`/chat/${chat_id}`);
+  const handleChatClick = (chat: any) => {
+    setSelectedChat(chat);
+    router.push(`/chat/${chat.chat_id}`);
   };
 
+  const { categoryData: rooms } = useRoomQuery({
+    categories: roomsInCategory ?? defaultCategories,
+  });
+
+  const handleDelete = async (chat_id: number) => {
+    const { data } = await axios.delete(`api/socket/chat/${chat_id}`);
+  };
   return (
     <>
       {/* Main chat area */}
-
       <main className="flex h-full w-full flex-1 flex-col bg-gray-50 dark:bg-zinc-800">
         {roomsInCategory && selectedRoom == null ? (
           // 채팅방 목록 화면 , 카테고리가 선택이 되었고, 채팅방이 존재할 때
@@ -36,19 +38,36 @@ export const RoomList = () => {
               {roomsInCategory.category_name} 채팅방
             </h2>
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {rooms?.map((room) => {
-                const { chat_id, room_name, active_users } = room;
-                return (
+              {rooms?.map(
+                (
+                  { chat_id, room_name, active_users, user_id }: RoomsType,
+                  idx,
+                ) => (
                   <div
-                    key={room_name}
-                    className="cursor-pointer rounded-lg bg-white p-4 shadow transition hover:shadow-md"
-                    onClick={() => handleRoomClick(chat_id)}
+                    key={chat_id}
+                    className="group cursor-pointer rounded-lg bg-white p-4 shadow transition hover:shadow-md"
+                    onClick={() => handleChatClick(rooms[idx])}
                   >
-                    <h3 className="font-semibold">{room_name}</h3>
-                    <p className="text-sm text-gray-500">{!!active_users && `${active_users}명 참여중`}</p>
+                    <div className="flex items-center justify-between">
+                      <h3 className="font-semibold">{room_name}</h3>
+                      {user_id === user?.user_id && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDelete(chat_id);
+                          }}
+                          className="z-10 hidden text-red-600 group-hover:block"
+                        >
+                          <Trash size={16} />
+                        </button>
+                      )}
+                    </div>
+                    <p className="text-sm text-gray-500">
+                      {`${active_users}명 참여중`}
+                    </p>
                   </div>
-                );
-              })}
+                ),
+              )}
             </div>
           </div>
         ) : (

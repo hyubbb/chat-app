@@ -1,17 +1,20 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { X, Plus } from "lucide-react";
-import { CategoriesType, RoomsType } from "@/types";
+import { CategoriesType, RoomsType, UserType } from "@/types";
+import axios, { all } from "axios";
 
 type RoomCreateModalProps = {
   isOpen: boolean;
   onClose: () => void;
   categories: CategoriesType[];
+  user: UserType | null;
 };
 
 export default function RoomCreateModal({
   isOpen,
   onClose,
   categories,
+  user,
 }: RoomCreateModalProps) {
   const [roomTitle, setRoomTitle] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
@@ -22,7 +25,7 @@ export default function RoomCreateModal({
   useEffect(() => {
     if (!categories) return;
     categories?.map(({ rooms }) => {
-      return setAllRoomsData((prev) => [...prev, ...rooms]);
+      return setAllRoomsData([...rooms]);
     });
   }, [categories]);
 
@@ -41,17 +44,14 @@ export default function RoomCreateModal({
 
   const isDuplicateRoom = useCallback(
     (room: string) => allRoomsData.some(({ room_name }) => room_name === room),
-    [allRoomsData],
+    [allRoomsData, categories],
   );
-
   const fetchRoomPost = async (title: any, categoryName: any) => {
-    // 여기에서 새 채팅방 생성 로직을 구현합니다.
-    await fetch("/api/socket/category", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ categoryName, roomName: title }),
+    // 새 채팅방 생성 로직
+    await axios.post("/api/socket/chat", {
+      categoryName,
+      roomName: title,
+      userId: user?.user_id || null,
     });
   };
 

@@ -1,13 +1,14 @@
-import qs from "query-string";
+import { useQuery } from "@tanstack/react-query";
+import { messagesType, UserType } from "@/types";
 
-import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
-import { useSocketStore } from "./use-store";
-import { useRoomStore } from "./use-room.store";
-import { messagesType } from "@/types";
+type useMessageQueryType = {
+  chatId: number;
+};
 
-export const useMessageQuery = (chatId: string) => {
+export const useMessageQuery = ({ chatId }: useMessageQueryType) => {
   const { data, isError, isLoading } = useQuery<messagesType[]>({
     queryKey: ["messages", chatId],
+    initialData: [],
   });
 
   return { data, isError, isLoading };

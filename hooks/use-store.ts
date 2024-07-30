@@ -10,14 +10,18 @@ type SocketStoreType = {
     socket: any;
     isConnected: boolean;
   }) => void;
-  user: any;
-  getUser: (user: any) => void;
+  isLoginModalOpen: boolean;
+  setIsLoginModalOpen: (isOpen: boolean) => void;
+  isSignUpModalOpen: boolean;
+  setIsSignUpModalOpen: (isOpen: boolean) => void;
 };
 
-export const useSocketStore = create<SocketStoreType>((set) => ({
+export const useStore = create<SocketStoreType>((set) => ({
   socket: null,
   isConnected: false,
-  user: { user_id: 1, user_name: "admin" },
-  getUser: (user) => set({ user }),
-  setSocket: ({ socket, isConnected }) => set({ socket, isConnected }),
+  isLoginModalOpen: false,
+  setIsLoginModalOpen: (isOpen) => set({ isLoginModalOpen: isOpen }),
+  setSocket: (socket) => set({ socket: socket, isConnected: true }),
+  isSignUpModalOpen: false,
+  setIsSignUpModalOpen: (isOpen) => set({ isSignUpModalOpen: isOpen }),
 }));

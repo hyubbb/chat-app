@@ -10,16 +10,45 @@ export type NextApiResponseServerIo = NextApiResponse & {
   };
 };
 
+export type UserType = {
+  user_id: number;
+  id: number;
+  user_name: string;
+  photo_url: string;
+  role: string;
+};
+
+export const defaultUser: UserType = {
+  id: 0,
+  user_id: 0,
+  user_name: "",
+  photo_url: "",
+  role: "",
+};
+
 export type RoomsType = {
   chat_id: number;
   room_name: string;
   active_users: number;
+  user_id: number;
+};
+
+export const defaultRooms: RoomsType = {
+  chat_id: 0,
+  room_name: "",
+  active_users: 0,
 };
 
 export type CategoriesType = {
   category_id: number;
   category_name: string;
   rooms: RoomsType[];
+};
+
+export const defaultCategories: CategoriesType = {
+  category_id: 0,
+  category_name: "",
+  rooms: [],
 };
 
 export type CollapseStateType = {

@@ -10,7 +10,12 @@ const nextConfig = {
     return config;
   },
   images: {
-    domains: ["uploadthing.com", "utfs.io", "lh3.googleusercontent.com"],
+    domains: [
+      "uploadthing.com",
+      "utfs.io",
+      "lh3.googleusercontent.com",
+      "i.pinimg.com",
+    ],
   },
 };
 

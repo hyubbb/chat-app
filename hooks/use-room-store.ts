@@ -4,13 +4,13 @@ import { create } from "zustand";
 type RoomStoreType = {
   selected: CategoriesType | null;
   setSelected: (category: CategoriesType) => void;
-  selectedChat: RoomsType | null;
-  setSelectedChat: (chat: RoomsType) => void;
+  selectedChat: { chat_id: number; room_name: string; active_users: number };
+  setSelectedChat: (chat) => void;
 };
 
 export const useRoomStore = create<RoomStoreType>((set) => ({
   selected: null,
   setSelected: (category) => set({ selected: category }),
-  selectedChat: null,
+  selectedChat: { chat_id: 0, room_name: "no name", active_users: 0 },
   setSelectedChat: (chat) => set({ selectedChat: chat }),
 }));

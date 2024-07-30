@@ -2,39 +2,47 @@
 
 "use client";
 import { useEffect } from "react";
-import { useSocketStore } from "./use-store";
+import { useStore } from "./use-store";
 import { useQueryClient } from "@tanstack/react-query";
+import { UserType } from "@/types";
 
-export const useRoomSocket = () => {
-  const { socket } = useSocketStore();
+type UseRoomSocketProps = {
+  chatId: number;
+  user: UserType | null;
+};
+
+export const useRoomSocket = ({ chatId, user }: UseRoomSocketProps) => {
+  const { socket, isConnected } = useStore();
   const queryClient = useQueryClient();
 
-  const handleCategoryUpdate = (data: any) => {
-    // 카테고리 리스트 업데이트
-    queryClient.setQueryData(["categoryList"], data);
-
-    // 각 카테고리의 rooms 데이터 업데이트
-    data.forEach((category: any) => {
-      queryClient.setQueryData(
-        ["categoryRooms", category.category_id],
-        category.rooms,
-      );
-    });
-  };
-
   const handleJoinRoom = (data: any) => {
-    // 채팅방 입장 시
+    // 접속중인 채팅방
     queryClient.setQueryData(["joinRoomList"], data);
   };
 
-  useEffect(() => {
-    if (!socket) return;
+  const handleLeaveRoom = ({
+    chatId,
+    userId,
+  }: {
+    chatId: number;
+    userId: number;
+  }) => {
+    // 채팅방 퇴장 시
+    queryClient.removeQueries({ queryKey: ["messages", chatId] });
+  };
 
-    socket.on("categoryList", handleCategoryUpdate);
+  useEffect(() => {
+    if (!socket || !user || !chatId || !isConnected) return;
+
+    socket.emit("joinRoom", { chatId });
+    socket.emit("joinRoomList", { userId: user?.user_id });
+
     socket.on("joinRoomList", handleJoinRoom);
+    socket.on("leaveRoom", handleLeaveRoom);
 
     return () => {
-      socket.off("categoryList", handleCategoryUpdate);
+      socket.off("joinRoomList", handleJoinRoom);
+      socket.off("leaveRoom", handleLeaveRoom);
     };
-  }, [socket]);
+  }, [socket, user, chatId, isConnected]);
 };

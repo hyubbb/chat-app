@@ -1,19 +1,21 @@
 "use client";
 
-import { useSocketStore } from "@/hooks/use-store";
+import { useStore } from "@/hooks/use-store";
 import { ErrorProps } from "next/error";
 import { useEffect, useState } from "react";
 import { io as ClientIO } from "socket.io-client";
 
 export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
   const [isConnected, setIsConnected] = useState(false);
-  const { setSocket } = useSocketStore();
+  const { setSocket } = useStore();
 
   useEffect(() => {
-    const socketInstance = new (ClientIO as any)("http://localhost:3000", {
-      path: "/api/socket/server",
-      // autoConnect: false,
-    });
+    const socketInstance = new (ClientIO as any)(
+      process.env.NEXT_PUBLIC_SITE_URL,
+      {
+        path: "/api/socket/server",
+      },
+    );
 
     socketInstance.on("connect", () => {
       console.log("[CONNECTED]");
@@ -30,7 +32,7 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
       setIsConnected(false);
     });
 
-    setSocket({ socket: socketInstance, isConnected });
+    setSocket(socketInstance);
 
     return () => {
       socketInstance?.disconnect();

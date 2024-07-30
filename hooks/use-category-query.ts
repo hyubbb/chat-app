@@ -1,48 +1,30 @@
-import qs from "query-string";
+import { CategoriesType, UserType } from "@/types";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import axios from "axios";
 
-import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
-import { useSocketStore } from "./use-store";
-import { useRoomStore } from "./use-room.store";
+export const useCategoryQuery = ({ user }: { user: UserType }) => {
+  const queryClient = useQueryClient();
 
-interface ChatQueryProps {
-  queryKey: string;
-  // apiUrl: string;
-  // paramKey: "channelId" | "conversationId";
-  // paramValue: string;
-}
+  const categoryApi = async (): Promise<CategoriesType[]> => {
+    // 카테고리 리스트와 각 카테고리의 rooms 데이터를 가져옴
+    const { data } = await axios.get<CategoriesType[]>(`/api/category`);
 
-export const useCategoryQuery = ({ queryKey }: ChatQueryProps) => {
-  const { isConnected } = useSocketStore();
-  // const fetchMessages = async ({ pageParam = undefined }) => {
-  //   const url = qs.stringifyUrl(
-  //     {
-  //       url: apiUrl,
-  //       query: {
-  //         cursor: pageParam,
-  //         [paramKey]: paramValue,
-  //       },
-  //     },
-  //     { skipNull: true },
-  //   );
-  //   const res = await fetch(url);
-  //   return res.json();
-  // };
+    queryClient.setQueryData(["categoryList"], data);
+    // 각 카테고리별로 rooms 데이터를 캐시에 저장
+    data.forEach(({ category_id, rooms }) => {
+      queryClient.setQueryData(["categoryRooms", category_id], rooms);
+    });
 
-  const categoryApi = async () => {
-    try {
-      const response = await fetch("http://localhost:3000/api/socket/category");
-      const data = await response.json();
-      // setSelected=data[0];
-      return data;
-    } catch (error) {
-      console.log(error);
-    }
+    return data;
   };
 
-  const { data, isError, isLoading } = useQuery({
-    queryKey: [queryKey],
-    queryFn: categoryApi,
-  });
+  const { data, isError, isLoading, error } = useQuery<CategoriesType[], Error>(
+    {
+      queryKey: ["categoryList"],
+      initialData: [],
+      queryFn: categoryApi,
+    },
+  );
 
-  return { data, isError, isLoading };
+  return { data, isError, isLoading, error };
 };
