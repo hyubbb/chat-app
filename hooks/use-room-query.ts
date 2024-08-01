@@ -7,7 +7,7 @@ export const useRoomQuery = ({
   userId,
 }: {
   categories?: CategoriesType;
-  userId?: number;
+  userId?: number | null;
 }) => {
   const {
     data: categoryData,

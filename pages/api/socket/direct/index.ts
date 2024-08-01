@@ -3,6 +3,7 @@ import {
   sendMessageAndGetMessages,
 } from "@/lib/service/service";
 import { NextApiResponseServerIo } from "@/types";
+import { createDMRoomId } from "@/util/utils";
 import { NextApiRequest } from "next";
 
 export default async function handler(
@@ -13,15 +14,21 @@ export default async function handler(
     // 메세지 전송 처리
     try {
       const { userId, chatId, message } = req.body;
+      console.log(req.body);
       const result = await sendMessageAndGetMessages({
         userId,
         chatId,
         message,
+        type: "direct",
       });
-      res?.socket?.server?.io?.to(`chatRoom:${chatId}`).emit("messages", {
+
+      console.log("result: ", result);
+
+      const dmRoomId = createDMRoomId(chatId, userId);
+      res?.socket?.server?.io?.to(`dm_${dmRoomId}`).emit("getDirectMessages", {
         chatId: +chatId,
         messages: result,
-        messages_type: "message",
+        messages_type: "direct",
       });
       res.status(200).json({ success: true });
     } catch (error: any) {

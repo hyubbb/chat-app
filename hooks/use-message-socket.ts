@@ -29,9 +29,13 @@ export const useMessageSocket = ({ chatId }: { chatId: number }) => {
           // 초기 로딩: messages가 배열일 것으로 예상
           return Array.isArray(messages) ? messages : [messages];
         }
+
         // 넘어온 메세지가 배열이 아닌경우: 메세지나, 시스템메세지
         // 배열인경우 기존에 채팅방에 접속중이어서 대화가 있는 경우
-        if (oldData.length === 1 && !messages_type) {
+        if (
+          (oldData.length === 1 && !messages_type) ||
+          messages_type === "deleted"
+        ) {
           return messages;
         }
 

@@ -11,16 +11,16 @@ export type NextApiResponseServerIo = NextApiResponse & {
 };
 
 export type UserType = {
-  user_id: number;
-  id: number;
+  user_id: number | null;
+  id: number | null;
   user_name: string;
   photo_url: string;
   role: string;
 };
 
 export const defaultUser: UserType = {
-  id: 0,
-  user_id: 0,
+  id: null,
+  user_id: null,
   user_name: "",
   photo_url: "",
   role: "",
@@ -37,6 +37,7 @@ export const defaultRooms: RoomsType = {
   chat_id: 0,
   room_name: "",
   active_users: 0,
+  user_id: 0,
 };
 
 export type CategoriesType = {
@@ -68,4 +69,14 @@ export type messagesType = {
   category_id: number;
   category_name: string;
   message_type: string;
+  photo_url: string;
+};
+
+export type dmListType = {
+  id: number;
+  from_id: number;
+  to_id: number;
+  other_id: number;
+  other_name: string;
+  other_photo_url: string;
 };

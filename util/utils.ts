@@ -12,9 +12,7 @@ export const dateFormatted = (dbTime: string) => {
   return formattedDate;
 };
 
-
-
-export  const useInput = (initialValue:string) =>{
+export const useInput = (initialValue: string) => {
   // const [value, setValue] = useState(initialValue);
   const [value, setValue] = useState(initialValue);
   const [debouncedValue, setDebouncedValue] = useState(initialValue);
@@ -45,4 +43,10 @@ export  const useInput = (initialValue:string) =>{
     debouncedValue, // 디바운스된 값을 반환
     reset,
   };
-}
+};
+
+export const createDMRoomId = (userId1: number, userId2: number): string => {
+  // 항상 작은 ID가 앞에 오도록 정렬
+  const sortedIds = [userId1, userId2].sort((a, b) => a - b);
+  return `${sortedIds[0]}_${sortedIds[1]}`;
+};

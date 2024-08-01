@@ -83,8 +83,10 @@ SELECT
     m.content,
     m.sent_at,
     m.message_type,
+    m.receiver_id,
     u.user_name,
-    u.user_id
+    u.user_id,
+    u.photo_url
 FROM 
     messages m
 LEFT JOIN 
@@ -92,22 +94,59 @@ LEFT JOIN
 JOIN 
     room_members rm ON m.chat_id = rm.chat_id AND rm.user_id = ?
 WHERE 
-    m.chat_id = ? 
+    m.chat_id = ? AND m.message_type != 'direct'
     AND m.sent_at >= rm.last_joined_at
 ORDER BY 
     m.sent_at ASC
 LIMIT 50;
 `;
 
-export const SENT_MESSAGE = `
-INSERT INTO messages (user_id, chat_id, content) 
-VALUES (?, ?, ?);
+export const GET_DIRECT_MESSAGE_AFTER = `
+SELECT * FROM (
+    SELECT 
+        m.*,
+        sender.user_name AS user_name,
+        sender.photo_url AS photo_url
+    FROM messages m
+    JOIN direct_rooms dr ON (m.user_id = dr.from_id AND m.chat_id = dr.to_id)
+                         OR (m.user_id = dr.to_id AND m.chat_id = dr.from_id)
+    LEFT JOIN users sender ON m.user_id = sender.user_id
+    WHERE
+        (m.chat_id = ? AND m.user_id = ?) OR (m.user_id = ? AND m.chat_id = ?)
+        AND m.message_type = "direct"
+    ORDER BY m.sent_at DESC
+    LIMIT 50
+) AS sub
+ORDER BY sent_at ASC;
 `;
 
-// 사용자가 방에 입장했을떄 시스템 메시지
-export const SYSTEM_MESSAGE = `
-INSERT INTO messages (chat_id, content, message_type, user_id)
-VALUES (?, ?, 'system', NULL);
+// export const GET_DIRECT_MESSAGE_AFTER = `
+// SELECT DISTINCT
+//     m.message_id,
+//     m.chat_id,
+//     m.content,
+//     m.sent_at,
+//     m.message_type,
+//     m.receiver_id,
+//     u.user_name,
+//     u.user_id,
+//     u.photo_url
+// FROM
+//     messages m
+// LEFT JOIN
+//     users u ON m.user_id = u.user_id
+// LEFT JOIN
+//     room_members rm ON m.chat_id = rm.chat_id AND rm.user_id = ?
+// WHERE
+//     ( m.receiver_id = ?)
+// ORDER BY
+//     m.sent_at ASC
+// LIMIT 50;
+// `;
+
+export const SENT_MESSAGE = `
+INSERT INTO messages (user_id, chat_id, content, message_type)
+VALUES (?, ?, ?, ?);
 `;
 
 // 사용자가 방에 참여할 때 실행할 쿼리
@@ -161,8 +200,67 @@ SELECT COUNT(*) as count FROM room_members WHERE chat_id = ? AND user_id = ?;`;
 
 // 채팅방 삭제
 export const DELETE_MESSAGES = `
-DELETE FROM  WHERE chat_id = ? AND user_id = ?;`;
+DELETE FROM  messages WHERE chat_id = ? AND message_type = "direct" ;`;
 export const DELETE_ROOM_MEMBERS = `
 DELETE FROM room_members WHERE chat_id = ?;`;
 export const DELETE_CHAT_ROOM = `
 DELETE FROM chat_rooms WHERE chat_id = ?;`;
+
+// 삭제된 메세지 처리
+export const DELETE_TEXT_MESSAGE = `
+UPDATE messages
+SET content = '삭제된 메시지입니다.',
+    message_type = 'deleted' 
+WHERE message_id = ?;
+`;
+
+export const JOIN_DIRECT_ROOMS = `
+INSERT INTO direct_rooms (to_id, from_id, is_connected)
+VALUES (?, ?, 1)
+ON DUPLICATE KEY UPDATE
+    is_connected = 1,
+    joined_at = CURRENT_TIMESTAMP;
+`;
+
+export const IS_USER_CONNECTED_DM = `
+SELECT COUNT(*) as count FROM direct_rooms WHERE to_id = ? AND from_id = ? || from_id = ? AND to_id = ?;
+`;
+
+export const GET_USER_CONNECTED_DM = `
+ SELECT 
+    dr.id,
+    dr.to_id,
+    dr.from_id,
+    dr.joined_at,
+    CASE 
+        WHEN dr.from_id = ? THEN u_to.user_id
+        ELSE u_from.user_id
+    END AS other_id,
+    CASE 
+        WHEN dr.from_id = ? THEN u_to.user_name
+        ELSE u_from.user_name
+    END AS other_name,
+    CASE 
+        WHEN dr.from_id = ? THEN u_to.photo_url
+        ELSE u_from.photo_url
+    END AS other_photo_url
+FROM 
+    direct_rooms dr
+JOIN 
+    users u_from ON dr.from_id = u_from.user_id
+JOIN 
+    users u_to ON dr.to_id = u_to.user_id
+WHERE 
+    dr.to_id = ? OR dr.from_id = ?
+ 
+`;
+
+// DM 나가기
+export const LEAVE_DM = `
+DELETE FROM direct_rooms WHERE to_id = ? AND from_id = ? || from_id = ? AND to_id = ?;`;
+
+// DM 채팅방 삭제
+export const DELETE_DM_MESSAGES = `
+DELETE FROM  messages WHERE chat_id = ? AND message_type = "direct";`;
+export const DELETE_DM_CHAT_ROOM = `
+DELETE FROM direct_rooms WHERE to_id = ? and from_id = ? || from_id = ? and to_id = ?;`;

@@ -32,6 +32,22 @@ const ServerHandler = (req: NextApiRequest, res: NextApiResponseServerIo) => {
         socket.join(`userRoom:${userId}`);
       });
 
+      socket.on(
+        "directMessage",
+        ({
+          dmName,
+          userId,
+          chatId,
+        }: {
+          dmName: string;
+          userId: number;
+          chatId: number;
+        }) => {
+          socket.join(`dm_${dmName}:${userId}`);
+          socket.join(`dm_${dmName}`);
+        },
+      );
+
       socket.on("disconnect", () => {
         console.log("서버 disconnected");
       });

@@ -11,26 +11,31 @@ import { defaultUser } from "@/types";
 import { ChatInput } from "./chat-input";
 import { ChatHeader } from "./chat-header";
 import { ChatMessage } from "./chat-message";
-import { useMessageQuery } from "@/hooks/use-message.query";
+import { useDirectSocket } from "@/hooks/use-direct-socket";
+import { useDirectQuery } from "@/hooks/use-direct-query";
 
-export const ChatRoom = ({ chatId }: { chatId: number }) => {
+export const DirectRoom = ({ chatId }: { chatId: number }) => {
   const { setIsLoginModalOpen } = useStore();
   const { data: user } = useUserQuery();
-  const { data: messages } = useMessageQuery({
+  useRoomSocket({ chatId, user: user });
+  useDirectSocket({ toId: chatId, user });
+
+  const { messages, dmList } = useDirectQuery({
     chatId,
     user: user ?? defaultUser,
+    direct: true,
   });
-  useRoomSocket({ chatId, user: user });
-  useMessageSocket({ chatId });
+
+  const dmInfo = dmList!.find((dm) => dm.other_id === chatId) || null;
 
   useEffect(() => {
     if (!chatId) return redirect("/");
-    if (!user?.id) return setIsLoginModalOpen(true);
+    if (!user?.user_id) return setIsLoginModalOpen(true);
   }, [user]);
 
   return (
     <>
-      <ChatHeader user={user} chatId={chatId} />
+      <ChatHeader user={user} chatId={chatId} dmInfo={dmInfo} />
       <ChatMessage messages={messages} user={user} chatId={chatId} />
       <ChatInput user={user} chatId={chatId} />
     </>

@@ -6,20 +6,26 @@ import {
   CREATE_CHAT_ROOM,
   CREATE_USER,
   DELETE_CHAT_ROOM,
+  DELETE_DM_CHAT_ROOM,
+  DELETE_DM_MESSAGES,
   DELETE_MESSAGES,
   DELETE_ROOM_MEMBERS,
+  DELETE_TEXT_MESSAGE,
   GET_CATEGORY,
   GET_CATEGORY_ROOMS,
-  GET_MESSAGE,
+  GET_DIRECT_MESSAGE_AFTER,
   GET_MESSAGE_AFTER,
+  GET_USER_CONNECTED_DM,
   GET_USER_CONNECTED_ROOMS,
   GET_USER_ROLE,
   IS_USER_CONNECTED,
+  IS_USER_CONNECTED_DM,
+  JOIN_DIRECT_ROOMS,
   JOIN_ROOM,
+  LEAVE_DM,
   LEAVE_ROOM,
   LOGIN_USER,
   SENT_MESSAGE,
-  SYSTEM_MESSAGE,
   USER_ENTERED_ROOM,
 } from "../query/queries";
 import { ResultSetHeader } from "mysql2";
@@ -117,9 +123,12 @@ export const createChatRoom = async (
 
 export const getMessages = async (chatId: number, userId: number) => {
   try {
-    const res = await executeQuery(GET_MESSAGE_AFTER, [userId, chatId]);
-    const data = res as messagesType[];
-    return data;
+    let res;
+    res = (await executeQuery(GET_MESSAGE_AFTER, [
+      userId,
+      chatId,
+    ])) as messagesType[];
+    return res;
   } catch (error) {
     console.error("메시지 전송 중 오류 발생:", error);
     throw error;
@@ -127,13 +136,13 @@ export const getMessages = async (chatId: number, userId: number) => {
 };
 
 export const sendMessageAndGetMessages = async ({
-  userId,
+  userId = null,
   chatId,
   message,
   init = false,
   type = "message",
 }: {
-  userId: number;
+  userId?: number | null;
   chatId: number;
   message: string;
   init?: boolean;
@@ -145,17 +154,38 @@ export const sendMessageAndGetMessages = async ({
     // 첫 입장과, 퇴장시에 시스템 메세지를 보내고, 그 이외에는 일반 메세지를 보내는 로직
     // 아니면 첫입장시에만 전체메세지를 불러오고, 그 이후에는 새로운 메세지만 불러오는 로직
     let result;
-    let response;
-    if (type == "system") {
-      await executeQuery(SYSTEM_MESSAGE, [chatId, message]);
-    } else {
-      await executeQuery(SENT_MESSAGE, [userId, chatId, message]);
-    }
-
-    result = (await executeQuery(GET_MESSAGE_AFTER, [
+    // let response;
+    // if (type == "system") {
+    //   await executeQuery(SYSTEM_MESSAGE, [chatId, message]);
+    // }
+    // if (type == "direct") {
+    //   await executeQuery(SENT_MESSAGE, [userId, chatId, message]);
+    // } else {
+    //   await executeQuery(SENT_MESSAGE, [userId, chatId, message]);
+    // }
+    const resSentMessage = (await executeQuery(SENT_MESSAGE, [
       userId,
       chatId,
-    ])) as messagesType[];
+      message,
+      type,
+    ])) as ResultSetHeader;
+
+    if (resSentMessage?.affectedRows === 0) return null;
+
+    if (type == "direct") {
+      console.log("sival");
+      result = (await executeQuery(GET_DIRECT_MESSAGE_AFTER, [
+        chatId,
+        userId,
+        chatId,
+        userId,
+      ])) as messagesType[];
+    } else {
+      result = (await executeQuery(GET_MESSAGE_AFTER, [
+        userId,
+        chatId,
+      ])) as messagesType[];
+    }
 
     if (!init) {
       // 입력 메세지와, 시스템메세지을떄 마지막 메세지만 반환
@@ -247,3 +277,107 @@ export const deleteChatRoom = async (chatId: string) => {
 //   const result = role === UserRole.Admin;
 //   return result;
 // };
+
+export const deleteMessageAndGetMessages = async (
+  userId: number,
+  chatId: number,
+  messageId: number,
+) => {
+  await executeQuery(DELETE_TEXT_MESSAGE, [messageId]);
+  const result = (await executeQuery(GET_MESSAGE_AFTER, [
+    userId,
+    chatId,
+  ])) as messagesType[];
+  return result;
+};
+
+export const getDirectMessages = async (chatId: number, userId: number) => {
+  try {
+    const res = await executeQuery(GET_DIRECT_MESSAGE_AFTER, [
+      chatId,
+      userId,
+      chatId,
+      userId,
+    ]);
+    const data = res as messagesType[];
+    return data;
+  } catch (error) {
+    console.error("메시지 전송 중 오류 발생:", error);
+    throw error;
+  }
+};
+
+// DM방 입장 쿼리
+export const directMessagesJoinRoom = async (
+  userId: number,
+  chatId: number,
+) => {
+  // 둘중에 작은 숫자
+  const smaller = userId > chatId ? chatId : userId;
+  // 둘중에 큰 숫자
+  const bigger = userId > chatId ? userId : chatId;
+  try {
+    await executeQuery(JOIN_DIRECT_ROOMS, [smaller, bigger]);
+  } catch (error) {
+    console.error("방 입장 중 오류 발생:", error);
+    throw error;
+  }
+};
+
+// DM목록 조회
+export const enteredDMList = async (userId: number) => {
+  // 둘중에 작은 숫자
+  try {
+    const dmLists = await executeQuery(GET_USER_CONNECTED_DM, [
+      userId,
+      userId,
+      userId,
+      userId,
+      userId,
+    ]);
+    return dmLists;
+  } catch (error) {
+    console.error("방 멤버 목록 조회 중 오류 발생:", error);
+    throw error;
+  }
+};
+
+export const isUserDMRoom = async (
+  userId: number,
+  chatId: number,
+): Promise<boolean> => {
+  const result = await executeQuery(IS_USER_CONNECTED_DM, [
+    userId,
+    chatId,
+    userId,
+    chatId,
+  ]);
+  const isUserInRoom = result as { count: number }[];
+  return isUserInRoom[0]?.count > 0 ? true : false;
+};
+
+// 방 나가기
+export const leaveDM = async (
+  userId: number,
+  chatId: number,
+): Promise<boolean> => {
+  try {
+    const res = (await executeQuery(LEAVE_DM, [
+      chatId,
+      userId,
+      chatId,
+      userId,
+    ])) as ResultSetHeader;
+    console.log("res: ", res);
+
+    return res?.affectedRows > 0;
+  } catch (error) {
+    console.error("방 나가기 중 오류 발생:", error);
+    throw error;
+  }
+};
+
+export const deleteDMRoom = async (chatId: string, userId: number) => {
+  await executeQuery(DELETE_DM_MESSAGES, [chatId]);
+  await executeQuery(DELETE_DM_CHAT_ROOM, [chatId, userId, chatId, userId]);
+};

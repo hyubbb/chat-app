@@ -8,7 +8,9 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
       <HeaderMenu />
       <div className="flex h-[calc(100vh-70px)] overflow-hidden">
         <SideMenu />
-        {children}
+        <main className="flex flex-1 flex-col dark:bg-zinc-800">
+          {children}
+        </main>
       </div>
     </div>
   );

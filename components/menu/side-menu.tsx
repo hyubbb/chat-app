@@ -17,6 +17,7 @@ import { useCategoryQuery } from "@/hooks/use-category-query";
 import { useRoomQuery } from "@/hooks/use-room-query";
 import { useUserQuery } from "@/hooks/use-user-query";
 import { useCategorySocket } from "@/hooks/use-category-socket";
+import { useDirectQuery } from "@/hooks/use-direct-query";
 
 export const SideMenu = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -29,7 +30,10 @@ export const SideMenu = () => {
   const pathname = usePathname();
   const { data: user } = useUserQuery();
   const { setSelected, selected } = useRoomStore();
-
+  const { dmList } = useDirectQuery({
+    user: user ?? defaultUser,
+    direct: true,
+  });
   // 카테고리 데이터 socket
   useCategorySocket();
   const {
@@ -63,13 +67,15 @@ export const SideMenu = () => {
       <SideMenuDirect
         toggleCollapse={toggleCollapse}
         collapseState={collapseState}
+        dmList={dmList}
+        user={user}
       />
 
       {/* Chat Rooms List */}
       <div className="h-full overflow-y-auto p-4">
         <div className="mb-4 flex items-center justify-between">
           <h2 className="font-semibold">채팅방</h2>
-          {user && (
+          {user && user.id && (
             <button
               onClick={() => setIsModalOpen(true)}
               className="mr-1 rounded p-1 text-blue-500 hover:bg-blue-100"

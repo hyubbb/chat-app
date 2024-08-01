@@ -1,15 +1,17 @@
 import {
   deleteChatRoom,
+  directMessagesJoinRoom,
+  enteredDMList,
   enteredRoomList,
   getCategoryRooms,
-  getMessages,
-  getRoomMembers,
-  isUserInRoom,
-  joinRoom,
+  getDirectMessages,
+  isUserDMRoom,
+  leaveDM,
   leaveRoom,
   sendMessageAndGetMessages,
 } from "@/lib/service/service";
 import { NextApiResponseServerIo } from "@/types";
+import { createDMRoomId } from "@/util/utils";
 import { NextApiRequest } from "next";
 
 export default async function handler(
@@ -21,7 +23,7 @@ export default async function handler(
     if (!chatId) {
       return res.status(400).json({ error: "Invalid request" });
     }
-    const result = await getRoomMembers(+chatId);
+    const result = await enteredDMList(+chatId);
     // res?.socket?.server?.io?.emit("joinRoomList", result);
     res.status(200).json({ result, success: true });
   }
@@ -30,7 +32,7 @@ export default async function handler(
     try {
       const chatId = parseInt(req.query.chatId as string, 10);
       const userId = parseInt(req.body.userId, 10);
-      const { userName, direct } = req.body;
+      const { userName } = req.body;
       let result;
       let ROOM_TYPE;
       let MESSAGE_TYPE;
@@ -46,31 +48,23 @@ export default async function handler(
           .json({ error: "Socket.IO server not initialized" });
       }
 
-      const isEntered = await isUserInRoom(userId, chatId);
-      if (isEntered) {
-        result = await getMessages(chatId, userId);
-        ROOM_TYPE = `userRoom:${userId}`;
-      } else {
-        await joinRoom(userId, chatId);
-        MESSAGE_TYPE = "system";
-        result = await sendMessageAndGetMessages({
-          userId,
-          chatId,
-          message: `${userName}님이 채팅방에 참여했습니다.`,
-          init: true,
-          type: MESSAGE_TYPE,
-        });
-        ROOM_TYPE = `chatRoom:${chatId}`;
+      const isEntered = await isUserDMRoom(userId, chatId);
+      const DM_ROOM_NAME = createDMRoomId(chatId, userId);
+      if (!isEntered) {
+        await directMessagesJoinRoom(userId, chatId);
       }
+      result = await getDirectMessages(chatId, userId);
+      MESSAGE_TYPE = "direct";
 
+      const userEnteredRoomList = await enteredDMList(userId);
       // 방문한 방의 목록
-      const userEnteredRoomList = await enteredRoomList(userId);
-      io.to(ROOM_TYPE).emit("messages", {
+      io.to(`dm_${DM_ROOM_NAME}:${userId}`).emit("getDirectMessages", {
         chatId,
         messages: result,
         messages_type: MESSAGE_TYPE,
       });
-      io.to(`userRoom:${userId}`).emit("joinRoomList", userEnteredRoomList);
+
+      io.to(`userRoom:${userId}`).emit("joinDmList", userEnteredRoomList);
 
       res.status(200).json({
         success: true,
@@ -106,7 +100,7 @@ export default async function handler(
       message,
       type: MESSAGE_TYPE,
     });
-
+    const DM_ROOM_NAME = createDMRoomId(+chatId, userId);
     const io = res?.socket?.server?.io;
     if (!io) {
       return res
@@ -115,28 +109,33 @@ export default async function handler(
     }
 
     // 채팅방 나가기
-    const isSuccess = await leaveRoom(+userId, +chatId);
+    const isSuccess = await leaveDM(+userId, +chatId);
+    console.log("isSuccess : ", isSuccess);
+    console.log("resultMessage : ", resultMessage);
     if (isSuccess) {
       // 참여중인 채팅방 목록 조회
-      const result = await enteredRoomList(+userId);
+      const result = await enteredDMList(+userId);
 
-      io.to(`chatRoom:${chatId}`).emit("messages", {
+      io.to(`dm_${DM_ROOM_NAME}`).emit("messages", {
         chatId: +chatId,
         messages: resultMessage,
         messages_type: MESSAGE_TYPE,
       });
-      io.to(`userRoom:${userId}`).emit("leaveRoom", {
-        chatId: +chatId,
-        userId: +userId,
-      });
+      // io.to(`userRoom:${userId}`).emit("leaveRoom", {
+      //   chatId: +chatId,
+      //   userId: +userId,
+      // });
 
-      io.to(`${chatId}`).emit("messages", { chatId });
-      io.to(`${userId}`).emit("leaveRoom", { chatId });
+      // io.to(`${chatId}`).emit("messages", { chatId });
+      // io.to(`${userId}`).emit("leaveRoom", { chatId });
 
-      io.to(`chatRoom:${chatId}`).emit("messages", { chatId });
-      io.to(`userRoom:${userId}`).emit("leaveRoom", { chatId });
+      // io.to(`chatRoom:${chatId}`).emit("messages", { chatId });
+      // io.to(`userRoom:${userId}`).emit("leaveRoom", { chatId });
 
-      io.to(`userRoom:${userId}`).emit("joinRoomList", result);
+      // io.to(`userRoom:${userId}`).emit("joinRoomList", result);
+      const userEnteredRoomList = await enteredDMList(userId);
+      io.to(`userRoom:${userId}`).emit("joinDmList", userEnteredRoomList);
+
       res.status(200).json({ result, success: true });
     }
 
