@@ -1,12 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
-import { useStore } from "./use-store";
 import { CategoriesType, RoomsType } from "@/types";
 
 export const useRoomQuery = ({
   categories,
   userId,
 }: {
-  categories?: CategoriesType;
+  categories?: CategoriesType | null;
   userId?: number | null;
 }) => {
   const {

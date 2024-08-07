@@ -1,15 +1,12 @@
-import { useStore } from "@/hooks/use-store";
-import { useUserQuery } from "@/hooks/use-user-query";
-import { useQueryClient } from "@tanstack/react-query";
+import { useAuthStore } from "@/store/authStore";
+import { useStore } from "@/store/use-store";
 import axios from "axios";
-import { query, set } from "firebase/database";
-import { Plus, X } from "lucide-react";
+import { X } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
-import { FormEventHandler, use, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export const LoginModal = () => {
   const inputRef = useRef<HTMLInputElement>(null);
-  const queryClient = useQueryClient();
   const pathname = usePathname();
   const router = useRouter();
   const { isLoginModalOpen, setIsLoginModalOpen } = useStore();
@@ -17,6 +14,7 @@ export const LoginModal = () => {
     id: "",
     password: "",
   });
+  const setToken = useAuthStore((state) => state.setToken);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -25,15 +23,11 @@ export const LoginModal = () => {
         id: userInfo.id,
         password: userInfo.password,
       });
-
-      const { success, data } = res.data;
-
+      const { success, token } = res.data;
       if (!success) {
         return alert("아이디 또는 비밀번호가 일치하지 않습니다.");
       }
-
-      // setUser(data);
-      queryClient.setQueryData(["user"], data);
+      setToken(token);
       setUserInfo({ id: "", password: "" });
       return setIsLoginModalOpen(false);
     } catch (error) {

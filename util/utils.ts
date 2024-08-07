@@ -12,41 +12,25 @@ export const dateFormatted = (dbTime: string) => {
   return formattedDate;
 };
 
-export const useInput = (initialValue: string) => {
-  // const [value, setValue] = useState(initialValue);
-  const [value, setValue] = useState(initialValue);
-  const [debouncedValue, setDebouncedValue] = useState(initialValue);
-
-  const handleChange = (e) => {
-    setValue(e.target.value);
-  };
-
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedValue(value);
-    }, 500);
-
-    return () => {
-      clearTimeout(handler);
-    };
-  }, [value]);
-
-  const reset = () => {
-    setValue(initialValue);
-    setDebouncedValue(initialValue);
-  };
-
-  return {
-    value,
-    setValue,
-    onChange: handleChange,
-    debouncedValue, // 디바운스된 값을 반환
-    reset,
-  };
-};
-
 export const createDMRoomId = (userId1: number, userId2: number): string => {
   // 항상 작은 ID가 앞에 오도록 정렬
   const sortedIds = [userId1, userId2].sort((a, b) => a - b);
   return `${sortedIds[0]}_${sortedIds[1]}`;
+};
+
+export const dateName = (file) => {
+  const now = new Date();
+  const timestamp = `${now.getFullYear()}${(now.getMonth() + 1)
+    .toString()
+    .padStart(2, "0")}${now.getDate().toString().padStart(2, "0")}_${now
+    .getHours()
+    .toString()
+    .padStart(2, "0")}${now.getMinutes().toString().padStart(2, "0")}${now
+    .getSeconds()
+    .toString()
+    .padStart(2, "0")}`;
+
+  // 고유한 파일 이름 생성
+  const uniqueFileName = `${timestamp}_${file.name}`;
+  return uniqueFileName;
 };

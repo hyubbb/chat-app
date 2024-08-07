@@ -8,7 +8,7 @@ import {
   isUserDMRoom,
   leaveDM,
   leaveRoom,
-  sendMessageAndGetMessages,
+  sendDMAndGetDM,
 } from "@/lib/service/service";
 import { NextApiResponseServerIo } from "@/types";
 import { createDMRoomId } from "@/util/utils";
@@ -24,7 +24,6 @@ export default async function handler(
       return res.status(400).json({ error: "Invalid request" });
     }
     const result = await enteredDMList(+chatId);
-    // res?.socket?.server?.io?.emit("joinRoomList", result);
     res.status(200).json({ result, success: true });
   }
 
@@ -33,14 +32,12 @@ export default async function handler(
       const chatId = parseInt(req.query.chatId as string, 10);
       const userId = parseInt(req.body.userId, 10);
       const { userName } = req.body;
+      const DM_ROOM_NAME = createDMRoomId(chatId, userId);
       let result;
-      let ROOM_TYPE;
       let MESSAGE_TYPE;
-
       if (isNaN(chatId) || isNaN(userId) || !userName) {
         return res.status(400).json({ error: "Invalid request parameters" });
       }
-
       const io = res?.socket?.server?.io;
       if (!io) {
         return res
@@ -49,7 +46,6 @@ export default async function handler(
       }
 
       const isEntered = await isUserDMRoom(userId, chatId);
-      const DM_ROOM_NAME = createDMRoomId(chatId, userId);
       if (!isEntered) {
         await directMessagesJoinRoom(userId, chatId);
       }
@@ -87,14 +83,14 @@ export default async function handler(
 
   if (req.method === "PATCH") {
     const { chatId } = req.query;
-    const { userId, userName } = req.body;
-    if (!userId || !chatId || !userName) {
+    const { userId, userName, exit_count } = req.body;
+    if (!userId || !chatId || !userName || isNaN(exit_count)) {
       return res.status(400).json({ error: "Invalid request" });
     }
     // 채팅방 나가기 시스템 메세지 전송 및 메세지 불러오기
     let MESSAGE_TYPE = "system";
     const message = `${userName}님이 나가셨습니다.`;
-    const resultMessage = await sendMessageAndGetMessages({
+    const resultMessage = await sendDMAndGetDM({
       userId: +userId,
       chatId: +chatId,
       message,
@@ -110,8 +106,7 @@ export default async function handler(
 
     // 채팅방 나가기
     const isSuccess = await leaveDM(+userId, +chatId);
-    console.log("isSuccess : ", isSuccess);
-    console.log("resultMessage : ", resultMessage);
+
     if (isSuccess) {
       // 참여중인 채팅방 목록 조회
       const result = await enteredDMList(+userId);
@@ -121,18 +116,7 @@ export default async function handler(
         messages: resultMessage,
         messages_type: MESSAGE_TYPE,
       });
-      // io.to(`userRoom:${userId}`).emit("leaveRoom", {
-      //   chatId: +chatId,
-      //   userId: +userId,
-      // });
 
-      // io.to(`${chatId}`).emit("messages", { chatId });
-      // io.to(`${userId}`).emit("leaveRoom", { chatId });
-
-      // io.to(`chatRoom:${chatId}`).emit("messages", { chatId });
-      // io.to(`userRoom:${userId}`).emit("leaveRoom", { chatId });
-
-      // io.to(`userRoom:${userId}`).emit("joinRoomList", result);
       const userEnteredRoomList = await enteredDMList(userId);
       io.to(`userRoom:${userId}`).emit("joinDmList", userEnteredRoomList);
 

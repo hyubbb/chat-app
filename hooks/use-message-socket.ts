@@ -2,56 +2,60 @@
 
 "use client";
 
-import { useEffect } from "react";
-import { useStore } from "./use-store";
+import { useCallback, useEffect, useState } from "react";
+import { useStore } from "../store/use-store";
 import { useQueryClient } from "@tanstack/react-query";
 import { messagesType } from "@/types";
 
 type categoriesPropsType = {
   chatId: number;
-  messages: messagesType[];
+  messages: messagesType[] | messagesType;
   messages_type?: string;
+  startTime: number;
 };
 
 export const useMessageSocket = ({ chatId }: { chatId: number }) => {
   const { socket, isConnected } = useStore();
   const queryClient = useQueryClient();
 
-  const handleMessageUpdate = ({
-    chatId,
-    messages,
-    messages_type,
-  }: categoriesPropsType) => {
-    queryClient.setQueryData(
-      ["messages", chatId],
-      (oldData: messagesType[]) => {
-        if (!oldData || !oldData.length || !messages_type) {
-          // 초기 로딩: messages가 배열일 것으로 예상
-          return Array.isArray(messages) ? messages : [messages];
-        }
+  const handleMessageUpdate = useCallback(
+    ({ chatId, messages, messages_type, startTime }: categoriesPropsType) => {
+      const endTime = performance.now();
+      const duration = endTime - startTime;
+      console.log(`Socket.IO 처리 시간: ${duration.toFixed(2)}ms`);
 
-        // 넘어온 메세지가 배열이 아닌경우: 메세지나, 시스템메세지
-        // 배열인경우 기존에 채팅방에 접속중이어서 대화가 있는 경우
-        if (
-          (oldData.length === 1 && !messages_type) ||
-          messages_type === "deleted"
-        ) {
-          return messages;
-        }
+      queryClient.setQueryData(
+        ["messages", chatId],
+        (oldData: messagesType[]) => {
+          if (!oldData || !oldData.length || !messages_type) {
+            return Array.isArray(messages) ? messages : [messages];
+          }
 
-        return Array.isArray(messages)
-          ? [...oldData, ...messages]
-          : [...oldData, messages];
-      },
-    );
-  };
+          if (
+            (oldData.length === 1 && !messages_type) ||
+            messages_type === "deleted"
+          ) {
+            return messages;
+          }
+
+          return Array.isArray(messages)
+            ? [...oldData, ...messages]
+            : [...oldData, messages];
+        },
+      );
+    },
+    [queryClient],
+  );
 
   useEffect(() => {
     if (!socket || !isConnected) return;
+
     socket.on("messages", handleMessageUpdate);
+    socket.on("receiveMessage", handleMessageUpdate);
 
     return () => {
       socket.off("messages", handleMessageUpdate);
+      socket.off("receiveMessage", handleMessageUpdate);
     };
-  }, [socket, isConnected]);
+  }, [socket, isConnected, handleMessageUpdate]);
 };

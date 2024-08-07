@@ -15,7 +15,7 @@ import { SideMenuCategory } from "./side-menu-category";
 import { SideMenuEntered } from "./side-menu-entered";
 import { useCategoryQuery } from "@/hooks/use-category-query";
 import { useRoomQuery } from "@/hooks/use-room-query";
-import { useUserQuery } from "@/hooks/use-user-query";
+import { useUserQuery } from "@/store/use-user-query";
 import { useCategorySocket } from "@/hooks/use-category-socket";
 import { useDirectQuery } from "@/hooks/use-direct-query";
 
@@ -30,10 +30,7 @@ export const SideMenu = () => {
   const pathname = usePathname();
   const { data: user } = useUserQuery();
   const { setSelected, selected } = useRoomStore();
-  const { dmList } = useDirectQuery({
-    user: user ?? defaultUser,
-    direct: true,
-  });
+  const { dmList } = useDirectQuery({ user: user, chatId: null });
   // 카테고리 데이터 socket
   useCategorySocket();
   const {
@@ -49,6 +46,7 @@ export const SideMenu = () => {
 
   const handleCategoryClick = (category: CategoriesType) => {
     setSelected(category);
+
     if (pathname !== "/") {
       router.push("/");
     }
@@ -94,11 +92,13 @@ export const SideMenu = () => {
             selected={selected}
           />
           {/* 참여중인 채팅방 - 변경 없음 */}
-          <SideMenuEntered
-            toggleCollapse={toggleCollapse}
-            collapseState={collapseState}
-            joinRoomData={joinRoomData}
-          />
+          {user && user.id && (
+            <SideMenuEntered
+              toggleCollapse={toggleCollapse}
+              collapseState={collapseState}
+              joinRoomData={joinRoomData}
+            />
+          )}
         </div>
       </div>
       <RoomCreateModal

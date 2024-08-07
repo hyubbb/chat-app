@@ -15,6 +15,8 @@ const nextConfig = {
       "utfs.io",
       "lh3.googleusercontent.com",
       "i.pinimg.com",
+      "chat-app-s3-hyub.s3.ap-northeast-2.amazonaws.com",
+      "chat-app-s3-hyub.s3.amazonaws.com",
     ],
   },
 };

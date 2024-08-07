@@ -1,6 +1,6 @@
 "use client";
 
-import { useStore } from "@/hooks/use-store";
+import { useStore } from "@/store/use-store";
 import { ErrorProps } from "next/error";
 import { useEffect, useState } from "react";
 import { io as ClientIO } from "socket.io-client";

@@ -1,45 +1,57 @@
 import { useQuery } from "@tanstack/react-query";
 import { dmListType, messagesType, UserType } from "@/types";
 import axios from "axios";
+import { createDMRoomId } from "@/util/utils";
+import { useEffect, useState } from "react";
 
 type useDirectQueryType = {
-  chatId?: number;
-  user: UserType;
-  direct?: boolean;
+  user: UserType | null;
+  chatId?: number | null;
 };
 
-export const useDirectQuery = ({
-  chatId,
-  user,
-  direct = false,
-}: useDirectQueryType) => {
-  const isUser = user.user_id;
+export const useDirectQuery = ({ user, chatId }: useDirectQueryType) => {
+  const [dmRoomId, setDmRoomId] = useState<string | null>(null);
+  useEffect(() => {
+    if (chatId && user?.user_id) {
+      const newDmRoomId: string = createDMRoomId(chatId, user?.user_id);
+      setDmRoomId(newDmRoomId);
+    }
+  }, [chatId, user]);
+
   const getMessages = async () => {
-    if (!isUser || !chatId) return null;
-    const { data } = await axios.post(`/api/socket/direct/${chatId}`, {
-      userId: user?.user_id,
-      userName: user?.user_name,
-      direct,
-    });
-    return data.data.messages;
+    if (!dmRoomId) return [];
+
+    try {
+      const { data } = await axios.post(`/api/socket/direct/${chatId}`, {
+        userId: user?.user_id,
+        userName: user?.user_name,
+        direct: true,
+      });
+      return data?.data?.messages;
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const getDmList = async () => {
-    if (!isUser) return;
-    const { data } = await axios.get(`/api/socket/direct/${user?.user_id}`);
-    return data.result;
+    if (user?.user_id == null) return [];
+    try {
+      const { data } = await axios.get(`/api/socket/direct/${user?.user_id}`);
+      return data.result;
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const {
     data: messages,
     isError: messagesError,
-    isLoading: messagesLoading,
+    isLoading: messagesIsLoading,
   } = useQuery<messagesType[]>({
-    queryKey: ["directMessages"],
-    // queryFn: !receiverId ? getMessages : getDirectMessages,
+    queryKey: ["directMessages", dmRoomId],
     queryFn: getMessages,
     initialData: [],
-    enabled: !!isUser,
+    enabled: !!dmRoomId,
   });
 
   const {
@@ -48,16 +60,15 @@ export const useDirectQuery = ({
     isLoading: dmListLoading,
   } = useQuery<dmListType[]>({
     queryKey: ["dmList"],
-    // queryFn: !receiverId ? getMessages : getDirectMessages,
     queryFn: getDmList,
     initialData: [],
-    enabled: !!isUser,
+    enabled: !!user?.user_id,
   });
 
   return {
     messages,
     messagesError,
-    messagesLoading,
+    messagesIsLoading,
     dmList,
     dmListError,
     dmListLoading,

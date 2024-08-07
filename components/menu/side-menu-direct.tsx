@@ -46,14 +46,7 @@ export const SideMenuDirect = ({
       {!collapseState.dm && (
         <ul className="mt-2 space-y-2">
           {dmList?.map(
-            ({
-              id,
-              from_id,
-              to_id,
-              other_id,
-              other_name,
-              other_photo_url,
-            }: dmListType) => {
+            ({ id, other_id, other_name, other_photo_url }: dmListType) => {
               return (
                 <li
                   key={id}
@@ -63,7 +56,14 @@ export const SideMenuDirect = ({
                   <div className="flex h-12 w-12 items-center justify-center rounded-full bg-zinc-950 text-sm font-bold text-white">
                     {other_photo_url ? (
                       <div className="relative h-12 w-12 overflow-hidden rounded-full bg-white">
-                        <Image src={other_photo_url} fill alt={other_name} />
+                        <Image
+                          src={other_photo_url}
+                          width={100}
+                          height={100}
+                          sizes="100vw"
+                          priority
+                          alt={other_name}
+                        />
                       </div>
                     ) : (
                       <div className="h-12 w-12 rounded-full bg-black"></div>

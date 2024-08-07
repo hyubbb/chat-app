@@ -9,13 +9,16 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.623.0",
     "@tanstack/react-query": "^5.51.11",
     "@tanstack/react-query-devtools": "^5.51.11",
+    "aws-sdk": "^2.1667.0",
     "axios": "^1.7.2",
     "bufferutil": "^4.0.8",
     "clsx": "^2.1.1",
     "firebase": "^10.12.4",
     "firebase-admin": "^12.2.0",
+    "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.414.0",
     "mysql2": "^3.10.3",
     "next": "14.2.5",
@@ -24,12 +27,14 @@
     "query-string": "^9.1.0",
     "react": "^18",
     "react-dom": "^18",
+    "react-hook-form": "^7.52.2",
     "socket.io": "^4.7.5",
     "socket.io-client": "^4.7.5",
     "tailwind-merge": "^2.4.0",
     "zustand": "^4.5.4"
   },
   "devDependencies": {
+    "@types/formidable": "^3.4.5",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",

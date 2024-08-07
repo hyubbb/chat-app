@@ -1,5 +1,13 @@
 export const CREATE_USER = `
-INSERT INTO users (id, user_name, password) VALUES (?, ?, ?)`;
+INSERT INTO users (id, user_name, password, photo_url) VALUES (?, ?, ?, ?)`;
+
+export const UPDATE_USER = `
+UPDATE users SET user_name = ?, photo_url = ? WHERE user_id = ?;
+`;
+
+export const GET_USER_INFO = `
+SELECT user_id, id, user_name, photo_url, role FROM users WHERE user_id = ?;
+`;
 
 export const CHECK_USER_EXISTS = `
   SELECT COUNT(*) as count
@@ -48,6 +56,13 @@ export const CREATE_CHAT_ROOM = `
     INSERT INTO chat_rooms (category_id, room_name, user_id) VALUES (?, ?, ?)
   `;
 
+export const GET_CHAT_ROOM = `
+    SELECT 
+        *
+    FROM chat_rooms
+    WHERE
+        cr.chat_id = ?
+`;
 export const GET_MESSAGE = `
 SELECT 
     m.message_id,
@@ -77,43 +92,47 @@ LIMIT 50;
 `;
 
 export const GET_MESSAGE_AFTER = `
-SELECT 
-    m.message_id,
-    m.chat_id,
-    m.content,
-    m.sent_at,
-    m.message_type,
-    m.receiver_id,
-    u.user_name,
-    u.user_id,
-    u.photo_url
-FROM 
-    messages m
-LEFT JOIN 
-    users u ON m.user_id = u.user_id
-JOIN 
-    room_members rm ON m.chat_id = rm.chat_id AND rm.user_id = ?
-WHERE 
-    m.chat_id = ? AND m.message_type != 'direct'
-    AND m.sent_at >= rm.last_joined_at
-ORDER BY 
-    m.sent_at ASC
-LIMIT 50;
+SELECT * FROM (
+    SELECT 
+        m.message_id,
+        m.chat_id,
+        m.content,
+        m.sent_at,
+        m.message_type,
+        m.receiver_id,
+        u.user_name,
+        u.user_id,
+        u.photo_url
+    FROM 
+        messages m
+    LEFT JOIN 
+        users u ON m.user_id = u.user_id
+    JOIN 
+        room_members rm ON m.chat_id = rm.chat_id AND rm.user_id = ?
+    WHERE 
+        m.chat_id = ? AND m.message_type != 'direct'
+        AND m.sent_at >= rm.last_joined_at
+    ORDER BY 
+        m.sent_at DESC
+    LIMIT 50
+) AS sub
+ORDER BY sent_at ASC;
 `;
 
 export const GET_DIRECT_MESSAGE_AFTER = `
 SELECT * FROM (
     SELECT 
-        m.*,
-        sender.user_name AS user_name,
-        sender.photo_url AS photo_url
-    FROM messages m
-    JOIN direct_rooms dr ON (m.user_id = dr.from_id AND m.chat_id = dr.to_id)
-                         OR (m.user_id = dr.to_id AND m.chat_id = dr.from_id)
-    LEFT JOIN users sender ON m.user_id = sender.user_id
-    WHERE
-        (m.chat_id = ? AND m.user_id = ?) OR (m.user_id = ? AND m.chat_id = ?)
-        AND m.message_type = "direct"
+        m.message_id,
+        m.content,
+        m.sent_at,
+        m.chat_id,
+        m.message_type,
+        u.user_name,
+        u.user_id,
+        u.photo_url
+	from messages m
+    JOIN users u ON u.user_id = m.user_id
+    where m.chat_id = ?
     ORDER BY m.sent_at DESC
     LIMIT 50
 ) AS sub
@@ -183,6 +202,23 @@ WHERE
     rm.user_id = ?;
 `;
 
+// 채팅방 info
+export const GET_CHAT_ROOM_INFO = `
+SELECT DISTINCT
+    cr.chat_id,
+    cr.room_name,
+    cr.user_id,
+    (SELECT COUNT(*) 
+    FROM room_members rm2 
+    WHERE rm2.chat_id = cr.chat_id ) AS user_count
+FROM 
+    room_members rm
+JOIN 
+    chat_rooms cr ON rm.chat_id = cr.chat_id
+WHERE 
+    cr.chat_id = ?;
+`;
+
 // 유저의 역할을 조회
 export const GET_USER_ROLE = `
 SELECT role FROM users WHERE user_id = ?;`;
@@ -200,7 +236,7 @@ SELECT COUNT(*) as count FROM room_members WHERE chat_id = ? AND user_id = ?;`;
 
 // 채팅방 삭제
 export const DELETE_MESSAGES = `
-DELETE FROM  messages WHERE chat_id = ? AND message_type = "direct" ;`;
+DELETE FROM messages WHERE chat_id = ? AND message_type != "direct" ;`;
 export const DELETE_ROOM_MEMBERS = `
 DELETE FROM room_members WHERE chat_id = ?;`;
 export const DELETE_CHAT_ROOM = `
@@ -215,52 +251,50 @@ WHERE message_id = ?;
 `;
 
 export const JOIN_DIRECT_ROOMS = `
-INSERT INTO direct_rooms (to_id, from_id, is_connected)
-VALUES (?, ?, 1)
-ON DUPLICATE KEY UPDATE
-    is_connected = 1,
-    joined_at = CURRENT_TIMESTAMP;
+INSERT INTO direct_rooms (room_id, user_id, other_user_id)
+VALUES (?, ?, ?)
+ON DUPLICATE KEY UPDATE is_connected = 1;
 `;
 
 export const IS_USER_CONNECTED_DM = `
-SELECT COUNT(*) as count FROM direct_rooms WHERE to_id = ? AND from_id = ? || from_id = ? AND to_id = ?;
+SELECT COUNT(*) as count FROM direct_rooms 
+WHERE room_id = ? AND user_id = ?;
 `;
 
 export const GET_USER_CONNECTED_DM = `
- SELECT 
+ SELECT DISTINCT
     dr.id,
-    dr.to_id,
-    dr.from_id,
+    dr.room_id,
+    dr.user_id,
+    dr.other_user_id,
     dr.joined_at,
+    dr.exit_time,
     CASE 
-        WHEN dr.from_id = ? THEN u_to.user_id
+        WHEN dr.user_id = ? THEN u_to.user_id
         ELSE u_from.user_id
     END AS other_id,
     CASE 
-        WHEN dr.from_id = ? THEN u_to.user_name
+        WHEN dr.user_id = ? THEN u_to.user_name
         ELSE u_from.user_name
     END AS other_name,
     CASE 
-        WHEN dr.from_id = ? THEN u_to.photo_url
+        WHEN dr.user_id = ? THEN u_to.photo_url
         ELSE u_from.photo_url
     END AS other_photo_url
 FROM 
     direct_rooms dr
 JOIN 
-    users u_from ON dr.from_id = u_from.user_id
+    users u_from ON dr.user_id = u_from.user_id
 JOIN 
-    users u_to ON dr.to_id = u_to.user_id
+    users u_to ON dr.other_user_id = u_to.user_id
 WHERE 
-    dr.to_id = ? OR dr.from_id = ?
- 
+    dr.user_id = ? OR dr.other_user_id = ?;
 `;
 
 // DM 나가기
-export const LEAVE_DM = `
-DELETE FROM direct_rooms WHERE to_id = ? AND from_id = ? || from_id = ? AND to_id = ?;`;
 
 // DM 채팅방 삭제
 export const DELETE_DM_MESSAGES = `
-DELETE FROM  messages WHERE chat_id = ? AND message_type = "direct";`;
+DELETE FROM messages WHERE chat_id = ? AND user_id = ? AND message_type = "direct";`;
 export const DELETE_DM_CHAT_ROOM = `
-DELETE FROM direct_rooms WHERE to_id = ? and from_id = ? || from_id = ? and to_id = ?;`;
+DELETE FROM direct_rooms WHERE to_id = ? AND from_id = ? || from_id = ? AND to_id = ?;`;

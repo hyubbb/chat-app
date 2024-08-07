@@ -29,14 +29,14 @@ export const defaultUser: UserType = {
 export type RoomsType = {
   chat_id: number;
   room_name: string;
-  active_users: number;
   user_id: number;
+  active_users: number;
 };
 
 export const defaultRooms: RoomsType = {
   chat_id: 0,
   room_name: "",
-  active_users: 0,
+  user_count: 0,
   user_id: 0,
 };
 
@@ -74,9 +74,18 @@ export type messagesType = {
 
 export type dmListType = {
   id: number;
-  from_id: number;
-  to_id: number;
+  room_id: number;
+  user_id: number;
   other_id: number;
   other_name: string;
-  other_photo_url: string;
+  other_photo_url: string | null;
+  exit_time: string | null;
+};
+
+export type useFormType = {
+  id: string;
+  userId?: number;
+  userName: string;
+  password: string;
+  photo: FileList | string | null;
 };

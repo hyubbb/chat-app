@@ -5,12 +5,10 @@ import { defaultCategories, RoomsType } from "@/types";
 import { useRouter } from "next/navigation";
 import { useRoomQuery } from "@/hooks/use-room-query";
 import { Trash } from "lucide-react";
-import { useUserQuery } from "@/hooks/use-user-query";
+import { useUserQuery } from "@/store/use-user-query";
 import axios from "axios";
 
 export const RoomList = () => {
-  const [isDarkMode, setIsDarkMode] = useState(false);
-  // const [rooms, setRooms] = useState<RoomsType[]>();
   const [selectedRoom, setSelectedRoom] = useState<RoomsType | null>(null);
   const { selected: roomsInCategory, setSelectedChat } = useRoomStore();
   const { data: user } = useUserQuery();
@@ -25,7 +23,7 @@ export const RoomList = () => {
   });
 
   const handleDelete = async (chat_id: number) => {
-    const { data } = await axios.delete(`api/socket/chat/${chat_id}`);
+    await axios.delete(`api/socket/chat/${chat_id}`);
   };
   return (
     <>

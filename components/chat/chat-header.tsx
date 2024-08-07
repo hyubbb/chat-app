@@ -1,5 +1,5 @@
 import { useRoomStore } from "@/hooks/use-room-store";
-import { UserType } from "@/types";
+import { RoomsType, UserType } from "@/types";
 import axios from "axios";
 import {
   EllipsisVertical,
@@ -12,9 +12,10 @@ import { useRouter } from "next/navigation";
 type ChatHeaderProps = {
   user: UserType | null;
   chatId: number;
+  roomInfo: RoomsType;
 };
 
-export const ChatHeader = ({ user, chatId }: ChatHeaderProps) => {
+export const ChatHeader = ({ user, chatId, roomInfo }: ChatHeaderProps) => {
   const { selectedChat } = useRoomStore();
   const router = useRouter();
 
@@ -32,10 +33,10 @@ export const ChatHeader = ({ user, chatId }: ChatHeaderProps) => {
     <div className="flex items-center justify-between space-x-2 border-b bg-white p-4 dark:bg-zinc-800 dark:text-zinc-300">
       <div className="flex items-center gap-x-2">
         <MessageSquare size={20} className="text-blue-500" />
-        <h2 className="font-semibold">{selectedChat?.room_name}</h2>
-        {selectedChat?.active_users! > 0 && (
+        <h2 className="font-semibold">{roomInfo?.room_name}</h2>
+        {roomInfo?.user_count! > 0 && (
           <span className="text-sm text-gray-500">
-            {`${selectedChat?.active_users}명 참여중`}
+            {`${roomInfo?.user_count}명 참여중`}
           </span>
         )}
       </div>

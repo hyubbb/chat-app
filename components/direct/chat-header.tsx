@@ -19,9 +19,10 @@ export const ChatHeader = ({ user, chatId, dmInfo }: ChatHeaderProps) => {
   const router = useRouter();
 
   const handleLeaveDM = async () => {
-    const { data } = await axios.patch(`/api/socket/direct/${chatId}`, {
+    const { data } = await axios.patch(`/api/socket/direct/$q{chatId}`, {
       userId: user?.user_id,
       userName: user?.user_name,
+      dmRoomCount: dmInfo?.exit_time,
     });
     if (data?.success) {
       router.push("/");
@@ -34,7 +35,7 @@ export const ChatHeader = ({ user, chatId, dmInfo }: ChatHeaderProps) => {
         <MessageSquare size={20} className="text-blue-500" />
         <h2 className="font-semibold">{dmInfo?.other_name}</h2>
       </div>
-      <div className="group relative cursor-pointer">
+      {/* <div className="group relative cursor-pointer">
         <EllipsisVertical size={20} />
         <div className="absolute right-0 top-0 hidden w-max flex-col gap-2 rounded-md bg-zinc-900 p-2 group-hover:flex">
           <button
@@ -50,7 +51,7 @@ export const ChatHeader = ({ user, chatId, dmInfo }: ChatHeaderProps) => {
             </button>
           )}
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };

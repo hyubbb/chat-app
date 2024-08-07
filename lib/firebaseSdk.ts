@@ -58,7 +58,6 @@ export const getRefreshedToken = async () => {
   if (currentUser) {
     try {
       const token = await currentUser.getIdToken(true);
-      console.log("New token obtained:", token);
       setCookie(null, "auth_token", token, {
         maxAge: 30 * 24 * 60 * 60, // 30 days
         path: "/",

@@ -15,10 +15,10 @@ export const SideMenuEntered = ({
 }: SideMenuEnteredProps) => {
   const router = useRouter();
 
-  const handleChatRoomClick = (chatId:number) => {
+  const handleChatRoomClick = (chatId: number) => {
     // 채팅방 클릭시 이동할 페이지
     router.push(`/chat/${chatId}`);
-  }
+  };
 
   return (
     <div>
@@ -44,9 +44,9 @@ export const SideMenuEntered = ({
       </div>
       {!collapseState.entered && (
         <ul className="space-y-1">
-          {joinRoomData?.map(({ chat_id, room_name,user_count }: any) => (
+          {joinRoomData?.map(({ chat_id, room_name, user_count }: any) => (
             <li
-              onClick={()=>handleChatRoomClick(chat_id)}
+              onClick={() => handleChatRoomClick(chat_id)}
               key={chat_id}
               className="flex cursor-pointer items-center justify-between rounded p-2 text-sm hover:bg-gray-100"
             >

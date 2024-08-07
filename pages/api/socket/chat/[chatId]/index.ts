@@ -22,7 +22,6 @@ export default async function handler(
       return res.status(400).json({ error: "Invalid request" });
     }
     const result = await getRoomMembers(+chatId);
-    // res?.socket?.server?.io?.emit("joinRoomList", result);
     res.status(200).json({ result, success: true });
   }
 
@@ -34,7 +33,6 @@ export default async function handler(
       let result;
       let ROOM_TYPE;
       let MESSAGE_TYPE;
-
       if (isNaN(chatId) || isNaN(userId) || !userName) {
         return res.status(400).json({ error: "Invalid request parameters" });
       }
