@@ -36,9 +36,9 @@ export async function POST(request: NextRequest) {
     );
     response.cookies.set("chat-token", token, {
       httpOnly: true,
-      secure: false,
+      secure: process.env.NODE_ENV === "production",
       path: "/",
-      maxAge: 3600,
+      maxAge: 86400,
       sameSite: "lax",
     });
 

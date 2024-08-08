@@ -4,11 +4,12 @@ import {
   CategoriesType,
   CollapseStateType,
   defaultUser,
+  dmListType,
   UserType,
 } from "@/types";
 import { Plus } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import RoomCreateModal from "../room/room-create-modal";
 import { SideMenuDirect } from "./side-menu-direct";
 import { SideMenuCategory } from "./side-menu-category";
@@ -19,30 +20,58 @@ import { useUserQuery } from "@/store/use-user-query";
 import { useCategorySocket } from "@/hooks/use-category-socket";
 import { useDirectQuery } from "@/hooks/use-direct-query";
 
-export const SideMenu = () => {
+type SideMenuProps = {
+  user: UserType;
+  dmList: dmListType[];
+  categories: CategoriesType[];
+};
+
+export const SideMenu = ({
+  user: initUser,
+  dmList: initDmList,
+  categories: initCategories,
+}: SideMenuProps) => {
+  const router = useRouter();
+  const pathname = usePathname();
+  const { setSelected, selected } = useRoomStore();
+  const [user, setUser] = useState<UserType>(initUser);
+  const [dmList, setDmList] = useState<dmListType[]>(initDmList);
+  const [categories, setCategories] =
+    useState<CategoriesType[]>(initCategories);
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [collapseState, setCollapseState] = useState<CollapseStateType>({
     dm: false,
     room: false,
     entered: false,
   });
-  const router = useRouter();
-  const pathname = usePathname();
-  const { data: user } = useUserQuery();
-  const { setSelected, selected } = useRoomStore();
-  const { dmList } = useDirectQuery({ user: user, chatId: null });
-  // 카테고리 데이터 socket
   useCategorySocket();
-  const {
-    data: categories,
-    isLoading,
-    isError,
-  } = useCategoryQuery({ user: user ?? defaultUser });
 
+  const { data: fetchUser } = useUserQuery();
+  const { dmList: fetchDmList } = useDirectQuery({ user: user, chatId: null });
+  const { data: fetchCategories } = useCategoryQuery({ user: user });
   // 참여중인 채팅방 데이터
   const { joinRoomData, isJoinRoomError, isJoinRoomLoading } = useRoomQuery({
-    userId: user?.user_id ?? defaultUser.user_id,
+    userId: user?.user_id,
   });
+
+  useEffect(() => {
+    if (fetchUser) {
+      setUser(fetchUser);
+    }
+  }, [fetchUser]);
+
+  useEffect(() => {
+    if (fetchDmList) {
+      setDmList(fetchDmList);
+    }
+  }, [fetchDmList]);
+
+  useEffect(() => {
+    if (fetchCategories) {
+      setCategories(fetchCategories);
+    }
+  }, [fetchCategories]);
 
   const handleCategoryClick = (category: CategoriesType) => {
     setSelected(category);
@@ -62,12 +91,15 @@ export const SideMenu = () => {
   return (
     <aside className="w-64 overflow-y-scroll border-r bg-white scrollbar-hide dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
       {/* Direct Messages - 접을 수 있는 기능 */}
-      <SideMenuDirect
-        toggleCollapse={toggleCollapse}
-        collapseState={collapseState}
-        dmList={dmList}
-        user={user}
-      />
+
+      {user && user.id && (
+        <SideMenuDirect
+          toggleCollapse={toggleCollapse}
+          collapseState={collapseState}
+          dmList={dmList}
+          user={user}
+        />
+      )}
 
       {/* Chat Rooms List */}
       <div className="h-full overflow-y-auto p-4">

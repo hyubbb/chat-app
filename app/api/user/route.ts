@@ -10,11 +10,13 @@ import {
   getUserInfo,
   updateUser,
 } from "@/lib/service/service";
+import { cookies } from "next/headers";
 
 const SECRET_KEY = process.env.JWT_SECRET as string;
 
 export async function GET(request: NextRequest) {
   const tokenCookie = request.cookies.get("chat-token");
+
   if (!tokenCookie) {
     return NextResponse.json({ user: null }, { status: 200 });
   }
@@ -24,7 +26,6 @@ export async function GET(request: NextRequest) {
     if (!token) return null;
     const decoded = jwt.verify(token, SECRET_KEY);
 
-    // 실제 애플리케이션에서는 사용자 데이터를 데이터베이스에서 가져옵니다.
     return NextResponse.json({ user: decoded as UserType }, { status: 200 });
   } catch (err) {
     return NextResponse.json({ message: "Invalid token" }, { status: 403 });
@@ -98,9 +99,9 @@ export async function PATCH(request: NextRequest) {
 
     response.cookies.set("chat-token", newToken, {
       httpOnly: true,
-      secure: false,
+      secure: process.env.NODE_ENV === "production",
       path: "/",
-      maxAge: 3600,
+      maxAge: 86400,
       sameSite: "lax",
     });
 

@@ -1,13 +1,50 @@
 import { HeaderMenu } from "@/components/menu/header-menu";
 import { SideMenu } from "@/components/menu/side-menu";
-import React from "react";
+import {
+  fetchCategories,
+  fetchCookiesUser,
+  fetchDmList,
+} from "../actions/actions";
 
-const MainLayout = ({ children }: { children: React.ReactNode }) => {
+import React from "react";
+import { cookies } from "next/headers";
+
+const loginAuth = async () => {
+  try {
+    const cookieStore = cookies();
+    const token = cookieStore.get("chat-token");
+    const res = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/user`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Cookie: `chat-token=${token?.value}`,
+      },
+    });
+
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    console.error("Error in loginAuth:", error);
+    return null;
+  }
+};
+
+const MainLayout = async ({ children }: { children: React.ReactNode }) => {
+  // const { user } = await loginAuth();
+  const resUser = await fetchCookiesUser();
+  const user = (await resUser?.json())?.user || null;
+
+  const resDmList = await fetchDmList(user);
+  const dmList = (await resDmList?.json())?.data || null;
+
+  const resCategories = await fetchCategories();
+  const categories = (await resCategories.json()) || null;
+
   return (
     <div className="flex h-screen flex-col">
-      <HeaderMenu />
+      <HeaderMenu user={user} />
       <div className="flex h-[calc(100vh-70px)] overflow-hidden">
-        <SideMenu />
+        <SideMenu user={user} dmList={dmList} categories={categories} />
         <main className="flex flex-1 flex-col dark:bg-zinc-800">
           {children}
         </main>

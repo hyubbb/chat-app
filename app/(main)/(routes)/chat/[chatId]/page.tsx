@@ -7,7 +7,7 @@ import {
 import { RoomsType } from "@/types";
 
 export const metadata = {
-  title: "Chat page",
+  title: "ROOM CHAT",
 };
 
 type ChatPageProps = {

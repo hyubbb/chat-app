@@ -3,8 +3,15 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { SocketProvider } from "@/components/providers/socket-providers";
 import { QueryProvider } from "@/components/providers/query-provider";
-
+import localFont from "next/font/local";
 const inter = Inter({ subsets: ["latin"] });
+
+const pretendard = localFont({
+  src: "../public/fonts/Pretendard.woff2",
+  display: "swap",
+  weight: "45 920",
+  variable: "--font-pretendard",
+});
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -18,7 +25,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body className={`${pretendard.variable} font-pretendard`}>
         <SocketProvider>
           <QueryProvider>{children}</QueryProvider>
         </SocketProvider>

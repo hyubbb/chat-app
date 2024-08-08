@@ -1,7 +1,7 @@
 import { DirectRoom } from "@/components/direct/direct-room";
 
 export const metadata = {
-  title: "Chat page",
+  title: "DIRECT CHAT",
 };
 
 type DirectMessagePageProps = {

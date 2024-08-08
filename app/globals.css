@@ -36,3 +36,11 @@ body {
     text-wrap: balance;
   }
 }
+
+@font-face {
+  font-family: "Climate Crisis", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+  src: url("/fonts/ClimateCrisis.ttf") format("truetype");
+}

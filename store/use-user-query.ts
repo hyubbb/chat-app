@@ -6,6 +6,8 @@ import axios from "axios";
 
 export const useUserQuery = () => {
   const token = useAuthStore((state) => state.token);
+
+  // token값을 확인하여 로그인 상태인지 확인
   const loginAuth = async () => {
     const { data } = await axios.get("/api/user", {
       headers: {
@@ -17,7 +19,7 @@ export const useUserQuery = () => {
 
   const { data, isError, isLoading, refetch } = useQuery<UserType | null>({
     queryKey: ["user"],
-    initialData: defaultUser,
+    initialData: null,
     queryFn: loginAuth,
     enabled: !!token,
   });

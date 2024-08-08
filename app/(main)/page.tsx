@@ -1,7 +1,7 @@
 import { RoomList } from "@/components/room/room-list";
 
 export const metadata = {
-  title: "Home",
+  title: "WELCOME CHAT APP",
 };
 
 const HomePage = async () => {

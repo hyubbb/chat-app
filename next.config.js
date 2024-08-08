@@ -19,6 +19,20 @@ const nextConfig = {
       "chat-app-s3-hyub.s3.amazonaws.com",
     ],
   },
+  async headers() {
+    return [
+      {
+        source: "/api/:path*",
+        headers: [
+          { key: "Access-Control-Allow-Credentials", value: "true" },
+          {
+            key: "Access-Control-Allow-Origin",
+            value: process.env.NEXT_PUBLIC_SITE_URL,
+          },
+        ],
+      },
+    ];
+  },
 };
 
 module.exports = nextConfig;

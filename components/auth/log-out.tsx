@@ -11,7 +11,7 @@ export const Logout = ({ user }: { user: UserType }) => {
   const { isEditModalOpen, setIsEditModalOpen } = useStore();
   const queryClient = useQueryClient();
   const router = useRouter();
-  const { setToken } = useAuthStore();
+  const { setToken, clearToken } = useAuthStore();
 
   const handleLogout = async () => {
     try {
@@ -23,12 +23,12 @@ export const Logout = ({ user }: { user: UserType }) => {
 
       if (res.status !== 200) throw new Error("로그아웃 실패");
 
-      router.push("/");
-      queryClient.setQueryData(["user"], null);
+      queryClient.setQueryData(["user"], []);
       queryClient.removeQueries({ queryKey: ["dmList"] });
       queryClient.removeQueries({ queryKey: ["joinRoomList"] });
       delete axios.defaults.headers.common["chat-token"];
-      setToken(null);
+      clearToken();
+      router.push("/");
     } catch (error) {
       console.error("로그아웃 실패 : ", error);
     }
@@ -39,7 +39,7 @@ export const Logout = ({ user }: { user: UserType }) => {
   };
 
   return (
-    <div className="flex w-full items-center justify-between space-x-2">
+    <div className="flex items-center space-x-2">
       <div className="flex items-center gap-x-3">
         {user?.photo_url && (
           <Image

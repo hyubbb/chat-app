@@ -14,7 +14,6 @@ export const SideMenuDirect = ({
   toggleCollapse,
   collapseState,
   dmList,
-  user,
 }: SideMenuDirectProps) => {
   const router = useRouter();
   const handleClick = (chatId: number) => {
