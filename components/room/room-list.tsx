@@ -19,7 +19,7 @@ export const RoomList = () => {
   };
 
   const { categoryData: rooms } = useRoomQuery({
-    categories: roomsInCategory ?? defaultCategories,
+    categories: roomsInCategory,
   });
 
   const handleDelete = async (chat_id: number) => {
@@ -38,7 +38,7 @@ export const RoomList = () => {
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
               {rooms?.map(
                 (
-                  { chat_id, room_name, active_users, user_id }: RoomsType,
+                  { chat_id, room_name, user_count, user_id }: RoomsType,
                   idx,
                 ) => (
                   <div
@@ -61,7 +61,7 @@ export const RoomList = () => {
                       )}
                     </div>
                     <p className="text-sm text-gray-500">
-                      {`${active_users}명 참여중`}
+                      {`${user_count}명 참여중`}
                     </p>
                   </div>
                 ),
@@ -71,7 +71,11 @@ export const RoomList = () => {
         ) : (
           // 초기 화면
           <div className="dark:text-zinc-3 flex h-full items-center justify-center dark:bg-zinc-800">
-            <p className="text-xl text-gray-500">채팅방을 선택해주세요</p>
+            <p className="text-xl text-gray-500">
+              {user && user.user_id
+                ? "채팅방을 선택해주세요"
+                : "로그인 해주세요"}
+            </p>
           </div>
         )}
       </main>

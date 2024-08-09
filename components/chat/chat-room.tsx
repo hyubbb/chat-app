@@ -1,25 +1,26 @@
 "use client";
-import { use, useEffect, useState } from "react";
+import { useEffect } from "react";
 import { redirect } from "next/navigation";
 
 import { useStore } from "@/store/use-store";
 import { useMessageSocket } from "@/hooks/use-message-socket";
 import { useRoomSocket } from "@/hooks/use-room-socket";
 import { useUserQuery } from "@/store/use-user-query";
-import { defaultCategories, defaultUser } from "@/types";
+import { RoomsType } from "@/types";
 
 import { ChatInput } from "./chat-input";
 import { ChatHeader } from "./chat-header";
 import { ChatMessage } from "./chat-message";
 import { useMessageQuery } from "@/hooks/use-message.query";
-import { Loading } from "../loading";
 
 export const ChatRoom = ({
   chatId,
   roomInfo,
+  usersList,
 }: {
   chatId: number;
-  roomInfo: any;
+  roomInfo: RoomsType;
+  usersList: any;
 }) => {
   const { setIsLoginModalOpen } = useStore();
   const { data: user, isLoading: userIsLoading } = useUserQuery();
@@ -46,7 +47,12 @@ export const ChatRoom = ({
 
   return (
     <>
-      <ChatHeader user={user} chatId={chatId} roomInfo={roomInfo} />
+      <ChatHeader
+        user={user}
+        chatId={chatId}
+        roomInfo={roomInfo}
+        usersList={usersList}
+      />
       <ChatMessage
         messages={messages}
         user={user}

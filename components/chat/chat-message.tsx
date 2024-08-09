@@ -1,7 +1,7 @@
 import { messagesType, UserType } from "@/types";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Loading } from "../loading";
 import { FileUploadModal } from "../modal/file-upload-modal";
 import { ChatItem } from "./chat-item";
@@ -21,8 +21,16 @@ export const ChatMessage = ({
 }: ChatMessageProps) => {
   const router = useRouter();
   const bottomRef = useRef<HTMLDivElement>(null);
+  const [init, setInit] = useState(true);
   useEffect(() => {
-    bottomRef?.current?.scrollIntoView({ behavior: "smooth" });
+    if (init) {
+      bottomRef?.current?.scrollIntoView({ behavior: "instant" });
+      setTimeout(() => {
+        setInit(false);
+      }, 2000);
+    } else {
+      bottomRef?.current?.scrollIntoView({ behavior: "smooth" });
+    }
   }, [bottomRef, messages]);
 
   const directMessage = ({ userId }: { userId: number }) => {
@@ -47,7 +55,7 @@ export const ChatMessage = ({
   };
   if (isLoading) return <Loading />;
   return (
-    <div className="mt-auto flex flex-col gap-y-2 overflow-y-auto dark:text-zinc-300">
+    <div className="mt-auto flex flex-col gap-y-2 overflow-y-auto overflow-x-hidden dark:text-zinc-300">
       {/* Chat messages would go here */}
       {messages &&
         messages?.map((data) => {

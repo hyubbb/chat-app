@@ -8,10 +8,15 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 
 export const Logout = ({ user }: { user: UserType }) => {
-  const { isEditModalOpen, setIsEditModalOpen } = useStore();
+  const {
+    isEditModalOpen,
+    setIsEditModalOpen,
+    isMenuModalOpen,
+    setIsMenuModalOpen,
+  } = useStore();
   const queryClient = useQueryClient();
   const router = useRouter();
-  const { setToken, clearToken } = useAuthStore();
+  const { clearToken } = useAuthStore();
 
   const handleLogout = async () => {
     try {
@@ -28,6 +33,7 @@ export const Logout = ({ user }: { user: UserType }) => {
       queryClient.removeQueries({ queryKey: ["joinRoomList"] });
       delete axios.defaults.headers.common["chat-token"];
       clearToken();
+      setIsMenuModalOpen(false);
       router.push("/");
     } catch (error) {
       console.error("로그아웃 실패 : ", error);
@@ -39,32 +45,31 @@ export const Logout = ({ user }: { user: UserType }) => {
   };
 
   return (
-    <div className="flex items-center space-x-2">
-      <div className="flex items-center gap-x-3">
+    <div className="flex items-center space-x-2 max-sm:w-full">
+      <div className="flex w-full items-center gap-x-3 max-sm:hidden">
         {user?.photo_url && (
           <Image
             src={user?.photo_url}
             width={40}
             height={40}
-            sizes="100vw"
             alt={user?.user_name}
-            className="h-12 w-12 rounded-full bg-white object-cover"
+            className="rounded-full bg-white"
           />
         )}
         <span className="font-semibold dark:text-zinc-300">
           {user?.user_name}
         </span>
       </div>
-      <div className="flex items-center gap-x-4">
+      <div className="flex w-full items-center gap-x-4 p-[10px]">
         <button
           onClick={handleEditProfile}
-          className="flex items-center space-x-1 rounded-md bg-yellow-400/80 px-4 py-2 text-white transition hover:bg-yellow-600"
+          className="flex items-center justify-center space-x-1 rounded-md bg-yellow-400/80 px-4 py-2 text-white transition hover:bg-yellow-600 max-sm:flex-1"
         >
           <UserCog size={18} />
         </button>
         <button
           onClick={handleLogout}
-          className="flex items-center space-x-1 rounded-md bg-red-400/80 px-4 py-2 text-white transition hover:bg-red-600"
+          className="flex items-center justify-center space-x-1 rounded-md bg-red-400/80 px-4 py-2 text-white transition hover:bg-red-600 max-sm:flex-1"
         >
           <LogOut size={18} />
         </button>

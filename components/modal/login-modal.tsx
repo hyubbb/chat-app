@@ -9,7 +9,8 @@ export const LoginModal = () => {
   const inputRef = useRef<HTMLInputElement>(null);
   const pathname = usePathname();
   const router = useRouter();
-  const { isLoginModalOpen, setIsLoginModalOpen } = useStore();
+  const { isLoginModalOpen, setIsLoginModalOpen, setIsMenuModalOpen } =
+    useStore();
   const [userInfo, setUserInfo] = useState({
     id: "",
     password: "",
@@ -29,7 +30,8 @@ export const LoginModal = () => {
       }
       setToken(token);
       setUserInfo({ id: "", password: "" });
-      return setIsLoginModalOpen(false);
+      setIsMenuModalOpen(false);
+      setIsLoginModalOpen(false);
     } catch (error) {
       console.error("Error getting user:", error);
     }

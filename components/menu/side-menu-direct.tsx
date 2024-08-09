@@ -21,7 +21,7 @@ export const SideMenuDirect = ({
   };
 
   return (
-    <div className="border-b p-4 dark:border-zinc-700">
+    <div className="border-b p-4 max-sm:p-2 dark:border-zinc-700">
       <div
         className="flex cursor-pointer items-center justify-between"
         onClick={() => toggleCollapse("dm")}
@@ -43,16 +43,16 @@ export const SideMenuDirect = ({
         </div>
       </div>
       {!collapseState.dm && (
-        <ul className="mt-2 space-y-2">
+        <ul className="mt-2 max-sm:flex max-sm:gap-x-2 sm:space-y-2">
           {dmList?.map(
             ({ id, other_id, other_name, other_photo_url }: dmListType) => {
               return (
                 <li
                   key={id}
                   onClick={() => handleClick(other_id)}
-                  className="flex items-center space-x-3 rounded p-1 hover:bg-gray-200 hover:text-zinc-700"
+                  className="flex items-center rounded p-1 hover:bg-gray-200 hover:text-zinc-700 max-sm:flex-col max-sm:gap-y-2 sm:space-x-4"
                 >
-                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-zinc-950 text-sm font-bold text-white">
+                  <div className="flex items-center justify-center rounded-full bg-zinc-950 text-sm font-bold text-white">
                     {other_photo_url ? (
                       <div className="relative h-12 w-12 overflow-hidden rounded-full bg-white">
                         <Image
@@ -61,6 +61,7 @@ export const SideMenuDirect = ({
                           height={100}
                           sizes="100vw"
                           priority
+                          className="h-auto w-auto"
                           alt={other_name}
                         />
                       </div>
@@ -68,7 +69,9 @@ export const SideMenuDirect = ({
                       <div className="h-12 w-12 rounded-full bg-black"></div>
                     )}
                   </div>
-                  <span>{other_name}</span>
+                  <div className="">
+                    <span>{other_name}</span>
+                  </div>
                 </li>
               );
             },

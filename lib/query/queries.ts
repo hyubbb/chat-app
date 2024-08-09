@@ -30,7 +30,7 @@ SELECT
             'chat_id', cr.chat_id,
             'room_name', cr.room_name,
             'user_id', cr.user_id,
-            'active_users', (
+            'user_count', (
                 SELECT COUNT(*) 
                 FROM room_members rm 
                 WHERE rm.chat_id = cr.chat_id  

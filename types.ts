@@ -30,7 +30,7 @@ export type RoomsType = {
   chat_id: number;
   room_name: string;
   user_id: number;
-  active_users: number;
+  user_count: number;
 };
 
 export const defaultRooms: RoomsType = {

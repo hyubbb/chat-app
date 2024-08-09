@@ -18,6 +18,8 @@ type SocketStoreType = {
   setIsEditModalOpen: (isOpen: boolean) => void;
   isUploadModalOpen: boolean;
   setIsUploadModalOpen: (isOpen: boolean) => void;
+  isMenuModalOpen: boolean;
+  setIsMenuModalOpen: (isOpen: boolean) => void;
 };
 
 export const useStore = create<SocketStoreType>((set) => ({
@@ -32,4 +34,6 @@ export const useStore = create<SocketStoreType>((set) => ({
   setIsEditModalOpen: (isOpen) => set({ isEditModalOpen: isOpen }),
   isUploadModalOpen: false,
   setIsUploadModalOpen: (isOpen) => set({ isUploadModalOpen: isOpen }),
+  isMenuModalOpen: false,
+  setIsMenuModalOpen: (isOpen) => set({ isMenuModalOpen: isOpen }),
 }));

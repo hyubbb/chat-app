@@ -7,9 +7,14 @@ import { useEffect, useState } from "react";
 type useDirectQueryType = {
   user: UserType | null;
   chatId?: number | null;
+  initDmList?: dmListType[] | null;
 };
 
-export const useDirectQuery = ({ user, chatId }: useDirectQueryType) => {
+export const useDirectQuery = ({
+  user,
+  chatId = null,
+  initDmList,
+}: useDirectQueryType) => {
   const [dmRoomId, setDmRoomId] = useState<string | null>(null);
   useEffect(() => {
     if (chatId && user?.user_id) {
@@ -61,7 +66,7 @@ export const useDirectQuery = ({ user, chatId }: useDirectQueryType) => {
   } = useQuery<dmListType[]>({
     queryKey: ["dmList"],
     queryFn: getDmList,
-    initialData: [],
+    initialData: initDmList || [],
     enabled: !!user?.user_id,
   });
 

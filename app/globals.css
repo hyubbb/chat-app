@@ -35,6 +35,9 @@ body {
   .text-balance {
     text-wrap: balance;
   }
+  .anywhere {
+    overflow-wrap: anywhere;
+  }
 }
 
 @font-face {

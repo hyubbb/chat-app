@@ -32,18 +32,18 @@ const loginAuth = async () => {
 const MainLayout = async ({ children }: { children: React.ReactNode }) => {
   // const { user } = await loginAuth();
   const resUser = await fetchCookiesUser();
-  const user = (await resUser?.json())?.user || null;
+  const user = (await resUser?.json())?.user;
 
   const resDmList = await fetchDmList(user);
-  const dmList = (await resDmList?.json())?.data || null;
+  const dmList = (await resDmList?.json())?.data;
 
   const resCategories = await fetchCategories();
-  const categories = (await resCategories.json()) || null;
+  const categories = await resCategories.json();
 
   return (
     <div className="flex h-screen flex-col">
       <HeaderMenu user={user} />
-      <div className="flex h-[calc(100vh-70px)] overflow-hidden">
+      <div className="flex h-[calc(100vh-70px)] overflow-hidden max-sm:flex-col max-sm:overflow-auto">
         <SideMenu user={user} dmList={dmList} categories={categories} />
         <main className="flex flex-1 flex-col dark:bg-zinc-800">
           {children}

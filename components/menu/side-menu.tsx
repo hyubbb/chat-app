@@ -7,7 +7,7 @@ import {
   dmListType,
   UserType,
 } from "@/types";
-import { Plus } from "lucide-react";
+import { LogOut, Plus, X, XCircle } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import RoomCreateModal from "../room/room-create-modal";
@@ -19,6 +19,10 @@ import { useRoomQuery } from "@/hooks/use-room-query";
 import { useUserQuery } from "@/store/use-user-query";
 import { useCategorySocket } from "@/hooks/use-category-socket";
 import { useDirectQuery } from "@/hooks/use-direct-query";
+import { cn } from "@/util/utils";
+import { Logout } from "../auth/log-out";
+import { Login } from "../auth/log-in";
+import { useStore } from "@/store/use-store";
 
 type SideMenuProps = {
   user: UserType;
@@ -33,49 +37,27 @@ export const SideMenu = ({
 }: SideMenuProps) => {
   const router = useRouter();
   const pathname = usePathname();
-  const { setSelected, selected } = useRoomStore();
-  const [user, setUser] = useState<UserType>(initUser);
-  const [dmList, setDmList] = useState<dmListType[]>(initDmList);
-  const [categories, setCategories] =
-    useState<CategoriesType[]>(initCategories);
-
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [collapseState, setCollapseState] = useState<CollapseStateType>({
     dm: false,
     room: false,
     entered: false,
   });
+
   useCategorySocket();
 
-  const { data: fetchUser } = useUserQuery();
-  const { dmList: fetchDmList } = useDirectQuery({ user: user, chatId: null });
-  const { data: fetchCategories } = useCategoryQuery({ user: user });
-  // 참여중인 채팅방 데이터
+  const { isMenuModalOpen, setIsMenuModalOpen } = useStore();
+  const { setSelected, selected } = useRoomStore();
+
+  const { data: user } = useUserQuery(initUser);
+  const { dmList: dmList } = useDirectQuery({ user: user, initDmList });
+  const { data: categories } = useCategoryQuery({ user: user, initCategories });
   const { joinRoomData, isJoinRoomError, isJoinRoomLoading } = useRoomQuery({
     userId: user?.user_id,
   });
-
-  useEffect(() => {
-    if (fetchUser) {
-      setUser(fetchUser);
-    }
-  }, [fetchUser]);
-
-  useEffect(() => {
-    if (fetchDmList) {
-      setDmList(fetchDmList);
-    }
-  }, [fetchDmList]);
-
-  useEffect(() => {
-    if (fetchCategories) {
-      setCategories(fetchCategories);
-    }
-  }, [fetchCategories]);
-
   const handleCategoryClick = (category: CategoriesType) => {
     setSelected(category);
-
+    setIsMenuModalOpen(false);
     if (pathname !== "/") {
       router.push("/");
     }
@@ -89,10 +71,10 @@ export const SideMenu = ({
   };
 
   return (
-    <aside className="w-64 overflow-y-scroll border-r bg-white scrollbar-hide dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
+    <aside className="w-64 overflow-y-scroll border-b-2 border-r bg-white scrollbar-hide max-sm:w-full dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
       {/* Direct Messages - 접을 수 있는 기능 */}
 
-      {user && user.id && (
+      {user && user.id && !pathname?.includes("/chat") && (
         <SideMenuDirect
           toggleCollapse={toggleCollapse}
           collapseState={collapseState}
@@ -102,36 +84,51 @@ export const SideMenu = ({
       )}
 
       {/* Chat Rooms List */}
-      <div className="h-full overflow-y-auto p-4">
-        <div className="mb-4 flex items-center justify-between">
-          <h2 className="font-semibold">채팅방</h2>
-          {user && user.id && (
-            <button
-              onClick={() => setIsModalOpen(true)}
-              className="mr-1 rounded p-1 text-blue-500 hover:bg-blue-100"
-            >
-              <Plus size={20} />
-            </button>
-          )}
+      <div
+        className={cn(
+          `absolute left-0 top-0 h-full w-full flex-col bg-black max-sm:hidden`,
+          isMenuModalOpen ? "z-30 max-sm:flex" : "hidden",
+        )}
+      >
+        <div className="flex h-16 w-full items-center justify-end border-b-[1px] pr-4">
+          <XCircle onClick={() => setIsMenuModalOpen(false)} />
         </div>
-        <div className="space-y-4">
-          {/* 전체 채팅방 (카테고리) */}
-          <SideMenuCategory
-            toggleCollapse={toggleCollapse}
-            collapseState={collapseState}
-            categories={categories}
-            handleCategoryClick={handleCategoryClick}
-            selected={selected}
-          />
-          {/* 참여중인 채팅방 - 변경 없음 */}
-          {user && user.id && (
-            <SideMenuEntered
+        <div className="overflow-y-auto p-4 max-sm:w-full">
+          <div className="mb-4 flex items-center justify-between">
+            <h2 className="font-semibold">채팅방</h2>
+            {user && user.id && (
+              <button
+                onClick={() => setIsModalOpen(true)}
+                className="mr-1 rounded p-1 text-blue-500 hover:bg-blue-100"
+              >
+                <Plus size={20} />
+              </button>
+            )}
+          </div>
+          <div className="space-y-4">
+            {/* 전체 채팅방 (카테고리) */}
+            <SideMenuCategory
               toggleCollapse={toggleCollapse}
               collapseState={collapseState}
-              joinRoomData={joinRoomData}
+              categories={categories}
+              handleCategoryClick={handleCategoryClick}
+              selected={selected}
             />
-          )}
+            {/* 참여중인 채팅방 - 변경 없음 */}
+            {user && user.id && (
+              <SideMenuEntered
+                toggleCollapse={toggleCollapse}
+                collapseState={collapseState}
+                joinRoomData={joinRoomData}
+              />
+            )}
+          </div>
         </div>
+        {isMenuModalOpen && (
+          <div className="flex w-full">
+            {user && user.id ? <Logout user={user} /> : <Login />}
+          </div>
+        )}
       </div>
       <RoomCreateModal
         isOpen={isModalOpen}

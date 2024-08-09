@@ -131,7 +131,6 @@ export default async function handler(
           }),
         );
       }
-
       res?.socket?.server?.io?.to(`chatRoom:${chatId}`).emit("messages", {
         chatId,
         messages: result,

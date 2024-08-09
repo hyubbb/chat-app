@@ -21,7 +21,6 @@ export const ChatMessage = ({
   chatId,
   isLoading,
 }: ChatMessageProps) => {
-  const router = useRouter();
   const bottomRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     bottomRef?.current?.scrollIntoView({ behavior: "smooth" });

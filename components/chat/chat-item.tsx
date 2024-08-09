@@ -80,7 +80,7 @@ export const ChatItem = React.memo(
             <div className="h-12 w-12 rounded-full bg-black"></div>
           )}
         </DirectMessageNotMe>
-        <div className="flex w-full flex-col items-start">
+        <div className="anywhere flex w-full flex-col items-start">
           <div className="flex gap-x-3">
             <span className="font-bold">{user_name}</span>
             <span className="text-sm text-zinc-500/80">

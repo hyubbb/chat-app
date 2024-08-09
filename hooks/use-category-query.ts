@@ -2,7 +2,13 @@ import { CategoriesType, UserType } from "@/types";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 
-export const useCategoryQuery = ({ user }: { user: UserType | null }) => {
+export const useCategoryQuery = ({
+  user,
+  initCategories,
+}: {
+  user: UserType | null;
+  initCategories: CategoriesType[];
+}) => {
   const queryClient = useQueryClient();
 
   const categoryApi = async (): Promise<CategoriesType[]> => {
@@ -21,7 +27,7 @@ export const useCategoryQuery = ({ user }: { user: UserType | null }) => {
   const { data, isError, isLoading, error } = useQuery<CategoriesType[], Error>(
     {
       queryKey: ["categoryList"],
-      initialData: [],
+      initialData: initCategories || [],
       queryFn: categoryApi,
     },
   );

@@ -3,6 +3,7 @@ import {
   enteredRoomList,
   getCategoryRooms,
   getChatInfo,
+  getRoomMembers,
 } from "@/lib/service/service";
 import { RoomsType } from "@/types";
 
@@ -24,9 +25,14 @@ const getChat = async (chatId: number) => {
 
 const ChatPage = async ({ params }: ChatPageProps) => {
   const info = await getChat(params?.chatId);
+  const enteredUsers = await getRoomMembers(params?.chatId);
   return (
     <>
-      <ChatRoom chatId={+params.chatId} roomInfo={info} />
+      <ChatRoom
+        chatId={+params.chatId}
+        roomInfo={info}
+        usersList={enteredUsers}
+      />
     </>
   );
 };

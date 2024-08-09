@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useAuthStore } from "./authStore";
 import axios from "axios";
 
-export const useUserQuery = () => {
+export const useUserQuery = (initUser?: UserType) => {
   const token = useAuthStore((state) => state.token);
 
   // token값을 확인하여 로그인 상태인지 확인
@@ -19,7 +19,7 @@ export const useUserQuery = () => {
 
   const { data, isError, isLoading, refetch } = useQuery<UserType | null>({
     queryKey: ["user"],
-    initialData: null,
+    initialData: initUser || null,
     queryFn: loginAuth,
     enabled: !!token,
   });

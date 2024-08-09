@@ -1,3 +1,4 @@
+import { useStore } from "@/store/use-store";
 import { CollapseStateType } from "@/types";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -14,9 +15,11 @@ export const SideMenuEntered = ({
   joinRoomData,
 }: SideMenuEnteredProps) => {
   const router = useRouter();
+  const { setIsMenuModalOpen } = useStore();
 
   const handleChatRoomClick = (chatId: number) => {
     // 채팅방 클릭시 이동할 페이지
+    setIsMenuModalOpen(false);
     router.push(`/chat/${chatId}`);
   };
 
