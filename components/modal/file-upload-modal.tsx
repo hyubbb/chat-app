@@ -1,3 +1,4 @@
+import { UseEsc } from "@/hooks/useEsc";
 import { useStore } from "@/store/use-store";
 import { UserType } from "@/types";
 import axios from "axios";
@@ -21,17 +22,7 @@ export const FileUploadModal = ({
   const [imageName, setImageName] = useState<string | null>(null);
   const { setIsUploadModalOpen, isUploadModalOpen } = useStore();
   const { socket } = useStore();
-  useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        handleClose();
-      }
-    };
-    window.addEventListener("keydown", handler);
-    return () => {
-      window.removeEventListener("keydown", handler);
-    };
-  }, []);
+  UseEsc(setIsUploadModalOpen);
 
   const handleClose = () => {
     setIsUploadModalOpen(false);

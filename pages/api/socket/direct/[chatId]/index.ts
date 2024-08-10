@@ -20,6 +20,7 @@ export default async function handler(
 ) {
   if (req.method === "GET") {
     const { chatId } = req.query;
+    console.log(chatId);
     if (!chatId) {
       return res.status(400).json({ error: "Invalid request" });
     }

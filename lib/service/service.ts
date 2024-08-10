@@ -400,7 +400,7 @@ export const enteredDMList = async (userId: number) => {
       userId,
     ])) as dmListType[];
 
-    const result = dmLists?.filter((dm) => dm.user_id !== userId);
+    const result = dmLists?.filter((dm) => dm.user_id == userId);
     return result;
   } catch (error) {
     console.error("방 멤버 목록 조회 중 오류 발생:", error);

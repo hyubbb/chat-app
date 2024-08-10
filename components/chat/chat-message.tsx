@@ -31,7 +31,7 @@ export const ChatMessage = ({
     } else {
       bottomRef?.current?.scrollIntoView({ behavior: "smooth" });
     }
-  }, [bottomRef, messages]);
+  }, [bottomRef, messages, setInit, init]);
 
   const directMessage = ({ userId }: { userId: number }) => {
     router.push(`/direct/${userId}`);

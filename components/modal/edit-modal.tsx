@@ -1,5 +1,6 @@
 import { useSignUpForm } from "@/hooks/use-signup-form";
 import { useSignUpSubmit } from "@/hooks/use-signup-submit";
+import { UseEsc } from "@/hooks/useEsc";
 import { useStore } from "@/store/use-store";
 import { useFormType, UserType } from "@/types";
 import { X } from "lucide-react";
@@ -13,7 +14,7 @@ export const EditModal = ({ user }: { user: UserType | null }) => {
 
   const methods = useSignUpForm();
   const { register, handleSubmit, errors, reset, watch } = methods;
-  const { onSubmit, handleFileChange, isLoading } = useSignUpSubmit(
+  const { onSubmit, handleFileChange } = useSignUpSubmit(
     setIsEditModalOpen,
     setPreviewUrl,
     user?.photo_url,
@@ -26,17 +27,7 @@ export const EditModal = ({ user }: { user: UserType | null }) => {
     setIsEditModalOpen(false);
   };
 
-  useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        setIsEditModalOpen(false);
-      }
-    };
-    window.addEventListener("keydown", handler);
-    return () => {
-      window.removeEventListener("keydown", handler);
-    };
-  }, []);
+  UseEsc(setIsEditModalOpen);
 
   useEffect(() => {
     if (isEditModalOpen && inputRef.current) {
@@ -53,7 +44,7 @@ export const EditModal = ({ user }: { user: UserType | null }) => {
       });
       setPreviewUrl(user?.photo_url);
     }
-  }, [user]);
+  }, [user, reset]);
 
   useEffect(() => {
     if (previewUrl) {

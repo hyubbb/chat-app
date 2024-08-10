@@ -28,6 +28,10 @@ export const DirectRoom = ({ chatId }: { chatId: number }) => {
   const dmInfo = dmList?.find((dm) => dm.other_id === chatId) || null;
 
   useEffect(() => {
+    if (chatId === user?.user_id) return redirect("/");
+  }, [chatId, user]);
+
+  useEffect(() => {
     if (userIsLoading) {
       return; // 로딩 중일 때는 아무것도 하지 않음
     }
@@ -38,6 +42,7 @@ export const DirectRoom = ({ chatId }: { chatId: number }) => {
   }, [user, userIsLoading, setIsLoginModalOpen]);
 
   if (userIsLoading || messagesIsLoading) return <Loading />;
+
   return (
     <>
       <ChatHeader user={user} chatId={chatId} dmInfo={dmInfo} />

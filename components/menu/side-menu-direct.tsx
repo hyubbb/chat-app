@@ -21,7 +21,7 @@ export const SideMenuDirect = ({
   };
 
   return (
-    <div className="border-b p-4 max-sm:p-2 dark:border-zinc-700">
+    <div className="border-b p-4 max-sm:p-2 max-sm:px-4 dark:border-zinc-700">
       <div
         className="flex cursor-pointer items-center justify-between"
         onClick={() => toggleCollapse("dm")}

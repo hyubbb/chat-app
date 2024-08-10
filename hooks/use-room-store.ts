@@ -1,11 +1,15 @@
-import { CategoriesType, RoomsType } from "@/types";
+import { CategoriesType } from "@/types";
 import { create } from "zustand";
 
 type RoomStoreType = {
   selected: CategoriesType | null;
   setSelected: (category: CategoriesType) => void;
   selectedChat: { chat_id: number; room_name: string; active_users: number };
-  setSelectedChat: (chat) => void;
+  setSelectedChat: (chat: {
+    chat_id: number;
+    room_name: string;
+    active_users: number;
+  }) => void;
 };
 
 export const useRoomStore = create<RoomStoreType>((set) => ({

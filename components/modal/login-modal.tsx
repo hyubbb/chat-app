@@ -1,3 +1,4 @@
+import { UseEsc } from "@/hooks/useEsc";
 import { useAuthStore } from "@/store/authStore";
 import { useStore } from "@/store/use-store";
 import axios from "axios";
@@ -11,6 +12,7 @@ export const LoginModal = () => {
   const router = useRouter();
   const { isLoginModalOpen, setIsLoginModalOpen, setIsMenuModalOpen } =
     useStore();
+  UseEsc(setIsLoginModalOpen);
   const [userInfo, setUserInfo] = useState({
     id: "",
     password: "",
@@ -49,20 +51,6 @@ export const LoginModal = () => {
       inputRef.current.focus();
     }
   }, [isLoginModalOpen]);
-
-  useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        setIsLoginModalOpen(false);
-      }
-    };
-
-    window.addEventListener("keydown", handler);
-
-    return () => {
-      window.removeEventListener("keydown", handler);
-    };
-  }, []);
 
   if (!isLoginModalOpen) return null;
   return (

@@ -3,13 +3,12 @@ import { useRoomStore } from "@/hooks/use-room-store";
 import {
   CategoriesType,
   CollapseStateType,
-  defaultUser,
   dmListType,
   UserType,
 } from "@/types";
-import { LogOut, Plus, X, XCircle } from "lucide-react";
+import { Plus, XCircle } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import RoomCreateModal from "../room/room-create-modal";
 import { SideMenuDirect } from "./side-menu-direct";
 import { SideMenuCategory } from "./side-menu-category";
@@ -23,6 +22,7 @@ import { cn } from "@/util/utils";
 import { Logout } from "../auth/log-out";
 import { Login } from "../auth/log-in";
 import { useStore } from "@/store/use-store";
+import { UseEsc } from "@/hooks/useEsc";
 
 type SideMenuProps = {
   user: UserType;
@@ -45,6 +45,7 @@ export const SideMenu = ({
   });
 
   useCategorySocket();
+  UseEsc(setIsModalOpen);
 
   const { isMenuModalOpen, setIsMenuModalOpen } = useStore();
   const { setSelected, selected } = useRoomStore();
@@ -74,7 +75,7 @@ export const SideMenu = ({
     <aside className="w-64 overflow-y-scroll border-b-2 border-r bg-white scrollbar-hide max-sm:w-full dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
       {/* Direct Messages - 접을 수 있는 기능 */}
 
-      {user && user.id && !pathname?.includes("/chat") && (
+      {user && user.id && (
         <SideMenuDirect
           toggleCollapse={toggleCollapse}
           collapseState={collapseState}
@@ -86,11 +87,13 @@ export const SideMenu = ({
       {/* Chat Rooms List */}
       <div
         className={cn(
-          `absolute left-0 top-0 h-full w-full flex-col bg-black max-sm:hidden`,
-          isMenuModalOpen ? "z-30 max-sm:flex" : "hidden",
+          "max-sm:hidden",
+          isMenuModalOpen
+            ? "absolute left-0 top-0 z-30 h-full w-full flex-col bg-black max-sm:flex"
+            : "block",
         )}
       >
-        <div className="flex h-16 w-full items-center justify-end border-b-[1px] pr-4">
+        <div className="hidden h-16 w-full items-center justify-end border-b-[1px] pr-4 max-sm:flex">
           <XCircle onClick={() => setIsMenuModalOpen(false)} />
         </div>
         <div className="overflow-y-auto p-4 max-sm:w-full">

@@ -120,5 +120,5 @@ export const useSignUpSubmit = (
     [setPreviewUrl],
   );
 
-  return { onSubmit, handleFileChange, isLoading: mutation?.isLoading };
+  return { onSubmit, handleFileChange };
 };

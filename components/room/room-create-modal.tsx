@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { X, Plus } from "lucide-react";
 import { CategoriesType, RoomsType, UserType } from "@/types";
-import axios, { all } from "axios";
+import axios from "axios";
 
 type RoomCreateModalProps = {
   isOpen: boolean;
@@ -44,16 +44,19 @@ export default function RoomCreateModal({
 
   const isDuplicateRoom = useCallback(
     (room: string) => allRoomsData.some(({ room_name }) => room_name === room),
-    [allRoomsData, categories],
+    [allRoomsData],
   );
-  const fetchRoomPost = async (title: any, categoryName: any) => {
-    // 새 채팅방 생성 로직
-    await axios.post("/api/socket/chat", {
-      categoryName,
-      roomName: title,
-      userId: user?.user_id || null,
-    });
-  };
+  const fetchRoomPost = useCallback(
+    async (title: any, categoryName: any) => {
+      // 새 채팅방 생성 로직
+      await axios.post("/api/socket/chat", {
+        categoryName,
+        roomName: title,
+        userId: user?.user_id || null,
+      });
+    },
+    [user],
+  );
 
   const handleCreateRoom = useCallback(() => {
     const category = isNewCategory ? newCategory : selectedCategory;
@@ -81,10 +84,10 @@ export default function RoomCreateModal({
     onClose,
   ]);
 
-  const handleClose = useCallback(() => {
+  const handleClose = () => {
     clearForm();
     onClose();
-  }, [clearForm, onClose]);
+  };
 
   if (!isOpen) return null;
 

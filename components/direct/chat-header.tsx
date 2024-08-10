@@ -19,7 +19,7 @@ export const ChatHeader = ({ user, chatId, dmInfo }: ChatHeaderProps) => {
   const router = useRouter();
 
   const handleLeaveDM = async () => {
-    const { data } = await axios.patch(`/api/socket/direct/$q{chatId}`, {
+    const { data } = await axios.patch(`/api/socket/direct/${chatId}`, {
       userId: user?.user_id,
       userName: user?.user_name,
       dmRoomCount: dmInfo?.exit_time,

@@ -1,5 +1,6 @@
 import { useSignUpForm } from "@/hooks/use-signup-form";
 import { useSignUpSubmit } from "@/hooks/use-signup-submit";
+import { UseEsc } from "@/hooks/useEsc";
 import { useStore } from "@/store/use-store";
 import { useFormType } from "@/types";
 import { X } from "lucide-react";
@@ -11,6 +12,7 @@ export const SignUpModal = () => {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const { setIsSignUpModalOpen, isSignUpModalOpen } = useStore();
   const methods = useSignUpForm();
+  UseEsc(setIsSignUpModalOpen);
   const { register, handleSubmit, errors, reset, watch } = methods;
   const { onSubmit, handleFileChange } = useSignUpSubmit(
     setIsSignUpModalOpen,
@@ -23,18 +25,6 @@ export const SignUpModal = () => {
     reset();
     setIsSignUpModalOpen(false);
   };
-
-  useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        setIsSignUpModalOpen(false);
-      }
-    };
-    window.addEventListener("keydown", handler);
-    return () => {
-      window.removeEventListener("keydown", handler);
-    };
-  }, []);
 
   useEffect(() => {
     if (isSignUpModalOpen && inputRef.current) {

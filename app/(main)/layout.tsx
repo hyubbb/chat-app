@@ -45,7 +45,7 @@ const MainLayout = async ({ children }: { children: React.ReactNode }) => {
       <HeaderMenu user={user} />
       <div className="flex h-[calc(100vh-70px)] overflow-hidden max-sm:flex-col max-sm:overflow-auto">
         <SideMenu user={user} dmList={dmList} categories={categories} />
-        <main className="flex flex-1 flex-col dark:bg-zinc-800">
+        <main className="flex flex-1 flex-col overflow-auto dark:bg-zinc-800">
           {children}
         </main>
       </div>

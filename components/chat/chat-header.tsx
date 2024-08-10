@@ -41,8 +41,15 @@ export const ChatHeader = ({
     setListModal(!listModal);
   };
 
+  const directMessage = ({ userId }: { userId: number | null }) => {
+    if (userId !== user?.user_id) {
+      router.push(`/direct/${userId}`);
+    }
+  };
+
   return (
-    <div className="flex items-center justify-between space-x-2 border-b bg-white p-4 max-sm:fixed max-sm:top-[69px] max-sm:z-20 max-sm:h-[70px] max-sm:w-full dark:bg-zinc-800 dark:text-zinc-300">
+    // <div className="flex items-center justify-between space-x-2 border-b bg-white p-4 max-sm:fixed max-sm:top-[69px] max-sm:z-20 max-sm:h-[70px] max-sm:w-full dark:bg-zinc-800 dark:text-zinc-300">
+    <div className="flex items-center justify-between space-x-2 border-b bg-white p-4 dark:bg-zinc-800 dark:text-zinc-300">
       <div className="flex items-center gap-x-2">
         <MessageSquare size={20} className="text-blue-500" />
         <h2 className="font-semibold">{roomInfo?.room_name}</h2>
@@ -84,9 +91,13 @@ export const ChatHeader = ({
             </div>
             <div className="flex flex-col gap-y-4">
               {usersList?.map((user: UserType) => (
-                <div key={user.user_id} className="flex items-center gap-2">
-                  <div className="h-8 w-8 rounded-full bg-gray-200">
-                    {user.photo_url && (
+                <div
+                  onClick={() => directMessage({ userId: user?.user_id })}
+                  key={user.user_id}
+                  className="flex items-center gap-2"
+                >
+                  {user?.photo_url ? (
+                    <div className="h-8 w-8 rounded-full bg-gray-200">
                       <Image
                         src={user.photo_url}
                         alt={user.user_name}
@@ -94,8 +105,10 @@ export const ChatHeader = ({
                         height={32}
                         className="rounded-full"
                       />
-                    )}
-                  </div>
+                    </div>
+                  ) : (
+                    <div className="h-8 w-8 rounded-full bg-black"></div>
+                  )}
                   <span className="text-zinc-200">{user?.user_name}</span>
                 </div>
               ))}

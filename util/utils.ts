@@ -18,7 +18,7 @@ export const createDMRoomId = (userId1: number, userId2: number): string => {
   return `${sortedIds[0]}_${sortedIds[1]}`;
 };
 
-export const dateName = (file) => {
+export const dateName = (file: { name: string }) => {
   const now = new Date();
   const timestamp = `${now.getFullYear()}${(now.getMonth() + 1)
     .toString()

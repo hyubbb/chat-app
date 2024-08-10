@@ -4,13 +4,7 @@ import { UserType } from "@/types";
 import { dateName } from "@/util/utils";
 import { AWS_BUCKET, AWS_S3 } from "@/lib/aws-s3";
 import { DeleteObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3";
-import {
-  checkUserExists,
-  createUser,
-  getUserInfo,
-  updateUser,
-} from "@/lib/service/service";
-import { cookies } from "next/headers";
+import { getUserInfo, updateUser } from "@/lib/service/service";
 
 const SECRET_KEY = process.env.JWT_SECRET as string;
 
@@ -23,8 +17,23 @@ export async function GET(request: NextRequest) {
   const token = tokenCookie.value;
 
   try {
-    if (!token) return null;
+    if (!token) {
+      return new Response(JSON.stringify({ message: "Token not provided" }), {
+        status: 400,
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+    }
     const decoded = jwt.verify(token, SECRET_KEY);
+    if (typeof decoded !== "object" || decoded === null) {
+      return new Response(JSON.stringify({ message: "Invalid token" }), {
+        status: 403,
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+    }
 
     return NextResponse.json({ user: decoded as UserType }, { status: 200 });
   } catch (err) {
@@ -111,7 +120,10 @@ export async function PATCH(request: NextRequest) {
     //   return NextResponse.json({ data: fetchedUser, success: true }); // Created
     // }
   } catch (error) {
-    console.error("Error getting user:", error);
-    return new NextResponse("Internal Error", { status: 500 });
+    console.error("Error processing PATCH request:", error);
+    return NextResponse.json(
+      { message: "Internal Server Error" },
+      { status: 500 },
+    );
   }
 }

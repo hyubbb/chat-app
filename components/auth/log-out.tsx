@@ -45,8 +45,8 @@ export const Logout = ({ user }: { user: UserType }) => {
   };
 
   return (
-    <div className="flex items-center space-x-2 max-sm:w-full">
-      <div className="flex w-full items-center gap-x-3 max-sm:hidden">
+    <div className="flex items-center gap-x-2 max-sm:w-full">
+      <div className="flex w-full items-center gap-2 text-nowrap max-sm:hidden">
         {user?.photo_url && (
           <Image
             src={user?.photo_url}
