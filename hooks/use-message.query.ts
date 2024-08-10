@@ -13,8 +13,7 @@ export const useMessageQuery = ({
   user,
   direct = false,
 }: useMessageQueryType) => {
-  const isUser = user?.id !== null;
-
+  const isUser = user !== null;
   const getMessages = async () => {
     if (!isUser) return [];
     const { data } = await axios.post(`/api/socket/chat/${chatId}`, {

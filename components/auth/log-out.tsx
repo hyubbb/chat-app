@@ -5,7 +5,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { LogOut, UserCog } from "lucide-react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 
 export const Logout = ({ user }: { user: UserType }) => {
   const {
@@ -16,8 +16,10 @@ export const Logout = ({ user }: { user: UserType }) => {
   } = useStore();
   const queryClient = useQueryClient();
   const router = useRouter();
-  const { clearToken } = useAuthStore();
+  const pathname = usePathname()?.split("/")[2];
+  const mNumber = pathname ? parseInt(pathname) : 0;
 
+  const { clearToken } = useAuthStore();
   const handleLogout = async () => {
     try {
       const res = await axios.post(
@@ -29,6 +31,7 @@ export const Logout = ({ user }: { user: UserType }) => {
       if (res.status !== 200) throw new Error("로그아웃 실패");
 
       queryClient.setQueryData(["user"], []);
+      queryClient.removeQueries({ queryKey: ["messages", mNumber] });
       queryClient.removeQueries({ queryKey: ["dmList"] });
       queryClient.removeQueries({ queryKey: ["joinRoomList"] });
       delete axios.defaults.headers.common["chat-token"];
