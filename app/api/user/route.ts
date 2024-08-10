@@ -108,7 +108,7 @@ export async function PATCH(request: NextRequest) {
 
     response.cookies.set("chat-token", newToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: false,
       path: "/",
       maxAge: 86400,
       sameSite: "lax",

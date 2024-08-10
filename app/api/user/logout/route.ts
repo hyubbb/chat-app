@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
     response.cookies.set("chat-token", "", {
       httpOnly: true,
       secure: false,
-      maxAge: 0, // 즉시 만료시킴
+      maxAge: 0,
       path: "/",
       sameSite: "lax",
     });

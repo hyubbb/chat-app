@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
     );
     response.cookies.set("chat-token", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: false,
       path: "/",
       maxAge: 86400,
       sameSite: "lax",

@@ -50,7 +50,7 @@ export const SideMenuDirect = ({
                 <li
                   key={id}
                   onClick={() => handleClick(other_id)}
-                  className="flex items-center rounded p-1 hover:bg-gray-200 hover:text-zinc-700 max-sm:flex-col max-sm:gap-y-2 sm:space-x-4"
+                  className="flex cursor-pointer items-center rounded p-1 hover:bg-gray-200 hover:text-zinc-700 max-sm:flex-col max-sm:gap-y-2 sm:space-x-4"
                 >
                   <div className="flex items-center justify-center rounded-full bg-zinc-950 text-sm font-bold text-white">
                     {other_photo_url ? (
