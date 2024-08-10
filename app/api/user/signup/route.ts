@@ -1,4 +1,3 @@
-import { getUser } from "@/lib/firebaseSdk";
 import { checkUserExists, createUser } from "@/lib/service/service";
 import { NextRequest, NextResponse } from "next/server";
 import { PutObjectCommand } from "@aws-sdk/client-s3";
