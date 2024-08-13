@@ -7,31 +7,32 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v2 # 1. 코드 체크아웃
+
       - name: Use Node.js
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v2 # 2. Node.js 설정
         with:
           node-version: "18.19.1"
+
       - name: Install dependencies
-        run: npm ci
+        run: npm ci # 3. 의존성 설치
+
       - name: Build
-        run: npm run build
-      - name: Setup SSH Key
-        env:
-          EC2_SSH_PRIVATE_KEY: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
-        run: |
-          mkdir -p ~/.ssh
-          echo "$EC2_SSH_PRIVATE_KEY" > chatapp-key.pem
-          chmod 600 chatapp-key.pem
-          ssh-keyscan -H 3.39.73.42 >> ~/.ssh/known_hosts
+        run: npm run build # 4. 프로젝트 빌드
+
       - name: Deploy to EC2
+        env:
+          PRIVATE_KEY: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
+          HOST: ${{ secrets.EC2_HOST }}
+          USER: ${{ secrets.EC2_USER }}
         run: |
-          scp -i chatapp-key.pem -r .next/* ubuntu@3.39.73.42:~/chat-app
-          ssh -i chatapp-key.pem ubuntu@3.39.73.42 << 'EOF'
+          echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
+          scp -o StrictHostKeyChecking=no -i private_key -r .next/* ${USER}@${HOST}:~/chat-app  
+          ssh -o StrictHostKeyChecking=no -i private_key ${USER}@${HOST} '
             cd ~/chat-app
-            npm install
             npm ci
             pm2 delete all || true
-            pm2 start "npm run start" --name "chat-app"
-          EOF
+            pm2 start "npm run start" --name "chat-app"  
+          '
