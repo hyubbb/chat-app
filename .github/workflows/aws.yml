@@ -27,7 +27,7 @@ jobs:
           ssh-keyscan -H 3.39.73.42 >> ~/.ssh/known_hosts
       - name: Deploy to EC2
         run: |
-          scp -i chatapp-key.pem -r build/* ubuntu@3.39.73.42:~/chat-app
+          scp -i chatapp-key.pem -r .next/* ubuntu@3.39.73.42:~/chat-app
           ssh -i chatapp-key.pem ubuntu@3.39.73.42 << 'EOF'
             cd ~/chat-app
             npm install
