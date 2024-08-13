@@ -22,17 +22,18 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Deploy to EC2
-        env:
-          PRIVATE_KEY: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
-          HOST: ${{ secrets.EC2_HOST }}
-          USER: ${{ secrets.EC2_USER }}
+      - name: Setup SSH Key
         run: |
-          echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
-          scp -o StrictHostKeyChecking=no -i private_key -r build/* ${USER}@${HOST}:~/chat-app
-          ssh -o StrictHostKeyChecking=no -i private_key ${USER}@${HOST} '
+          echo "$EC2_SSH_PRIVATE_KEY" | tr -d '\r' | sed 's/\\n/\n/g' > private_key.pem
+          chmod 600 private_key.pem
+
+      - name: Deploy to EC2
+        run: |
+          scp -o StrictHostKeyChecking=no -i private_key.pem -r build/* ubuntu@3.39.73.42:~/chat-app
+          ssh -o StrictHostKeyChecking=no -i private_key.pem ubuntu@3.39.73.42 << 'EOF'
             cd ~/chat-app
+            npm install
             npm ci
             pm2 delete all || true
             pm2 start "npm run start" --name "chat-app"
-          '
+          EOF
