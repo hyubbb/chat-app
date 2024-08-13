@@ -7,30 +7,28 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v2
-
       - name: Use Node.js
         uses: actions/setup-node@v2
         with:
           node-version: "18.19.1"
-
       - name: Install dependencies
         run: npm ci
-
       - name: Build
         run: npm run build
-
       - name: Setup SSH Key
+        env:
+          EC2_SSH_PRIVATE_KEY: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
         run: |
-          echo "$EC2_SSH_PRIVATE_KEY" | tr -d '\r' | sed 's/\\n/\n/g' > private_key.pem
-          chmod 600 private_key.pem
-
+          mkdir -p ~/.ssh
+          echo "$EC2_SSH_PRIVATE_KEY" > chatapp-key.pem
+          chmod 600 chatapp-key.pem
+          ssh-keyscan -H 3.39.73.42 >> ~/.ssh/known_hosts
       - name: Deploy to EC2
         run: |
-          scp -o StrictHostKeyChecking=no -i private_key.pem -r build/* ubuntu@3.39.73.42:~/chat-app
-          ssh -o StrictHostKeyChecking=no -i private_key.pem ubuntu@3.39.73.42 << 'EOF'
+          scp -i chatapp-key.pem -r build/* ubuntu@3.39.73.42:~/chat-app
+          ssh -i chatapp-key.pem ubuntu@3.39.73.42 << 'EOF'
             cd ~/chat-app
             npm install
             npm ci
