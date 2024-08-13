@@ -115,10 +115,6 @@ export async function PATCH(request: NextRequest) {
     });
 
     return response;
-    // if (newUser) {
-    // const fetchedUser = await getUserInfo(userId);
-    //   return NextResponse.json({ data: fetchedUser, success: true }); // Created
-    // }
   } catch (error) {
     console.error("Error processing PATCH request:", error);
     return NextResponse.json(
