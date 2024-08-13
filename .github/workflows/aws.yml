@@ -28,9 +28,10 @@ jobs:
           HOST: ${{ secrets.EC2_HOST }}
           USER: ${{ secrets.EC2_USER }}
         run: |
-          echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
+          echo "$PRIVATE_KEY" | tr -d '\r' | sed 's/\\n/\n/g' > private_key
+          chmod 600 private_key
           scp -o StrictHostKeyChecking=no -i private_key -r build/* ${USER}@${HOST}:~/chat-app
-          ssh -o StrictHostKeyChecking=no -i private_key ${USER}@${HOST} '
+          ssh -vvv -o StrictHostKeyChecking=no -i private_key ${USER}@${HOST} '
             cd ~/chat-app
             npm install
             npm ci
