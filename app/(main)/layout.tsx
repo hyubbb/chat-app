@@ -13,7 +13,7 @@ const loginAuth = async () => {
   try {
     const cookieStore = cookies();
     const token = cookieStore.get("chat-token");
-    const res = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/user`, {
+    const res = await fetch(`/${process.env.NEXT_PUBLIC_SITE_URL}/api/user`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
