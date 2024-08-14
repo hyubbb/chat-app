@@ -21,6 +21,7 @@ jobs:
 
       - name: Build
         run: npm run build # 4. 프로젝트 빌드
+
       - name: Deploy to EC2
         env:
           PRIVATE_KEY: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
