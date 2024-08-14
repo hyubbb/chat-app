@@ -29,7 +29,7 @@ export const HeaderMenu = ({ user: initUser }: { user: UserType }) => {
         <div
           className={`text-3xl text-zinc-50 max-sm:text-lg ${climateCrisis.className}`}
         >
-          CHAT APP
+          CHAT APP1
         </div>
       </Link>
       <div className="hidden max-sm:block" onClick={handleOpenRooms}>
