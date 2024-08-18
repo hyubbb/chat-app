@@ -21,14 +21,12 @@ JWT, Socket.io, MySQL, RDS, S3, EC2, Github Actions
  
 <img width="688" alt="2" src="https://github.com/user-attachments/assets/a01c5b20-7012-4dac-b412-66c5f3e884c9">
 
- 
 
 ## JWT 토큰 활용
+ 
+<img width="692" alt="22" src="https://github.com/user-attachments/assets/b240a9b0-4524-4ef3-8a9c-928b2f5658f4">
 
  
- <img width="719" alt="3" src="https://github.com/user-attachments/assets/49ad09ff-8adc-455d-bf00-c7be6d80d635">
-
-
 ## 기능
 
  
