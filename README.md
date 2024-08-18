@@ -12,26 +12,26 @@ JWT, Socket.io, MySQL, RDS, S3, EC2, Github Actions
 
 ## 아키텍쳐
 
----
+ 
  <img width="741" alt="image" src="https://github.com/user-attachments/assets/3001ee49-e656-42f1-aea9-6c4ddaec2127">
 
 
 ## 대표 구현 내역 - 실시간채팅
 
----
+ 
 <img width="688" alt="2" src="https://github.com/user-attachments/assets/a01c5b20-7012-4dac-b412-66c5f3e884c9">
 
  
 
 ## JWT 토큰 활용
 
----
+ 
  <img width="719" alt="3" src="https://github.com/user-attachments/assets/49ad09ff-8adc-455d-bf00-c7be6d80d635">
 
 
 ## 기능
 
----
+ 
 
 - Github action을 이용하여 `CI/CD` 자동화 처리
 - 실시간 메세지 통신
@@ -79,7 +79,7 @@ JWT, Socket.io, MySQL, RDS, S3, EC2, Github Actions
 
 Socket을 단독으로 사용하는 것이 조금 더 빠르며, 간편할진 모르겠으나, 클라이언트쪽에서는 HTTP통신을 하고 서버쪽에선 Socket통신을 하는 방식으로 섞어서 쓰는방식이 상태코드나 헤더 등의 데이터를 포함하여 요청-응답의 처리를 명확히 구분해서 처리 할 수 있기때문에 범용성이 더 뛰어나다고 생각합니다.
 
----
+ 
 
 ### < SERVER ACTION 과 API속도 비교 >
 
