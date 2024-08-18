@@ -13,20 +13,21 @@ JWT, Socket.io, MySQL, RDS, S3, EC2, Github Actions
 ## 아키텍쳐
 
 ---
+ <img width="741" alt="image" src="https://github.com/user-attachments/assets/3001ee49-e656-42f1-aea9-6c4ddaec2127">
 
-![image.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/71c29658-790c-447e-8748-e4539fd62f66/3116e493-26c0-40c9-b15c-2584e937562f/image.png)
 
 ## 대표 구현 내역 - 실시간채팅
 
 ---
+<img width="688" alt="2" src="https://github.com/user-attachments/assets/a01c5b20-7012-4dac-b412-66c5f3e884c9">
 
-![image.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/71c29658-790c-447e-8748-e4539fd62f66/481267e3-7cb2-4857-aec9-dc5f4f3e4f1a/image.png)
+ 
 
 ## JWT 토큰 활용
 
 ---
+ <img width="719" alt="3" src="https://github.com/user-attachments/assets/49ad09ff-8adc-455d-bf00-c7be6d80d635">
 
-![image.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/71c29658-790c-447e-8748-e4539fd62f66/3143a144-2b0f-4d09-b181-70a989065a7d/image.png)
 
 ## 기능
 
@@ -55,7 +56,9 @@ JWT, Socket.io, MySQL, RDS, S3, EC2, Github Actions
 
 직접 사용해보고 더 좋은 방식으로 사용해보고자 테스트 했습니다.
 
-![image.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/71c29658-790c-447e-8748-e4539fd62f66/815ea440-8647-4ccd-a0d9-180f2606f2c3/image.png)
+<img width="552" alt="4" src="https://github.com/user-attachments/assets/c69474f8-ac2b-49b1-bdff-ce95dac694fa">
+
+ 
 
 ### 비교
 
@@ -83,8 +86,9 @@ Socket을 단독으로 사용하는 것이 조금 더 빠르며, 간편할진 �
 새로고침 시, 로그인정보가 로드되기전에 비로그인 일때의 DOM이 보이는 깜빡임 현상의 발생. 
 서버사이드에서 데이터 처리시 server action과 api 속도차이 비교.
 
-![image.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/71c29658-790c-447e-8748-e4539fd62f66/24b8fcc1-61d3-4268-8d20-1b0350f6504b/image.png)
+<img width="215" alt="5" src="https://github.com/user-attachments/assets/32c25de9-df58-4237-9fe2-39c5305255d6">
 
+ 
 - Cookie에서 Token값을 불러 온 뒤,  JWT verify 처리
 - server action의 경우 서버와 직접통신을 하기때문에 
 네트워크를 거치지 않아도 됩니다.
