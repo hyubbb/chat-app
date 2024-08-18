@@ -46,7 +46,7 @@ JWT, Socket.io, MySQL, RDS, S3, EC2, Github Actions
 
 ## 해결하고자 한 문제
 
----
+ 
 
 ### < Socket.io와 HTTP Api 속도 비교 >
 
@@ -77,7 +77,8 @@ JWT, Socket.io, MySQL, RDS, S3, EC2, Github Actions
 
 Socket을 단독으로 사용하는 것이 조금 더 빠르며, 간편할진 모르겠으나, 클라이언트쪽에서는 HTTP통신을 하고 서버쪽에선 Socket통신을 하는 방식으로 섞어서 쓰는방식이 상태코드나 헤더 등의 데이터를 포함하여 요청-응답의 처리를 명확히 구분해서 처리 할 수 있기때문에 범용성이 더 뛰어나다고 생각합니다.
 
- 
+
+ ---
 
 ### < SERVER ACTION 과 API속도 비교 >
 
