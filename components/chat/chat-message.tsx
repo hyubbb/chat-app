@@ -9,12 +9,17 @@ import { Loader2 } from "lucide-react";
 import { useChatScroll } from "@/hooks/use-chat-scroll";
 import { useMessageQuery } from "@/hooks/use-message.query";
 import { useMessageSocket } from "@/hooks/use-message-socket";
+import { InfiniteData } from "@tanstack/react-query";
 
 type ChatMessageProps = {
   user: UserType | null;
   chatId: number;
   chatRef: RefObject<HTMLDivElement>;
   bottomRef: RefObject<HTMLDivElement>;
+};
+type GetMessagesResult = {
+  messages: messagesType[];
+  nextPage: number | undefined;
 };
 
 export const ChatMessage = ({
@@ -41,8 +46,11 @@ export const ChatMessage = ({
   const messages = useMemo(() => {
     if (!messagesData) return [];
 
+    // TypeScript에게 messagesData의 타입을 알려줍니다
+    const typedMessagesData = messagesData as InfiniteData<GetMessagesResult>;
+
     // 페이지를 복사하고 역순으로 정렬
-    const reversedPages = [...messagesData.pages].reverse();
+    const reversedPages = [...typedMessagesData.pages].reverse();
 
     // 각 페이지의 메시지를 flatMap으로 연결
     return reversedPages.flatMap((page) => page.messages);
