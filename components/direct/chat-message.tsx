@@ -83,7 +83,7 @@ export const ChatMessage = ({
               <div key={idx} className={"flex items-start gap-x-3 p-2"}>
                 {photo_url ? (
                   <div>
-                    <div className="h-12 w-12 rounded-full bg-white">
+                    <div className="flex h-12 w-12 items-center rounded-full bg-white">
                       <Image
                         src={photo_url}
                         width={100}
@@ -91,7 +91,7 @@ export const ChatMessage = ({
                         alt={user_name}
                         sizes="100vw"
                         priority
-                        className="rounded-full"
+                        className="rounded-full object-contain"
                       />
                     </div>
                   </div>

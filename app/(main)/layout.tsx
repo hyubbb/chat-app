@@ -11,18 +11,17 @@ import { cookies } from "next/headers";
 
 const loginAuth = async () => {
   try {
-    const cookieStore = cookies();
-    const token = cookieStore.get("chat-token");
-    const res = await fetch(`/${process.env.NEXT_PUBLIC_SITE_URL}/api/user`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Cookie: `chat-token=${token?.value}`,
-      },
-    });
-
-    const data = await res.json();
-    return data;
+    // const cookieStore = cookies();
+    // const token = cookieStore.get("chat-token");
+    // const res = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/user`, {
+    //   method: "GET",
+    //   headers: {
+    //     "Content-Type": "application/json",
+    //     Cookie: `chat-token=${token?.value}`,
+    //   },
+    // });
+    // const data = await res.json();
+    // return data;
   } catch (error) {
     console.error("Error in loginAuth:", error);
     return null;

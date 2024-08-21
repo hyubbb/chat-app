@@ -29,6 +29,8 @@ export default async function handler(
     try {
       const chatId = parseInt(req.query.chatId as string, 10);
       const userId = parseInt(req.body.userId, 10);
+      const cursor = req.body.cursor;
+      const MESSAGES_PER_PAGE = 20;
       const { userName, direct } = req.body;
       let result;
       let ROOM_TYPE;
@@ -46,7 +48,7 @@ export default async function handler(
 
       const isEntered = await isUserInRoom(userId, chatId);
       if (isEntered) {
-        result = await getMessages(chatId, userId);
+        result = await getMessages(chatId, userId, cursor, MESSAGES_PER_PAGE);
         ROOM_TYPE = `userRoom:${userId}`;
       } else {
         await joinRoom(userId, chatId);
@@ -57,17 +59,19 @@ export default async function handler(
           message: `${userName}님이 채팅방에 참여했습니다.`,
           init: true,
           type: MESSAGE_TYPE,
+          cursor,
         });
         ROOM_TYPE = `chatRoom:${chatId}`;
       }
 
+      // io.to(ROOM_TYPE).emit("messages", {
+      //   chatId,
+      //   messages: result,
+      //   nextCursor: result && result[0].message_id,
+      //   messages_type: MESSAGE_TYPE,
+      // });
       // 방문한 방의 목록
       const userEnteredRoomList = await enteredRoomList(userId);
-      io.to(ROOM_TYPE).emit("messages", {
-        chatId,
-        messages: result,
-        messages_type: MESSAGE_TYPE,
-      });
       io.to(`userRoom:${userId}`).emit("joinRoomList", userEnteredRoomList);
 
       res.status(200).json({
@@ -76,6 +80,7 @@ export default async function handler(
           chatId,
           messages: result,
           messages_type: MESSAGE_TYPE,
+          nextCursor: result && result[0].message_id,
         },
         message: "User joined the chat room successfully",
       });
@@ -91,7 +96,7 @@ export default async function handler(
 
   if (req.method === "PATCH") {
     const { chatId } = req.query;
-    const { userId, userName } = req.body;
+    const { userId, userName, cursor } = req.body;
     if (!userId || !chatId || !userName) {
       return res.status(400).json({ error: "Invalid request" });
     }
@@ -103,6 +108,7 @@ export default async function handler(
       chatId: +chatId,
       message,
       type: MESSAGE_TYPE,
+      cursor,
     });
 
     const io = res?.socket?.server?.io;

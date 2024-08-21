@@ -1,11 +1,12 @@
+import { Loader2 } from "lucide-react";
+
 export const Loading = () => {
   return (
-    <div className="fixed left-0 top-0 h-full w-full bg-zinc-400/10">
-      <div className="flex h-full items-center justify-center">
-        <div className="h-4 w-4 animate-bounce rounded-full bg-blue-700 [animation-delay:.7s]"></div>
-        <div className="h-4 w-4 animate-bounce rounded-full bg-blue-700 [animation-delay:.3s]"></div>
-        <div className="h-4 w-4 animate-bounce rounded-full bg-blue-700 [animation-delay:.7s]"></div>
-      </div>
+    <div className="flex flex-1 flex-col items-center justify-center">
+      <Loader2 className="my-4 h-7 w-7 animate-spin text-zinc-500" />
+      <p className="text-xs text-zinc-500 dark:text-zinc-400">
+        Loading messages...
+      </p>
     </div>
   );
 };

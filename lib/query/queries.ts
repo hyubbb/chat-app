@@ -110,11 +110,12 @@ SELECT * FROM (
     JOIN 
         room_members rm ON m.chat_id = rm.chat_id AND rm.user_id = ?
     WHERE 
-        m.chat_id = ? AND m.message_type != 'direct'
+        m.chat_id = ? AND m.message_type != 'direct' 
         AND m.sent_at >= rm.last_joined_at
+        AND m.message_id < ?
     ORDER BY 
         m.sent_at DESC
-    LIMIT 50
+    LIMIT ?
 ) AS sub
 ORDER BY sent_at ASC;
 `;

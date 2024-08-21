@@ -56,7 +56,7 @@ export const Logout = ({ user }: { user: UserType }) => {
             width={40}
             height={40}
             alt={user?.user_name}
-            className="rounded-full bg-white"
+            className="h-[40px] w-[40px] rounded-full bg-white object-contain"
           />
         )}
         <span className="font-semibold dark:text-zinc-300">

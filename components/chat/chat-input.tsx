@@ -1,16 +1,15 @@
-import { useMessageSocket } from "@/hooks/use-message-socket";
 import { useStore } from "@/store/use-store";
 import { UserType } from "@/types";
-import axios from "axios";
 import { Plus } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { RefObject, useEffect, useRef, useState } from "react";
 
 type ChatInputProps = {
   user: UserType | null;
   chatId: number;
+  bottomRef: RefObject<HTMLDivElement>;
 };
 
-export const ChatInput = ({ user, chatId }: ChatInputProps) => {
+export const ChatInput = ({ user, chatId, bottomRef }: ChatInputProps) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const { setIsUploadModalOpen } = useStore();
   const { socket } = useStore();
@@ -39,9 +38,13 @@ export const ChatInput = ({ user, chatId }: ChatInputProps) => {
       (data: any) => {
         if (data.success) {
           setIsSending(false);
+          setTimeout(() => {
+            bottomRef?.current?.scrollIntoView({ behavior: "instant" });
+          }, 100);
         }
       },
     );
+
     // await axios.post("/api/socket/message", {
     //   userId: user?.user_id,
     //   chatId,
@@ -55,7 +58,7 @@ export const ChatInput = ({ user, chatId }: ChatInputProps) => {
 
   return (
     <div className="border-t-2 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-800">
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} aria-disabled={isSending}>
         <div className="relative flex items-center">
           <button
             type="button"

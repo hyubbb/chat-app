@@ -1,5 +1,5 @@
 "use client";
-import { useEffect } from "react";
+import { ElementRef, useEffect, useRef } from "react";
 import { redirect } from "next/navigation";
 
 import { useStore } from "@/store/use-store";
@@ -11,7 +11,6 @@ import { RoomsType } from "@/types";
 import { ChatInput } from "./chat-input";
 import { ChatHeader } from "./chat-header";
 import { ChatMessage } from "./chat-message";
-import { useMessageQuery } from "@/hooks/use-message.query";
 
 export const ChatRoom = ({
   chatId,
@@ -22,15 +21,12 @@ export const ChatRoom = ({
   roomInfo: RoomsType;
   usersList: any;
 }) => {
+  const chatRef = useRef<ElementRef<"div">>(null);
+  const bottomRef = useRef<ElementRef<"div">>(null);
   const { setIsLoginModalOpen } = useStore();
   const { data: user, isLoading: userIsLoading } = useUserQuery();
-  const { data: messages, isLoading: messagesIsLoading } = useMessageQuery({
-    chatId,
-    user,
-  });
-  useRoomSocket({ chatId, user: user });
-  useMessageSocket({ chatId });
 
+  useRoomSocket({ chatId, user: user });
   useEffect(() => {
     if (!chatId) return redirect("/");
   }, [chatId]);
@@ -54,12 +50,12 @@ export const ChatRoom = ({
         usersList={usersList}
       />
       <ChatMessage
-        messages={messages}
         user={user}
         chatId={chatId}
-        isLoading={messagesIsLoading}
+        chatRef={chatRef}
+        bottomRef={bottomRef}
       />
-      <ChatInput user={user} chatId={chatId} />
+      <ChatInput user={user} chatId={chatId} bottomRef={bottomRef} />
     </>
   );
 };

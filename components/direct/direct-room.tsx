@@ -3,10 +3,8 @@ import { useEffect } from "react";
 import { redirect } from "next/navigation";
 
 import { useStore } from "@/store/use-store";
-import { useMessageSocket } from "@/hooks/use-message-socket";
 import { useRoomSocket } from "@/hooks/use-room-socket";
 import { useUserQuery } from "@/store/use-user-query";
-import { defaultUser } from "@/types";
 
 import { ChatInput } from "./chat-input";
 import { ChatHeader } from "./chat-header";

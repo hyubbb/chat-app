@@ -34,6 +34,7 @@ import { ResultSetHeader } from "mysql2";
 const createDMRoomId = (userId1: number, userId2: number) => {
   return [userId1, userId2].sort((a, b) => a - b).join("_");
 };
+let MESSAGES_PER_PAGE = 20;
 
 export const createUser = async (
   id: string,
@@ -158,13 +159,22 @@ export const createChatRoom = async (
   }
 };
 
-export const getMessages = async (chatId: number, userId: number) => {
+export const getMessages = async (
+  chatId: number,
+  userId: number,
+  cursor: number,
+  MESSAGES_PER_PAGE: number,
+) => {
   try {
-    let res;
-    res = (await executeQuery(GET_MESSAGE_AFTER, [
+    const initCursor = cursor === undefined ? 99999999 : cursor;
+
+    let res = await executeQuery(GET_MESSAGE_AFTER, [
       userId,
       chatId,
-    ])) as messagesType[];
+      initCursor,
+      MESSAGES_PER_PAGE + "",
+    ]);
+
     return res;
   } catch (error) {
     console.error("메시지 전송 중 오류 발생:", error);
@@ -178,18 +188,19 @@ export const sendMessageAndGetMessages = async ({
   message,
   init = false,
   type = "message",
+  cursor = undefined,
 }: {
   userId?: number | null;
   chatId: number;
   message: string;
   init?: boolean;
   type?: string;
+  cursor?: number;
 }) => {
   try {
     // 첫 입장과, 퇴장시에 시스템 메세지를 보내고, 그 이외에는 일반 메세지를 보내는 로직
     // 아니면 첫입장시에만 전체메세지를 불러오고, 그 이후에는 새로운 메세지만 불러오는 로직
     let result;
-
     const resSentMessage = (await executeQuery(SENT_MESSAGE, [
       userId,
       chatId,
@@ -199,9 +210,16 @@ export const sendMessageAndGetMessages = async ({
 
     if (resSentMessage?.affectedRows === 0) return null;
 
+    if (cursor === undefined) {
+      cursor = resSentMessage.insertId + 1;
+      MESSAGES_PER_PAGE = 1;
+    }
+
     result = (await executeQuery(GET_MESSAGE_AFTER, [
       userId,
       chatId,
+      cursor,
+      MESSAGES_PER_PAGE + "",
     ])) as messagesType[];
 
     if (!init) {
@@ -209,7 +227,6 @@ export const sendMessageAndGetMessages = async ({
       const lastMessage = result[result?.length - 1];
       result = lastMessage;
     }
-
     return result;
   } catch (error) {
     console.error("메시지 전송 중 오류 발생:", error);
@@ -347,7 +364,9 @@ export const deleteMessageAndGetMessages = async (
   type: string = "message",
 ) => {
   await executeQuery(DELETE_TEXT_MESSAGE, [messageId]);
+
   let result;
+
   if (type == "message") {
     result = (await executeQuery(GET_MESSAGE_AFTER, [
       userId,
