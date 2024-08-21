@@ -9,7 +9,7 @@ import {
   leaveRoom,
   sendMessageAndGetMessages,
 } from "@/lib/service/service";
-import { NextApiResponseServerIo } from "@/types";
+import { messagesType, NextApiResponseServerIo } from "@/types";
 import { NextApiRequest } from "next";
 
 export default async function handler(
@@ -32,7 +32,7 @@ export default async function handler(
       const cursor = req.body.cursor;
       const MESSAGES_PER_PAGE = 20;
       const { userName, direct } = req.body;
-      let result;
+      let result: messagesType[] | messagesType;
       let ROOM_TYPE;
       let MESSAGE_TYPE;
       if (isNaN(chatId) || isNaN(userId) || !userName) {
@@ -64,12 +64,17 @@ export default async function handler(
         ROOM_TYPE = `chatRoom:${chatId}`;
       }
 
-      // io.to(ROOM_TYPE).emit("messages", {
-      //   chatId,
-      //   messages: result,
-      //   nextCursor: result && result[0].message_id,
-      //   messages_type: MESSAGE_TYPE,
-      // });
+      if (Array.isArray(result)) {
+        result = result;
+      } else {
+        result = [result];
+      }
+      io.to(ROOM_TYPE).emit("messages", {
+        chatId,
+        messages: result,
+        nextCursor: result[0].message_id,
+        messages_type: MESSAGE_TYPE,
+      });
       // 방문한 방의 목록
       const userEnteredRoomList = await enteredRoomList(userId);
       io.to(`userRoom:${userId}`).emit("joinRoomList", userEnteredRoomList);

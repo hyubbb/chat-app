@@ -101,7 +101,6 @@ export const ChatMessage = ({
   if (status === "pending") {
     return <Loading />;
   }
-
   return (
     <div
       ref={chatRef}
@@ -110,7 +109,7 @@ export const ChatMessage = ({
       {!hasNextPage && <div className="flex-1" />}
       {/* {!hasNextPage && <ChatWelcome type={type} name={name} />} */}
 
-      {hasNextPage && messages.length > 20 && (
+      {hasNextPage && messages.length >= 20 && (
         <div className="flex justify-center">
           {isFetchingNextPage ? (
             <Loader2 className="my-5 h-6 w-6 animate-spin text-zinc-500" />

@@ -168,12 +168,12 @@ export const getMessages = async (
   try {
     const initCursor = cursor === undefined ? 99999999 : cursor;
 
-    let res = await executeQuery(GET_MESSAGE_AFTER, [
+    let res = (await executeQuery(GET_MESSAGE_AFTER, [
       userId,
       chatId,
       initCursor,
       MESSAGES_PER_PAGE + "",
-    ]);
+    ])) as messagesType[];
 
     return res;
   } catch (error) {
@@ -207,8 +207,6 @@ export const sendMessageAndGetMessages = async ({
       message,
       type,
     ])) as ResultSetHeader;
-
-    if (resSentMessage?.affectedRows === 0) return null;
 
     if (cursor === undefined) {
       cursor = resSentMessage.insertId + 1;
