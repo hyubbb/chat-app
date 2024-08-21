@@ -58,7 +58,7 @@ export const ChatInput = ({ user, chatId, bottomRef }: ChatInputProps) => {
 
   return (
     <div className="border-t-2 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-800">
-      <form onSubmit={handleSubmit} aria-disabled={isSending}>
+      <form onSubmit={handleSubmit}>
         <div className="relative flex items-center">
           <button
             type="button"
@@ -73,6 +73,7 @@ export const ChatInput = ({ user, chatId, bottomRef }: ChatInputProps) => {
             placeholder="메시지를 입력하세요..."
             className="w-full rounded-md border px-3 py-2 pl-10 focus:outline-none focus:ring-2 focus:ring-blue-500"
             value={message}
+            disabled={isSending}
             onChange={(e) => setMessage(e.target.value)}
           />
         </div>
