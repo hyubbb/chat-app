@@ -135,10 +135,9 @@ SELECT * FROM (
 	from messages m
     JOIN users u ON u.user_id = m.user_id
     where m.chat_id = ?
-    ORDER BY m.sent_at DESC
+    ORDER BY m.sent_at ASC
     LIMIT 50
-) AS sub
-ORDER BY sent_at DESC;
+) AS sub;
 `;
 
 // export const GET_DIRECT_MESSAGE_AFTER = `
