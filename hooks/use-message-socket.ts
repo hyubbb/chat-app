@@ -57,19 +57,39 @@ export const useMessageSocket = ({ chatId }: { chatId: number }) => {
           ? [...oldData.pages[0].messages, ...messages]
           : [...oldData.pages[0].messages, messages];
 
-        if (
-          (oldData.pages[0].messages.length === 1 && !messages_type) ||
-          messages_type === "deleted"
-        ) {
+        return {
+          ...oldData,
+          pages: [
+            {
+              messages: newMessages,
+              ...oldData.pages.slice(1),
+              nextPage: oldData.pages[0].nextPage,
+            },
+          ],
+        };
+      });
+    },
+    [],
+  );
+
+  const handleDeleteMessage = useCallback(
+    ({ chatId, messages }: categoriesPropsType) => {
+      queryClient.setQueryData(["messages", chatId], (oldData: any) => {
+        const newMessage = Array.isArray(messages) ? messages[0] : messages;
+        const updatesData = oldData.pages.map((page: any) => {
           return {
-            ...oldData,
-            pages: [{ messages: newMessages }, ...oldData.pages.slice(1)],
+            ...page,
+            messages: page.messages.map((oldMessage: any) =>
+              oldMessage.message_id === newMessage.message_id
+                ? newMessage
+                : oldMessage,
+            ),
           };
-        }
+        });
 
         return {
           ...oldData,
-          pages: [{ messages: newMessages }, ...oldData.pages.slice(1)],
+          pages: updatesData,
         };
       });
     },
@@ -80,10 +100,12 @@ export const useMessageSocket = ({ chatId }: { chatId: number }) => {
     if (!socket || !isConnected) return;
 
     socket.on("messages", handleMessageUpdate);
+    socket.on("deleteMessage", handleDeleteMessage);
     socket.on("receiveMessage", handleMessageUpdate);
 
     return () => {
       socket.off("messages", handleMessageUpdate);
+      socket.off("deleteMessage", handleDeleteMessage);
       socket.off("receiveMessage", handleMessageUpdate);
     };
   }, [socket, isConnected, handleMessageUpdate]);

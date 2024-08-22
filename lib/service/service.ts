@@ -369,6 +369,8 @@ export const deleteMessageAndGetMessages = async (
     result = (await executeQuery(GET_MESSAGE_AFTER, [
       userId,
       chatId,
+      messageId + 1,
+      1 + "",
     ])) as messagesType[];
   } else {
     result = (await executeQuery(GET_DIRECT_MESSAGE_AFTER, [

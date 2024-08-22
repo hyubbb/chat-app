@@ -113,6 +113,7 @@ export default async function handler(
 
   if (req.method === "PATCH") {
     // 메세지 전송 처리
+
     try {
       const body = await parseJsonData(req);
       const { userId, chatId, messageId, message_type, content } = body;
@@ -121,6 +122,7 @@ export default async function handler(
         chatId,
         messageId,
       );
+
       if (message_type === "image") {
         const urlParts = content?.split("/");
         const fileName = urlParts?.[urlParts?.length - 1]; // 경로의 마지막 부분이 파일 이름
@@ -131,7 +133,7 @@ export default async function handler(
           }),
         );
       }
-      res?.socket?.server?.io?.to(`chatRoom:${chatId}`).emit("messages", {
+      res?.socket?.server?.io?.to(`chatRoom:${chatId}`).emit("deleteMessage", {
         chatId,
         messages: result,
         messages_type: "deleted",

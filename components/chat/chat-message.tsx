@@ -48,9 +48,8 @@ export const ChatMessage = ({
 
     // TypeScript에게 messagesData의 타입을 알려줍니다
     const typedMessagesData = messagesData as InfiniteData<GetMessagesResult>;
-
     // 페이지를 복사하고 역순으로 정렬
-    const reversedPages = [...typedMessagesData.pages].reverse();
+    const reversedPages = [...typedMessagesData?.pages].reverse();
 
     // 각 페이지의 메시지를 flatMap으로 연결
     return reversedPages.flatMap((page) => page.messages);
@@ -109,7 +108,7 @@ export const ChatMessage = ({
       {!hasNextPage && <div className="flex-1" />}
       {/* {!hasNextPage && <ChatWelcome type={type} name={name} />} */}
 
-      {hasNextPage && messages.length >= 20 && (
+      {hasNextPage && (
         <div className="flex justify-center">
           {isFetchingNextPage ? (
             <Loader2 className="my-5 h-6 w-6 animate-spin text-zinc-500" />
