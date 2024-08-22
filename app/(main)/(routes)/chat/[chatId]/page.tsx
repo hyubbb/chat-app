@@ -1,10 +1,5 @@
 import { ChatRoom } from "@/components/chat/chat-room";
-import {
-  enteredRoomList,
-  getCategoryRooms,
-  getChatInfo,
-  getRoomMembers,
-} from "@/lib/service/service";
+import { getChatInfo, getRoomMembers } from "@/lib/service/service";
 import { RoomsType } from "@/types";
 
 export const metadata = {

@@ -8,14 +8,14 @@ import { messagesType } from "@/types";
 
 type categoriesPropsType = {
   chatId: number;
-  messages: MessageQueryProps;
+  messages: messagesType[];
   messages_type?: string;
   startTime: number;
-  nextPage: number;
+  nextCursor: number;
 };
 
 type MessageQueryProps = {
-  pages: { messages: messagesType[] | []; nextCursor: number };
+  pages: { messages: messagesType[]; nextCursor: number }[];
   pageParams: number[];
 };
 
@@ -29,13 +29,19 @@ export const useMessageSocket = ({ chatId }: { chatId: number }) => {
       messages,
       messages_type,
       startTime,
-      nextPage,
+      nextCursor,
     }: categoriesPropsType) => {
       const endTime = performance.now();
       const duration = endTime - startTime;
       console.log(`Socket.IO 처리 시간: ${duration.toFixed(2)}ms`);
 
+      const nextCursorKey =
+        messages.length >= 20
+          ? messages[messages.length - 1]?.message_id
+          : undefined;
+
       queryClient.setQueryData(["messages", chatId], (oldData: any) => {
+        if (!messages) return oldData;
         if (
           !oldData ||
           !oldData.pages ||
@@ -45,27 +51,29 @@ export const useMessageSocket = ({ chatId }: { chatId: number }) => {
           return {
             pages: [
               {
-                messages: Array.isArray(messages) ? messages : [messages],
-                nextPage: nextPage,
+                messages: messages,
+                nextCursor: nextCursorKey,
               },
             ],
-            pageParams: [nextPage],
+            pageParams: [undefined],
           };
         }
 
-        const newMessages = Array.isArray(messages)
-          ? [...oldData.pages[0].messages, ...messages]
-          : [...oldData.pages[0].messages, messages];
+        const oldMessages = oldData.pages[0].messages;
+        const oldCursorKey =
+          oldMessages.length >= 20
+            ? oldMessages[oldMessages.length - 1].message_id
+            : undefined;
+
+        const newMessages = Array.isArray(messages) ? messages : [messages];
+        const updatedFirstPage = {
+          messages: [...newMessages, ...oldData.pages[0].messages],
+          nextCursor: oldCursorKey || oldData.pages[0].nextCursor,
+        };
 
         return {
           ...oldData,
-          pages: [
-            {
-              messages: newMessages,
-              ...oldData.pages.slice(1),
-              nextPage: oldData.pages[0].nextPage,
-            },
-          ],
+          pages: [updatedFirstPage, ...oldData.pages.slice(1)],
         };
       });
     },

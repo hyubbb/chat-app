@@ -117,7 +117,8 @@ SELECT * FROM (
         m.sent_at DESC
     LIMIT ?
 ) AS sub
-ORDER BY sent_at ASC;
+ ORDER BY 
+        sent_at DESC;
 `;
 
 export const GET_DIRECT_MESSAGE_AFTER = `
@@ -137,7 +138,7 @@ SELECT * FROM (
     ORDER BY m.sent_at DESC
     LIMIT 50
 ) AS sub
-ORDER BY sent_at ASC;
+ORDER BY sent_at DESC;
 `;
 
 // export const GET_DIRECT_MESSAGE_AFTER = `

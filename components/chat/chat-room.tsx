@@ -21,10 +21,10 @@ export const ChatRoom = ({
   roomInfo: RoomsType;
   usersList: any;
 }) => {
-  const chatRef = useRef<ElementRef<"div">>(null);
-  const bottomRef = useRef<ElementRef<"div">>(null);
   const { setIsLoginModalOpen } = useStore();
   const { data: user, isLoading: userIsLoading } = useUserQuery();
+  const chatRef = useRef<ElementRef<"div">>(null);
+  const bottomRef = useRef<ElementRef<"div">>(null);
 
   useRoomSocket({ chatId, user: user });
   useEffect(() => {

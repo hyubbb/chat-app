@@ -1,7 +1,7 @@
 import { messagesType, UserType } from "@/types";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import { RefObject, useEffect, useMemo, useState } from "react";
+import { ElementRef, Fragment, RefObject, useState } from "react";
 import { Loading } from "../loading";
 import { FileUploadModal } from "../modal/file-upload-modal";
 import { ChatItem } from "./chat-item";
@@ -9,17 +9,12 @@ import { Loader2 } from "lucide-react";
 import { useChatScroll } from "@/hooks/use-chat-scroll";
 import { useMessageQuery } from "@/hooks/use-message.query";
 import { useMessageSocket } from "@/hooks/use-message-socket";
-import { InfiniteData } from "@tanstack/react-query";
 
 type ChatMessageProps = {
   user: UserType | null;
   chatId: number;
-  chatRef: RefObject<HTMLDivElement>;
-  bottomRef: RefObject<HTMLDivElement>;
-};
-type GetMessagesResult = {
-  messages: messagesType[];
-  nextPage: number | undefined;
+  chatRef: RefObject<ElementRef<"div">>;
+  bottomRef: RefObject<ElementRef<"div">>;
 };
 
 export const ChatMessage = ({
@@ -29,8 +24,7 @@ export const ChatMessage = ({
   bottomRef,
 }: ChatMessageProps) => {
   const router = useRouter();
-
-  // const [init, setInit] = useState(true);
+  const [init, setInit] = useState(true);
 
   const {
     data: messagesData,
@@ -42,18 +36,8 @@ export const ChatMessage = ({
     chatId,
     user,
   });
+
   useMessageSocket({ chatId });
-  const messages = useMemo(() => {
-    if (!messagesData) return [];
-
-    // TypeScript에게 messagesData의 타입을 알려줍니다
-    const typedMessagesData = messagesData as InfiniteData<GetMessagesResult>;
-    // 페이지를 복사하고 역순으로 정렬
-    const reversedPages = [...typedMessagesData?.pages].reverse();
-
-    // 각 페이지의 메시지를 flatMap으로 연결
-    return reversedPages.flatMap((page) => page.messages);
-  }, [messagesData]);
 
   useChatScroll({
     chatRef,
@@ -61,20 +45,6 @@ export const ChatMessage = ({
     loadMore: fetchNextPage,
     shouldLoadMore: !isFetchingNextPage && !!hasNextPage,
   });
-
-  // useEffect(() => {
-  //   if (init) {
-  //     bottomRef?.current?.scrollIntoView({ behavior: "instant" });
-  //     const timer = setTimeout(() => setInit(false), 2000);
-  //     return () => clearTimeout(timer);
-  //   }
-  // }, [init, bottomRef]);
-
-  // useEffect(() => {
-  //   if (!init) {
-  //     bottomRef?.current?.scrollIntoView({ behavior: "smooth" });
-  //   }
-  // }, [init, bottomRef, messages]);
 
   const directMessage = ({ userId }: { userId: number }) => {
     router.push(`/direct/${userId}`);
@@ -100,13 +70,13 @@ export const ChatMessage = ({
   if (status === "pending") {
     return <Loading />;
   }
+
   return (
     <div
       ref={chatRef}
-      className="mt-auto flex flex-col gap-y-2 overflow-y-auto overflow-x-hidden dark:text-zinc-300"
+      className="flex flex-1 flex-col gap-y-2 overflow-y-auto overflow-x-hidden dark:text-zinc-300"
     >
       {!hasNextPage && <div className="flex-1" />}
-      {/* {!hasNextPage && <ChatWelcome type={type} name={name} />} */}
 
       {hasNextPage && (
         <div className="flex justify-center">
@@ -123,21 +93,25 @@ export const ChatMessage = ({
         </div>
       )}
 
-      {/* Chat messages would go here */}
-      {messages &&
-        messages?.map((data) => {
-          return (
-            <ChatItem
-              key={`${data.message_id}_${data.sent_at}`}
-              message={data}
-              user={user}
-              directMessage={directMessage}
-              handleDelete={handleDelete}
-            />
-          );
-        })}
+      <div className="mt-auto flex flex-col-reverse">
+        {messagesData?.pages?.map((group, i) => (
+          <Fragment key={i}>
+            {group.messages.map((data: messagesType) => (
+              <ChatItem
+                key={`${data.message_id}_${data.sent_at}`}
+                message={data}
+                user={user}
+                directMessage={directMessage}
+                handleDelete={handleDelete}
+              />
+            ))}
+          </Fragment>
+        ))}
+      </div>
+
+      <div ref={bottomRef} />
+
       <FileUploadModal user={user} chatId={chatId} type="message" />
-      <div ref={bottomRef}></div>
     </div>
   );
 };

@@ -69,23 +69,26 @@ export default async function handler(
       } else {
         result = [result];
       }
+      let newCursor = undefined;
+      if (result.length >= 20) {
+        newCursor = result[result.length - 1]?.message_id;
+      }
+
       io.to(ROOM_TYPE).emit("messages", {
         chatId,
         messages: result,
-        nextCursor: result[0].message_id,
+        nextCursor: newCursor,
         messages_type: MESSAGE_TYPE,
       });
       // 방문한 방의 목록
       const userEnteredRoomList = await enteredRoomList(userId);
       io.to(`userRoom:${userId}`).emit("joinRoomList", userEnteredRoomList);
-
       res.status(200).json({
         success: true,
         data: {
-          chatId,
           messages: result,
           messages_type: MESSAGE_TYPE,
-          nextCursor: result && result[0].message_id,
+          nextCursor: result && newCursor,
         },
         message: "User joined the chat room successfully",
       });

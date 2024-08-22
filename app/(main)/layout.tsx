@@ -11,17 +11,17 @@ import { cookies } from "next/headers";
 
 const loginAuth = async () => {
   try {
-    // const cookieStore = cookies();
-    // const token = cookieStore.get("chat-token");
-    // const res = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/user`, {
-    //   method: "GET",
-    //   headers: {
-    //     "Content-Type": "application/json",
-    //     Cookie: `chat-token=${token?.value}`,
-    //   },
-    // });
-    // const data = await res.json();
-    // return data;
+    const cookieStore = cookies();
+    const token = cookieStore.get("chat-token");
+    const res = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/user`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Cookie: `chat-token=${token?.value}`,
+      },
+    });
+    const data = await res.json();
+    return data;
   } catch (error) {
     console.error("Error in loginAuth:", error);
     return null;
@@ -40,7 +40,7 @@ const MainLayout = async ({ children }: { children: React.ReactNode }) => {
   const categories = await resCategories.json();
 
   return (
-    <div className="flex h-screen flex-col">
+    <div className="flex h-full flex-col">
       <HeaderMenu user={user} />
       <div className="flex h-[calc(100vh-70px)] overflow-hidden max-sm:flex-col max-sm:overflow-auto">
         <SideMenu user={user} dmList={dmList} categories={categories} />

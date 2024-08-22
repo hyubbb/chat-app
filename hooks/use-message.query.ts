@@ -1,4 +1,5 @@
 import {
+  keepPreviousData,
   useInfiniteQuery,
   UseInfiniteQueryResult,
 } from "@tanstack/react-query";
@@ -13,54 +14,43 @@ type useMessageQueryType = {
   direct?: boolean;
 };
 
-type GetMessagesResult = {
-  messages: messagesType[];
-  nextPage: number | undefined;
-};
-
 export const useMessageQuery = ({
   chatId,
   user,
   direct = false,
-}: useMessageQueryType): UseInfiniteQueryResult => {
+}: useMessageQueryType) => {
   const { isConnected } = useStore();
   const isUser = user !== null;
 
-  const getMessages = useCallback(
-    async ({
-      pageParam = undefined,
-    }: {
-      pageParam?: number;
-    }): Promise<GetMessagesResult> => {
-      if (!isUser) return { messages: [], nextPage: undefined };
-      try {
-        const { data } = await axios.post(`/api/socket/chat/${chatId}`, {
-          userId: user?.user_id,
-          userName: user?.user_name,
-          direct,
-          cursor: pageParam,
-        });
-        const messages = data.success ? data.data.messages : [];
-        const nextPage =
-          messages.length === 20 ? data.data.nextCursor : undefined;
+  const getMessages = async ({
+    pageParam = undefined,
+  }: {
+    pageParam?: number;
+  }) => {
+    if (!isUser) return { messages: [], nextCursor: undefined };
+    try {
+      const { data } = await axios.post(`/api/socket/chat/${chatId}`, {
+        userId: user?.user_id,
+        userName: user?.user_name,
+        direct,
+        cursor: pageParam,
+      });
+      return data.data;
+    } catch (error) {
+      console.error("Error fetching messages:", error);
+      return { messages: [], nextCursor: undefined };
+    }
+  };
 
-        return { messages, nextPage };
-      } catch (error) {
-        console.error("Error fetching messages:", error);
-        return { messages: [], nextPage: undefined };
-      }
-    },
-    [chatId, user, direct],
-  );
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, status } =
+    useInfiniteQuery({
+      queryKey: ["messages", chatId],
+      queryFn: getMessages,
+      getNextPageParam: (lastPage) => lastPage?.nextCursor,
+      refetchInterval: isConnected ? false : 1000,
+      initialPageParam: undefined,
+      refetchOnMount: false,
+    });
 
-  return useInfiniteQuery({
-    queryKey: ["messages", chatId],
-    queryFn: getMessages,
-    getNextPageParam: (lastPage) => {
-      return lastPage.nextPage;
-    },
-    enabled: !!isUser,
-    refetchInterval: isConnected ? false : 1000,
-    initialPageParam: undefined,
-  });
+  return { data, fetchNextPage, hasNextPage, isFetchingNextPage, status };
 };

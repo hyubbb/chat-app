@@ -1,12 +1,12 @@
 import { useStore } from "@/store/use-store";
 import { UserType } from "@/types";
 import { Plus } from "lucide-react";
-import { RefObject, useEffect, useRef, useState } from "react";
+import { ElementRef, RefObject, useEffect, useRef, useState } from "react";
 
 type ChatInputProps = {
   user: UserType | null;
   chatId: number;
-  bottomRef: RefObject<HTMLDivElement>;
+  bottomRef: RefObject<ElementRef<"div">>;
 };
 
 export const ChatInput = ({ user, chatId, bottomRef }: ChatInputProps) => {
