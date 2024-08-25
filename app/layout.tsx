@@ -4,7 +4,6 @@ import "./globals.css";
 import { SocketProvider } from "@/components/providers/socket-providers";
 import { QueryProvider } from "@/components/providers/query-provider";
 import localFont from "next/font/local";
-const inter = Inter({ subsets: ["latin"] });
 
 const pretendard = localFont({
   src: "../public/fonts/Pretendard.woff2",
