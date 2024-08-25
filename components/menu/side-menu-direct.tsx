@@ -54,7 +54,7 @@ export const SideMenuDirect = ({
                 >
                   <div className="flex items-center justify-center rounded-full bg-zinc-950 text-sm font-bold text-white">
                     {other_photo_url ? (
-                      <div className="relative h-12 w-12 overflow-hidden rounded-full bg-white">
+                      <div className="relative flex h-12 w-12 items-center justify-center overflow-hidden rounded-full bg-white">
                         <Image
                           src={other_photo_url}
                           width={100}

@@ -13,7 +13,6 @@ type ChatPageProps = {
 };
 
 const getChat = async (chatId: number) => {
-  // if (chatId === undefined) return;
   const [roomInfo] = (await getChatInfo(chatId)) as RoomsType[];
   return roomInfo;
 };

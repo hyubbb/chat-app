@@ -22,7 +22,7 @@ const ServerHandler = (req: NextApiRequest, res: NextApiResponseServerIo) => {
     io.on("connection", (socket) => {
       console.log("서버 connection");
 
-      socket.on("joinRoom", ({ chatId }: { chatId: string }) => {
+      socket.on("createChatRoom", ({ chatId }: { chatId: string }) => {
         socket.join(`chatRoom:${chatId}`);
       });
 
@@ -85,10 +85,8 @@ const ServerHandler = (req: NextApiRequest, res: NextApiResponseServerIo) => {
           });
 
           // 메시지를 채팅방에 방송
-          // socket.to(`chatRoom:${chatId}`).emit("receiveMessage", result);
           callback && callback({ success: true });
-
-          io.to(`chatRoom:${chatId}`).emit("receiveMessage", {
+          io.to(`chatRoom:${chatId}`).emit("messages", {
             chatId: +chatId,
             messages: result,
             messages_type: type,
@@ -97,8 +95,6 @@ const ServerHandler = (req: NextApiRequest, res: NextApiResponseServerIo) => {
         } catch (error) {
           console.error("Error processing message:", error);
         }
-
-        // socket.to(`chatRoom:${chatId}`).emit("receiveMessage", message);
       });
 
       socket.on("disconnect", () => {

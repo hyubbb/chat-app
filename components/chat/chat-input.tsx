@@ -11,10 +11,10 @@ type ChatInputProps = {
 
 export const ChatInput = ({ user, chatId, bottomRef }: ChatInputProps) => {
   const inputRef = useRef<HTMLInputElement>(null);
-  const { setIsUploadModalOpen } = useStore();
   const { socket } = useStore();
   const [message, setMessage] = useState("");
   const [isSending, setIsSending] = useState(false); // 메시지 전송 상태 관리
+  const { setIsUploadModalOpen } = useStore();
   useEffect(() => {
     inputRef?.current?.focus();
   }, [inputRef, isSending]);
@@ -27,6 +27,7 @@ export const ChatInput = ({ user, chatId, bottomRef }: ChatInputProps) => {
     setIsSending(true); // 메시지 전송 상태 변경
     const startTime = performance.now(); // 메시지 전송 시점 기록
 
+    // socket.io 방식
     socket?.emit(
       "sendMessage",
       {
@@ -45,6 +46,7 @@ export const ChatInput = ({ user, chatId, bottomRef }: ChatInputProps) => {
       },
     );
 
+    // api 호출 방식
     // await axios.post("/api/socket/message", {
     //   userId: user?.user_id,
     //   chatId,
