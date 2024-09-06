@@ -9,7 +9,7 @@ import { useUserQuery } from "@/store/use-user-query";
 import axios from "axios";
 
 export const RoomList = () => {
-  const [selectedRoom, setSelectedRoom] = useState<RoomsType | null>(null);
+  const [selectedRoom, _] = useState<RoomsType | null>(null);
   const { selected: roomsInCategory, setSelectedChat } = useRoomStore();
   const { data: user } = useUserQuery();
   const router = useRouter();

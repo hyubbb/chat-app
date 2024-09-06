@@ -2,7 +2,6 @@
 import { useUserQuery } from "@/store/use-user-query";
 import { Login } from "../auth/log-in";
 import { Logout } from "../auth/log-out";
-import { Loading } from "../loading";
 import { LoginModal } from "../modal/login-modal";
 import { EditModal } from "../modal/edit-modal";
 import { UserType } from "@/types";

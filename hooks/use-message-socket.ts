@@ -36,7 +36,7 @@ export const useMessageSocket = ({ chatId }: { chatId: number }) => {
       console.log(`Socket.IO 처리 시간: ${duration.toFixed(2)}ms`);
 
       const nextCursorKey =
-        messages.length >= 20
+        messages?.length >= 20
           ? messages[messages.length - 1]?.message_id
           : undefined;
 
@@ -109,12 +109,10 @@ export const useMessageSocket = ({ chatId }: { chatId: number }) => {
 
     socket.on("messages", handleMessageUpdate);
     socket.on("deleteMessage", handleDeleteMessage);
-    socket.on("receiveMessage", handleMessageUpdate);
 
     return () => {
       socket.off("messages", handleMessageUpdate);
       socket.off("deleteMessage", handleDeleteMessage);
-      socket.off("receiveMessage", handleMessageUpdate);
     };
   }, [socket, isConnected, handleMessageUpdate]);
 };

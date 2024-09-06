@@ -24,8 +24,8 @@ export const ChatMessage = ({
   bottomRef,
 }: ChatMessageProps) => {
   const router = useRouter();
-  const [init, setInit] = useState(true);
 
+  // useInfiniteQuery를 사용하여 메시지 데이터를 가져옴
   const {
     data: messagesData,
     fetchNextPage,
@@ -37,6 +37,7 @@ export const ChatMessage = ({
     user,
   });
 
+  // socket.on을 사용하여 메시지 소켓을 가져옴
   useMessageSocket({ chatId });
 
   useChatScroll({

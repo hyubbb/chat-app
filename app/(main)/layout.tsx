@@ -30,6 +30,8 @@ const loginAuth = async () => {
 
 const MainLayout = async ({ children }: { children: React.ReactNode }) => {
   // const { user } = await loginAuth();
+
+  // JWT쿠키 정보를 가져와서 user 정보를 가져온다.
   const resUser = await fetchCookiesUser();
   const user = (await resUser?.json())?.user;
 
