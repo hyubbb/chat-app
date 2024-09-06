@@ -97,7 +97,7 @@ export const ChatHeader = ({
                   className="flex items-center gap-2"
                 >
                   {user?.photo_url ? (
-                    <div className="h-8 w-8 rounded-full bg-gray-200">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-200">
                       <Image
                         src={user.photo_url}
                         alt={user.user_name}
