@@ -18,6 +18,7 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponseServerIo,
 ) {
+  // DM 메세지 목록 가져오기
   if (req.method === "GET") {
     const { chatId } = req.query;
     if (!chatId) {
@@ -27,6 +28,7 @@ export default async function handler(
     res.status(200).json({ result, success: true });
   }
 
+  // DM 채팅방 참여, 초기 메세지 불러오기
   if (req.method === "POST") {
     try {
       const chatId = parseInt(req.query.chatId as string, 10);
@@ -81,6 +83,7 @@ export default async function handler(
     }
   }
 
+  // DM 채팅방 나가기
   if (req.method === "PATCH") {
     const { chatId } = req.query;
     const { userId, userName, exit_count } = req.body;

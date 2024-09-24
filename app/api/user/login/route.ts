@@ -5,6 +5,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 const SECRET_KEY = process.env.JWT_SECRET as string;
 
+// 로그인 처리를 하고, JWT를 생성하여 쿠키에 저장
 export async function POST(request: NextRequest) {
   try {
     const { id, password } = await request.json();

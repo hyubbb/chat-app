@@ -17,7 +17,7 @@ const climateCrisis = Climate_Crisis({
 
 export const HeaderMenu = ({ user: initUser }: { user: UserType }) => {
   const { data: user, refetch } = useUserQuery(initUser);
-  const { isMenuModalOpen, setIsMenuModalOpen } = useStore();
+  const { setIsMenuModalOpen } = useStore();
   refetch();
   const handleOpenRooms = () => {
     setIsMenuModalOpen(true);

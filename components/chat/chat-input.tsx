@@ -46,7 +46,7 @@ export const ChatInput = ({ user, chatId, bottomRef }: ChatInputProps) => {
       },
     );
 
-    // api 호출 방식
+    // api 호출 방식 비교용 코드
     // await axios.post("/api/socket/message", {
     //   userId: user?.user_id,
     //   chatId,

@@ -2,6 +2,11 @@ import { CategoriesType, UserType } from "@/types";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 
+/**
+ *
+ * @description 카테고리 정보를 가져오는 API를 호출하여 데이터를 가져옴
+ * 초기 데이터를 받아와서 캐시에 저장
+ */
 export const useCategoryQuery = ({
   user,
   initCategories,

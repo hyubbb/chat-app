@@ -22,14 +22,16 @@ const ServerHandler = (req: NextApiRequest, res: NextApiResponseServerIo) => {
     io.on("connection", (socket) => {
       console.log("서버 connection");
 
+      // 채팅방 socket.room 설정
       socket.on("createChatRoom", ({ chatId }: { chatId: string }) => {
         socket.join(`chatRoom:${chatId}`);
       });
-
+      // 유저별 socket.room 설정
       socket.on("joinRoomList", ({ userId }: { userId: string }) => {
         socket.join(`userRoom:${userId}`);
       });
 
+      // DM방과 DM방의 유저별 socket.room 설정
       socket.on(
         "directMessage",
         ({ dmName, userId }: { dmName: string; userId: number }) => {
@@ -38,6 +40,8 @@ const ServerHandler = (req: NextApiRequest, res: NextApiResponseServerIo) => {
         },
       );
 
+      // Socket 통신으로 메시지를 전송하고 받는 부분
+      // api-socket 통신과 비교하기 위해서 추가한 코드
       socket.on("sendMessage", async (data, callback) => {
         const {
           userId,

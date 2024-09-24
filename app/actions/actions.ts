@@ -8,6 +8,26 @@ import { enteredDMList, getCategoryRooms } from "@/lib/service/service";
 
 const SECRET_KEY = process.env.JWT_SECRET as string;
 
+export const fetchData = async () => {
+  const userResponse = await fetchCookiesUser();
+  const userData = await userResponse?.json();
+  const user = userData?.user;
+
+  const [dmListResponse, categoriesResponse] = await Promise.all([
+    user ? fetchDmList(user) : null,
+    fetchCategories(),
+  ]);
+
+  const dmListData = user ? await dmListResponse?.json() : null;
+  const categoriesData = await categoriesResponse.json();
+
+  return {
+    user,
+    dmList: dmListData?.data,
+    categories: categoriesData,
+  };
+};
+
 export const fetchCookiesUser = async () => {
   const cookieStore = cookies();
   const token = cookieStore.get("chat-token")?.value;

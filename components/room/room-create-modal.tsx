@@ -22,10 +22,11 @@ export default function RoomCreateModal({
   const [isNewCategory, setIsNewCategory] = useState(false);
   const [allRoomsData, setAllRoomsData] = useState<RoomsType[]>([]);
 
+  // 전체의 채팅방 데이터를 가져옴, 채팅방 이름이 중복되는지 확인하기 위해서
   useEffect(() => {
     if (!categories) return;
     categories?.map(({ rooms }) => {
-      return setAllRoomsData([...rooms]);
+      return setAllRoomsData((prev) => [...prev, ...rooms]);
     });
   }, [categories]);
 
@@ -36,16 +37,22 @@ export default function RoomCreateModal({
     setIsNewCategory(false);
   }, []);
 
+  // 카테고리명 중복 확인
   const isDuplicateCategory = useCallback(
     (category: string) =>
       categories.some(({ category_name }) => category_name === category),
     [categories],
   );
 
+  // 채팅방 이름 중복 확인
   const isDuplicateRoom = useCallback(
-    (room: string) => allRoomsData.some(({ room_name }) => room_name === room),
-    [allRoomsData],
+    (room: string) => {
+      return allRoomsData.some(({ room_name }) => room_name == room);
+    },
+
+    [allRoomsData, roomTitle],
   );
+
   const fetchRoomPost = useCallback(
     async (title: any, categoryName: any) => {
       // 새 채팅방 생성 로직
@@ -61,10 +68,8 @@ export default function RoomCreateModal({
   const handleCreateRoom = useCallback(() => {
     const category = isNewCategory ? newCategory : selectedCategory;
 
-    if (
-      (isNewCategory && isDuplicateCategory(category)) ||
-      isDuplicateRoom(roomTitle)
-    ) {
+    // 카테고리명 또는 채팅방 이름이 중복되는지 확인
+    if (isDuplicateCategory(category) || isDuplicateRoom(roomTitle)) {
       alert("중복된 카테고리 또는 채팅방 이름입니다.");
       return;
     }

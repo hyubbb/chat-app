@@ -44,6 +44,7 @@ JWT, Socket.io, MySQL, RDS, S3, EC2, Github Actions
 - 유저정보 유지
     - `JWT`를 이용하여 쿠키에 토큰 값을 저장하여 로그인 정보 확인
 
+
 ## 해결하고자 한 문제
 
  

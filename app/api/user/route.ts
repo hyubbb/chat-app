@@ -8,6 +8,24 @@ import { getUserInfo, updateUser } from "@/lib/service/service";
 
 const SECRET_KEY = process.env.JWT_SECRET as string;
 
+const generateJWT = (user: UserType) => {
+  const payload = {
+    id: user.id,
+    user_id: user.user_id,
+    user_name: user.user_name,
+    photo_url: user.photo_url,
+    role: user.role,
+  };
+
+  const secretKey = process.env.JWT_SECRET as string; // 환경 변수에서 비밀 키를 가져옵니다
+  const options = {
+    expiresIn: "1h", // 토큰 만료 시간 (예: 1시간)
+  };
+
+  return jwt.sign(payload, secretKey, options);
+};
+
+// 토큰값을 확인한 후, 사용자 정보 가져오기
 export async function GET(request: NextRequest) {
   const tokenCookie = request.cookies.get("chat-token");
 
@@ -40,23 +58,8 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ message: "Invalid token" }, { status: 403 });
   }
 }
-const generateJWT = (user: UserType) => {
-  const payload = {
-    id: user.id,
-    user_id: user.user_id,
-    user_name: user.user_name,
-    photo_url: user.photo_url,
-    role: user.role,
-  };
 
-  const secretKey = process.env.JWT_SECRET as string; // 환경 변수에서 비밀 키를 가져옵니다
-  const options = {
-    expiresIn: "1h", // 토큰 만료 시간 (예: 1시간)
-  };
-
-  return jwt.sign(payload, secretKey, options);
-};
-
+// 사용자 정보 수정
 export async function PATCH(request: NextRequest) {
   try {
     const formData = await request.formData();

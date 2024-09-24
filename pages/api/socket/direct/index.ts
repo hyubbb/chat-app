@@ -1,5 +1,6 @@
 import {
   deleteMessageAndGetMessages,
+  enteredDMList,
   sendDMAndGetDM,
 } from "@/lib/service/service";
 import { NextApiResponseServerIo } from "@/types";
@@ -46,6 +47,7 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponseServerIo,
 ) {
+  // 메세지 전송, 이미지 업로드 처리
   if (req.method === "POST") {
     // 메세지 전송 처리
     let userId, chatId, message, type, startTime;
