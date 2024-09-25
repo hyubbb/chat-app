@@ -68,24 +68,6 @@ export default async function handler(
 
       // 상대방에게도 DM 방 목록을 업데이트해 줍니다.
       io.to(`userRoom:${chatId}`).emit("joinDmList", otherUserEnteredRoomList);
-
-      // res.status(200).json({
-      //   success: true,
-      //   data: {
-      //     chatId,
-      //     messages: result,
-      //     messages_type: MESSAGE_TYPE,
-      //   },
-      //   message: "User joined the chat room successfully",
-      // });
-
-      // res?.socket?.server?.io?.to(`dm_${roomId}`).emit("directMessages", {
-      //   messages: result,
-      //   messages_type: "direct",
-      //   roomId,
-      //   startTime,
-      // });
-      // res.status(200).json({ success: true });
     } catch (error) {
       console.error("Error in chat room joining process:", error);
       res.status(500).json({
@@ -133,7 +115,7 @@ export default async function handler(
 
       const userEnteredRoomList = await enteredDMList(userId);
       io.to(`userRoom:${userId}`).emit("joinDmList", userEnteredRoomList);
-
+      io.to(`userRoom:${userId}`).emit("leaveDm", roomId);
       res.status(200).json({ result, success: true });
     }
 

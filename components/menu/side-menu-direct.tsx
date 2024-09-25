@@ -69,13 +69,8 @@ export const SideMenuDirect = ({
                       <div className="h-12 w-12 rounded-full bg-black"></div>
                     )}
                   </div>
-                  <div className="flex flex-1 items-center justify-between">
-                    <div>
-                      <span>{other_name}</span>
-                    </div>
-                    <div className="flex items-center justify-center pr-2">
-                      <MessageSquareMore size={18} color="white" />
-                    </div>
+                  <div>
+                    <span>{other_name}</span>
                   </div>
                 </li>
               );

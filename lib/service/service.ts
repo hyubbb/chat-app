@@ -454,6 +454,7 @@ export const leaveDM = async (
     }
     // roomId 가 일치하는 방을 전부다 찾아서 other_user_leave을 업데이트 해준다.
     await executeQuery(PATCH_DM_CHAT_ROOM, [roomId]);
+
     return res?.affectedRows > 0;
   } catch (error) {
     console.error("방 나가기 중 오류 발생:", error);

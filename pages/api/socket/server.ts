@@ -18,6 +18,7 @@ const ServerHandler = (req: NextApiRequest, res: NextApiResponseServerIo) => {
     const io = new ServerIO(httpServer, {
       path: path,
       addTrailingSlash: false,
+      maxHttpBufferSize: 1e8, // 10MB
     });
 
     res.socket.server.io = io;

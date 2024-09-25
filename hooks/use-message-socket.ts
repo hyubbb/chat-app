@@ -62,7 +62,6 @@ export const useMessageSocket = ({ chatId }: { chatId: number }) => {
           messages: [...newMessages, ...oldData.pages[0].messages],
           nextCursor: oldCursorKey || oldData.pages[0].nextCursor,
         };
-
         return {
           ...oldData,
           pages: [updatedFirstPage, ...oldData.pages.slice(1)],

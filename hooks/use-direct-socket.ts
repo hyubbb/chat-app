@@ -58,6 +58,10 @@ export const useDirectSocket = ({
     queryClient.setQueryData(["dmList"], data);
   };
 
+  const handleLeaveDM = (roomId: string) => {
+    queryClient.removeQueries({ queryKey: ["directMessages", roomId] });
+  };
+
   // DM 채팅방 입장 -> toId(상대방의ID)가 있을경우
   useEffect(() => {
     if (!socket || !isConnected || !toId || !user?.user_id) return;
@@ -75,10 +79,12 @@ export const useDirectSocket = ({
 
     socket.on("directMessages", handleMessageUpdate);
     socket.on("joinDmList", handleDmListUpdate);
+    socket.on("leaveDm", handleLeaveDM);
 
     return () => {
       socket.off("directMessages", handleMessageUpdate);
       socket.off("joinDmList", handleDmListUpdate);
+      socket.off("leaveDm", handleLeaveDM);
     };
   }, [socket, isConnected, handleMessageUpdate, handleDmListUpdate]);
 };
