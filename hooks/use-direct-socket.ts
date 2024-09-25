@@ -7,10 +7,9 @@ import { messagesType, UserType } from "@/types";
 import { createDMRoomId } from "@/util/utils";
 
 type DirectSocketPropsType = {
-  chatId: number;
   messages: messagesType[];
   messages_type?: string;
-  dmRoomId: string;
+  roomId: string;
   startTime: number;
 };
 
@@ -19,23 +18,22 @@ export const useDirectSocket = ({
   user,
 }: {
   user: UserType | null;
-  toId: number;
+  toId?: number;
 }) => {
   const { socket, isConnected } = useStore();
   const queryClient = useQueryClient();
 
   const handleMessageUpdate = ({
-    chatId,
     messages,
     messages_type,
-    dmRoomId,
+    roomId,
     startTime,
   }: DirectSocketPropsType) => {
     const endTime = performance.now(); // 응답 수신 시점 기록
     const duration = endTime - startTime;
     console.log(`Api-Socket.io 처리 시간: ${duration.toFixed(2)}ms`);
     queryClient.setQueryData(
-      ["directMessages", dmRoomId],
+      ["directMessages", roomId],
       (oldData: messagesType[]) => {
         if (!oldData || !oldData.length || !messages_type) {
           // 초기 로딩: messages가 배열일 것으로 예상
@@ -60,19 +58,27 @@ export const useDirectSocket = ({
     queryClient.setQueryData(["dmList"], data);
   };
 
+  // DM 채팅방 입장 -> toId(상대방의ID)가 있을경우
   useEffect(() => {
     if (!socket || !isConnected || !toId || !user?.user_id) return;
+
     socket.emit("directMessage", {
-      dmName: createDMRoomId(toId, user?.user_id),
+      roomId: createDMRoomId(toId, user.user_id),
       chatId: toId,
-      userId: user?.user_id,
+      userId: user.user_id,
     });
-    socket.on("getDirectMessages", handleMessageUpdate);
+  }, [socket, isConnected, toId, user?.user_id]);
+
+  // DM 관련 소켓 이벤트설정
+  useEffect(() => {
+    if (!socket || !isConnected || toId) return;
+
+    socket.on("directMessages", handleMessageUpdate);
     socket.on("joinDmList", handleDmListUpdate);
 
     return () => {
-      socket.off("getDirectMessages", handleMessageUpdate);
+      socket.off("directMessages", handleMessageUpdate);
       socket.off("joinDmList", handleDmListUpdate);
     };
-  }, [socket, isConnected, toId, user?.user_id]);
+  }, [socket, isConnected, handleMessageUpdate, handleDmListUpdate]);
 };

@@ -26,7 +26,6 @@ export const ChatInput = ({ user, chatId, bottomRef }: ChatInputProps) => {
     setMessage("");
     setIsSending(true); // 메시지 전송 상태 변경
     const startTime = performance.now(); // 메시지 전송 시점 기록
-
     // socket.io 방식
     socket?.emit(
       "sendMessage",

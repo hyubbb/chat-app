@@ -1,5 +1,5 @@
 import { CollapseStateType, dmListType, UserType } from "@/types";
-import { ChevronDown, ChevronRight } from "lucide-react";
+import { ChevronDown, ChevronRight, MessageSquareMore } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 
@@ -69,8 +69,13 @@ export const SideMenuDirect = ({
                       <div className="h-12 w-12 rounded-full bg-black"></div>
                     )}
                   </div>
-                  <div className="">
-                    <span>{other_name}</span>
+                  <div className="flex flex-1 items-center justify-between">
+                    <div>
+                      <span>{other_name}</span>
+                    </div>
+                    <div className="flex items-center justify-center pr-2">
+                      <MessageSquareMore size={18} color="white" />
+                    </div>
                   </div>
                 </li>
               );

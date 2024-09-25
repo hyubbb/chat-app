@@ -1,5 +1,5 @@
 import { useStore } from "@/store/use-store";
-import { UserType } from "@/types";
+import { dmListType, UserType } from "@/types";
 import axios from "axios";
 import { Plus } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
@@ -7,9 +7,10 @@ import { useEffect, useRef, useState } from "react";
 type ChatInputProps = {
   user: UserType | null;
   chatId: number;
+  dmInfo: dmListType | null;
 };
 
-export const ChatInput = ({ user, chatId }: ChatInputProps) => {
+export const ChatInput = ({ user, dmInfo }: ChatInputProps) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const [message, setMessage] = useState("");
   const { setIsUploadModalOpen } = useStore();
@@ -27,7 +28,7 @@ export const ChatInput = ({ user, chatId }: ChatInputProps) => {
     setMessage("");
     const res = await axios.post("/api/socket/direct", {
       userId: user?.user_id,
-      chatId,
+      roomId: dmInfo?.room_id,
       message,
       startTime,
     });
@@ -54,6 +55,7 @@ export const ChatInput = ({ user, chatId }: ChatInputProps) => {
             className="w-full rounded-md border px-3 py-2 pl-10 focus:outline-none focus:ring-2 focus:ring-blue-500"
             value={message}
             onChange={(e) => setMessage(e.target.value)}
+            disabled={dmInfo?.other_user_leave}
           />
         </div>
       </form>

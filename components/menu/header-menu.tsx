@@ -9,6 +9,8 @@ import { Climate_Crisis } from "next/font/google";
 import Link from "next/link";
 import { useStore } from "@/store/use-store";
 import { EllipsisVertical } from "lucide-react";
+import { useSocket } from "@/hooks/use-socket";
+import { useDirectSocket } from "@/hooks/use-direct-socket";
 
 const climateCrisis = Climate_Crisis({
   subsets: ["latin"],
@@ -19,6 +21,8 @@ export const HeaderMenu = ({ user: initUser }: { user: UserType }) => {
   const { data: user, refetch } = useUserQuery(initUser);
   const { setIsMenuModalOpen } = useStore();
   refetch();
+  useSocket({ initUser });
+  useDirectSocket({ user });
   const handleOpenRooms = () => {
     setIsMenuModalOpen(true);
   };

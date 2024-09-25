@@ -5,7 +5,10 @@ import { useStore } from "@/store/use-store";
 export const Login = () => {
   const { setIsLoginModalOpen, setIsSignUpModalOpen } = useStore();
   return (
-    <div className="flex w-full items-center justify-end space-x-2 p-[10px] max-sm:w-full">
+    <div
+      className="flex w-full items-center justify-end space-x-2 p-[10px] max-sm:w-full"
+      id="login-btn"
+    >
       <div className="flex items-center gap-x-3">
         <span className="font-semibold dark:text-zinc-300"></span>
       </div>

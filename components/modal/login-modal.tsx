@@ -54,7 +54,10 @@ export const LoginModal = () => {
 
   if (!isLoginModalOpen) return null;
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4"
+      id="login-modal"
+    >
       <div className="w-full max-w-md rounded-lg bg-white shadow-xl dark:bg-gray-800">
         <div className="flex items-center justify-between border-b p-6 dark:border-gray-700">
           <h2 className="text-xl font-semibold dark:text-white">로 그 인</h2>
