@@ -16,6 +16,7 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponseServerIo,
 ) {
+  // 채팅방 멤버 조회
   if (req.method === "GET") {
     const { chatId } = req.query;
     if (!chatId) {
@@ -24,7 +25,7 @@ export default async function handler(
     const result = await getRoomMembers(+chatId);
     res.status(200).json({ result, success: true });
   }
-
+  // 채팅방에 참여, 초기 메세지 불러오기
   if (req.method === "POST") {
     try {
       const chatId = parseInt(req.query.chatId as string, 10);
@@ -102,6 +103,7 @@ export default async function handler(
     }
   }
 
+  // 채팅방 나가기
   if (req.method === "PATCH") {
     const { chatId } = req.query;
     const { userId, userName, cursor } = req.body;

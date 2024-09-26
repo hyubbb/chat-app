@@ -63,6 +63,7 @@ export const GET_CHAT_ROOM = `
     WHERE
         cr.chat_id = ?
 `;
+
 export const GET_MESSAGE = `
 SELECT 
     m.message_id,
@@ -131,11 +132,18 @@ SELECT * FROM (
         m.message_type,
         u.user_name,
         u.user_id,
-        u.photo_url
-	from messages m
+        u.photo_url,
+        dr.joined_at
+    FROM messages m
     JOIN users u ON u.user_id = m.user_id
-    where m.chat_id = ?
-    ORDER BY m.sent_at ASC
+    JOIN direct_rooms dr ON 
+        CONVERT(dr.room_id USING utf8mb4) COLLATE utf8mb4_unicode_ci = 
+        CONVERT(m.chat_id USING utf8mb4) COLLATE utf8mb4_unicode_ci 
+        AND (dr.user_id = u.user_id OR dr.other_user_id = u.user_id)
+    WHERE m.sent_at > dr.joined_at
+      AND (dr.user_id = ?) 
+      AND m.chat_id = ? 
+    ORDER BY m.sent_at ASC  
     LIMIT 50
 ) AS sub;
 `;
@@ -269,7 +277,7 @@ export const GET_USER_CONNECTED_DM = `
     dr.user_id,
     dr.other_user_id,
     dr.joined_at,
-    dr.exit_time,
+    dr.other_user_leave,
     CASE 
         WHEN dr.user_id = ? THEN u_to.user_id
         ELSE u_from.user_id
@@ -292,10 +300,14 @@ WHERE
     dr.user_id = ? OR dr.other_user_id = ?;
 `;
 
-// DM 나가기
-
 // DM 채팅방 삭제
 export const DELETE_DM_MESSAGES = `
-DELETE FROM messages WHERE chat_id = ? AND user_id = ? AND message_type = "direct";`;
+DELETE FROM messages WHERE user_id = ? AND chat_id = ? AND message_type = "direct";`;
+
+// DM의 상대방이 나갔을때, 채팅제어.
+export const PATCH_DM_CHAT_ROOM = `
+UPDATE direct_rooms SET other_user_leave = 1 WHERE room_id = ?;`;
+
+// DM 나가기
 export const DELETE_DM_CHAT_ROOM = `
-DELETE FROM direct_rooms WHERE to_id = ? AND from_id = ? || from_id = ? AND to_id = ?;`;
+DELETE FROM direct_rooms WHERE user_id = ? AND room_id = ?;`;

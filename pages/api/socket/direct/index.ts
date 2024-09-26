@@ -1,5 +1,6 @@
 import {
   deleteMessageAndGetMessages,
+  enteredDMList,
   sendDMAndGetDM,
 } from "@/lib/service/service";
 import { NextApiResponseServerIo } from "@/types";
@@ -46,9 +47,10 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponseServerIo,
 ) {
+  // 메세지 전송, 이미지 업로드 처리
   if (req.method === "POST") {
     // 메세지 전송 처리
-    let userId, chatId, message, type, startTime;
+    let userId, roomId, message, type, startTime;
     try {
       const contentType = req.headers["content-type"] || "";
       if (contentType.includes("multipart/form-data")) {
@@ -56,9 +58,9 @@ export default async function handler(
 
         // 필드 데이터 처리
         const [f_userId] = fields.userId as string[];
-        const [f_chatId] = fields.chatId as string[];
+        const [f_roomId] = fields.roomId as string[];
         const [photoData] = fields.photo as string[];
-        const [fstartTime] = fields.startTime as string[];
+        const [f_startTime] = fields.startTime as string[];
         const [photoDataName] = fields.photoName as string[];
         // base64 데이터에서 실제 이미지 데이터 추출
         const matches = photoData.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
@@ -80,13 +82,13 @@ export default async function handler(
         const photoUrl = `https://${AWS_BUCKET}.s3.amazonaws.com/messages/${photoName}`;
         message = photoUrl;
         userId = f_userId;
-        chatId = f_chatId;
+        roomId = f_roomId;
         type = "image";
-        startTime = fstartTime;
+        startTime = f_startTime;
       } else {
         const body = await parseJsonData(req);
         userId = body.userId;
-        chatId = body.chatId;
+        roomId = body.roomId;
         message = body.message;
         startTime = body.startTime;
         type = "direct";
@@ -94,17 +96,15 @@ export default async function handler(
 
       const result = await sendDMAndGetDM({
         userId,
-        chatId,
+        roomId,
         message,
         type,
       });
 
-      const dmRoomId = createDMRoomId(chatId, userId);
-      res?.socket?.server?.io?.to(`dm_${dmRoomId}`).emit("getDirectMessages", {
-        chatId: +chatId,
+      res?.socket?.server?.io?.to(`dm_${roomId}`).emit("directMessages", {
         messages: result,
         messages_type: "direct",
-        dmRoomId,
+        roomId,
         startTime,
       });
       res.status(200).json({ success: true });
@@ -137,8 +137,8 @@ export default async function handler(
           }),
         );
       }
-      res?.socket?.server?.io?.to(`dm_${dmRoomId}`).emit("getDirectMessages", {
-        chatId: +chatId,
+      res?.socket?.server?.io?.to(`dm_${dmRoomId}`).emit("directMessages", {
+        roomId: dmRoomId,
         messages: result,
         messages_type: "deleted",
         dmRoomId,

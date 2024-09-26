@@ -48,8 +48,11 @@ export const Logout = ({ user }: { user: UserType }) => {
   };
 
   return (
-    <div className="flex items-center gap-x-2 max-sm:w-full">
-      <div className="flex w-full items-center gap-2 text-nowrap max-sm:hidden">
+    <div className="flex items-center gap-x-2 max-sm:w-full" id="logout-btn">
+      <div
+        className="flex w-full items-center gap-2 text-nowrap max-sm:hidden"
+        id="user-icon"
+      >
         {user?.photo_url && (
           <Image
             src={user?.photo_url}

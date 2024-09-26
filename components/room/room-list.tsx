@@ -1,15 +1,18 @@
 "use client";
-import React, { useState } from "react";
-import { useRoomStore } from "@/hooks/use-room-store";
-import { defaultCategories, RoomsType } from "@/types";
-import { useRouter } from "next/navigation";
-import { useRoomQuery } from "@/hooks/use-room-query";
-import { Trash } from "lucide-react";
-import { useUserQuery } from "@/store/use-user-query";
+import React from "react";
 import axios from "axios";
+import { useRouter } from "next/navigation";
+import { Trash } from "lucide-react";
+import { RoomsType } from "@/types";
+import { useRoomStore } from "@/hooks/use-room-store";
+import { useRoomQuery } from "@/hooks/use-room-query";
+import { useUserQuery } from "@/store/use-user-query";
 
 export const RoomList = () => {
+<<<<<<< HEAD
   const [selectedRoom, _] = useState<RoomsType | null>(null);
+=======
+>>>>>>> 868249151e5c197e422d8a160e6cc717e549299a
   const { selected: roomsInCategory, setSelectedChat } = useRoomStore();
   const { data: user } = useUserQuery();
   const router = useRouter();
@@ -18,6 +21,7 @@ export const RoomList = () => {
     router.push(`/chat/${chat.chat_id}`);
   };
 
+  // 선택된 카테고리(roomsInCategory)의 채팅방 목록을 가져옴
   const { categoryData: rooms } = useRoomQuery({
     categories: roomsInCategory,
   });
@@ -29,7 +33,7 @@ export const RoomList = () => {
     <>
       {/* Main chat area */}
       <main className="flex h-full w-full flex-1 flex-col bg-gray-50 dark:bg-zinc-800">
-        {roomsInCategory && selectedRoom == null ? (
+        {roomsInCategory ? (
           // 채팅방 목록 화면 , 카테고리가 선택이 되었고, 채팅방이 존재할 때
           <div className="p-4">
             <h2 className="mb-4 text-xl font-bold dark:text-zinc-300">
@@ -69,7 +73,7 @@ export const RoomList = () => {
             </div>
           </div>
         ) : (
-          // 초기 화면
+          // 초기 화면, 카테고리가 선택이 되지 않았을 때
           <div className="dark:text-zinc-3 flex h-full items-center justify-center dark:bg-zinc-800">
             <p className="text-xl text-gray-500">
               {user && user.user_id

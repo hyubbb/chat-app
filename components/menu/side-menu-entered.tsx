@@ -54,7 +54,7 @@ export const SideMenuEntered = ({
               className="flex cursor-pointer items-center justify-between rounded p-2 text-sm hover:bg-gray-100"
             >
               <span>{room_name}</span>
-              <span className="rounded-full bg-green-200 px-2 py-1 text-xs text-green-700">
+              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-green-200 text-xs text-green-700">
                 {user_count}
               </span>
             </li>

@@ -5,7 +5,10 @@ import { Server as ServerIO } from "socket.io";
 import { dateName } from "@/util/utils";
 import { AWS_BUCKET, AWS_S3 } from "@/lib/aws-s3";
 import { PutObjectCommand } from "@aws-sdk/client-s3";
-import { sendMessageAndGetMessages } from "@/lib/service/service";
+import {
+  enteredDMList,
+  sendMessageAndGetMessages,
+} from "@/lib/service/service";
 
 const ServerHandler = (req: NextApiRequest, res: NextApiResponseServerIo) => {
   if (!res.socket.server.io) {
@@ -15,6 +18,7 @@ const ServerHandler = (req: NextApiRequest, res: NextApiResponseServerIo) => {
     const io = new ServerIO(httpServer, {
       path: path,
       addTrailingSlash: false,
+      maxHttpBufferSize: 1e8, // 10MB
     });
 
     res.socket.server.io = io;
@@ -22,33 +26,38 @@ const ServerHandler = (req: NextApiRequest, res: NextApiResponseServerIo) => {
     io.on("connection", (socket) => {
       console.log("서버 connection");
 
+<<<<<<< HEAD
       socket.on("createChatRoom", ({ chatId }: { chatId: string }) => {
         socket.join(`chatRoom:${chatId}`);
       });
 
       socket.on("joinRoomList", ({ userId }: { userId: string }) => {
+=======
+      // 유저별 socket.room 설정
+      socket.on("joinRoom", ({ userId }: { userId: string }) => {
+>>>>>>> 868249151e5c197e422d8a160e6cc717e549299a
         socket.join(`userRoom:${userId}`);
       });
 
+      // 채팅방 socket.room 설정
+      socket.on("createChatRoom", ({ chatId }: { chatId: string }) => {
+        socket.join(`chatRoom:${chatId}`);
+      });
+
+      // DM방과 DM방의 유저별 socket.room 설정
       socket.on(
         "directMessage",
-        ({ dmName, userId }: { dmName: string; userId: number }) => {
-          socket.join(`dm_${dmName}:${userId}`);
-          socket.join(`dm_${dmName}`);
+        ({ roomId, userId }: { roomId: string; userId: number }) => {
+          socket.join(`dm_${roomId}:${userId}`);
+          socket.join(`dm_${roomId}`);
         },
       );
 
+      // Socket 통신으로 메시지를 전송하고 받는 부분
+      // api-socket 통신과 비교하기 위해서 추가한 코드
       socket.on("sendMessage", async (data, callback) => {
-        const {
-          userId,
-          chatId,
-          message: messages,
-          photo,
-          startTime,
-          photoName,
-        } = data;
+        let { userId, chatId, message, photo, startTime, photoName } = data;
         let type;
-        let message = messages;
         try {
           if (photo) {
             // base64 데이터에서 실제 이미지 데이터 추출
@@ -77,6 +86,7 @@ const ServerHandler = (req: NextApiRequest, res: NextApiResponseServerIo) => {
           }
 
           // 메시지를 전송하고 필요한 응답을 수신
+
           const result = await sendMessageAndGetMessages({
             userId,
             chatId,

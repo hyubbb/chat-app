@@ -35,7 +35,10 @@ export const useRoomSocket = ({ chatId, user }: UseRoomSocketProps) => {
     if (!socket || !user || !chatId || !isConnected) return;
 
     socket.emit("createChatRoom", { chatId });
+<<<<<<< HEAD
     socket.emit("joinRoomList", { userId: user?.user_id });
+=======
+>>>>>>> 868249151e5c197e422d8a160e6cc717e549299a
 
     socket.on("joinRoomList", handleJoinRoom);
     socket.on("leaveRoom", handleLeaveRoom);

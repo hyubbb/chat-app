@@ -48,7 +48,6 @@ export const ChatHeader = ({
   };
 
   return (
-    // <div className="flex items-center justify-between space-x-2 border-b bg-white p-4 max-sm:fixed max-sm:top-[69px] max-sm:z-20 max-sm:h-[70px] max-sm:w-full dark:bg-zinc-800 dark:text-zinc-300">
     <div className="flex items-center justify-between space-x-2 border-b bg-white p-4 dark:bg-zinc-800 dark:text-zinc-300">
       <div className="flex items-center gap-x-2">
         <MessageSquare size={20} className="text-blue-500" />

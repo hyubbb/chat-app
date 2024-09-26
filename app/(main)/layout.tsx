@@ -3,32 +3,15 @@ import { SideMenu } from "@/components/menu/side-menu";
 import {
   fetchCategories,
   fetchCookiesUser,
+  fetchData,
   fetchDmList,
 } from "../actions/actions";
 
 import React from "react";
 import { cookies } from "next/headers";
 
-const loginAuth = async () => {
-  try {
-    const cookieStore = cookies();
-    const token = cookieStore.get("chat-token");
-    const res = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/user`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Cookie: `chat-token=${token?.value}`,
-      },
-    });
-    const data = await res.json();
-    return data;
-  } catch (error) {
-    console.error("Error in loginAuth:", error);
-    return null;
-  }
-};
-
 const MainLayout = async ({ children }: { children: React.ReactNode }) => {
+<<<<<<< HEAD
   // const { user } = await loginAuth();
 
   // JWT쿠키 정보를 가져와서 user 정보를 가져온다.
@@ -40,6 +23,10 @@ const MainLayout = async ({ children }: { children: React.ReactNode }) => {
 
   const resCategories = await fetchCategories();
   const categories = await resCategories.json();
+=======
+  // JWT쿠키 정보를 가져와서 user 정보를 가져온다.
+  const { user, dmList, categories } = await fetchData();
+>>>>>>> 868249151e5c197e422d8a160e6cc717e549299a
 
   return (
     <div className="flex h-full flex-col">

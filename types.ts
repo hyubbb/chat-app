@@ -79,7 +79,7 @@ export type dmListType = {
   other_id: number;
   other_name: string;
   other_photo_url: string | null;
-  exit_time: string | null;
+  other_user_leave: number | null;
 };
 
 export type useFormType = {

@@ -48,7 +48,7 @@ export const SideMenuCategory = ({
               onClick={() => handleCategoryClick(category)}
             >
               <span>{category?.category_name}</span>
-              <span className="rounded-full bg-gray-200 px-2 py-1 text-xs text-gray-700">
+              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-gray-200 text-xs text-gray-700">
                 {category?.rooms.length}
               </span>
             </li>

@@ -24,7 +24,6 @@ export const DirectRoom = ({ chatId }: { chatId: number }) => {
   });
 
   const dmInfo = dmList?.find((dm) => dm.other_id === chatId) || null;
-
   useEffect(() => {
     if (chatId === user?.user_id) return redirect("/");
   }, [chatId, user]);
@@ -50,7 +49,7 @@ export const DirectRoom = ({ chatId }: { chatId: number }) => {
         chatId={chatId}
         isLoading={messagesIsLoading}
       />
-      <ChatInput user={user} chatId={chatId} />
+      <ChatInput user={user} chatId={chatId} dmInfo={dmInfo} />
     </>
   );
 };

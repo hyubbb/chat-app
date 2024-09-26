@@ -4,13 +4,25 @@ import { PutObjectCommand } from "@aws-sdk/client-s3";
 import { AWS_BUCKET, AWS_S3 } from "@/lib/aws-s3";
 import { dateName } from "@/util/utils";
 
+// 사용자 생성
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
     const files = formData.getAll("photo") as File[];
-    const id = formData.get("id") as string;
-    const name = formData.get("userName") as string;
-    const password = formData.get("password") as string;
+    const id = formData.get("id");
+    const name = formData.get("userName");
+    const password = formData.get("password");
+
+    if (
+      typeof id !== "string" ||
+      typeof name !== "string" ||
+      typeof password !== "string"
+    ) {
+      return NextResponse.json(
+        { success: false, message: "Invalid form data" },
+        { status: 400 }, // Bad Request
+      );
+    }
     // ID 중복 체크
     const userExists = await checkUserExists(id);
     if (userExists) {
@@ -19,6 +31,7 @@ export async function POST(request: NextRequest) {
         { status: 409 }, // Conflict
       );
     }
+
     let photoUrl;
     if (files.length > 0 && files[0] instanceof File) {
       const photoName = dateName(files[0]);

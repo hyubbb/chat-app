@@ -39,6 +39,7 @@ export const useDirectQuery = ({
   };
 
   const getDmList = async () => {
+    // DM방이 눌릴때마다 실행이되네?
     if (user?.user_id == null) return [];
     try {
       const { data } = await axios.get(`/api/socket/direct/${user?.user_id}`);
