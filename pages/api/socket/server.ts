@@ -26,16 +26,8 @@ const ServerHandler = (req: NextApiRequest, res: NextApiResponseServerIo) => {
     io.on("connection", (socket) => {
       console.log("서버 connection");
 
-<<<<<<< HEAD
-      socket.on("createChatRoom", ({ chatId }: { chatId: string }) => {
-        socket.join(`chatRoom:${chatId}`);
-      });
-
-      socket.on("joinRoomList", ({ userId }: { userId: string }) => {
-=======
       // 유저별 socket.room 설정
       socket.on("joinRoom", ({ userId }: { userId: string }) => {
->>>>>>> 868249151e5c197e422d8a160e6cc717e549299a
         socket.join(`userRoom:${userId}`);
       });
 

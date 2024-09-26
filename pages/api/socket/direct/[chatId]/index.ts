@@ -2,12 +2,10 @@ import {
   deleteChatRoom,
   directMessagesJoinRoom,
   enteredDMList,
-  enteredRoomList,
   getCategoryRooms,
   getDirectMessages,
   isUserDMRoom,
   leaveDM,
-  leaveRoom,
   sendDMAndGetDM,
 } from "@/lib/service/service";
 import { NextApiResponseServerIo } from "@/types";

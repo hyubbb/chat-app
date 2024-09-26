@@ -9,10 +9,6 @@ import { useRoomQuery } from "@/hooks/use-room-query";
 import { useUserQuery } from "@/store/use-user-query";
 
 export const RoomList = () => {
-<<<<<<< HEAD
-  const [selectedRoom, _] = useState<RoomsType | null>(null);
-=======
->>>>>>> 868249151e5c197e422d8a160e6cc717e549299a
   const { selected: roomsInCategory, setSelectedChat } = useRoomStore();
   const { data: user } = useUserQuery();
   const router = useRouter();

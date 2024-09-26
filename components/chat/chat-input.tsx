@@ -26,10 +26,7 @@ export const ChatInput = ({ user, chatId, bottomRef }: ChatInputProps) => {
     setMessage("");
     setIsSending(true); // 메시지 전송 상태 변경
     const startTime = performance.now(); // 메시지 전송 시점 기록
-<<<<<<< HEAD
 
-=======
->>>>>>> 868249151e5c197e422d8a160e6cc717e549299a
     // socket.io 방식
     socket?.emit(
       "sendMessage",
@@ -49,11 +46,7 @@ export const ChatInput = ({ user, chatId, bottomRef }: ChatInputProps) => {
       },
     );
 
-<<<<<<< HEAD
-    // api 호출 방식
-=======
     // api 호출 방식 비교용 코드
->>>>>>> 868249151e5c197e422d8a160e6cc717e549299a
     // await axios.post("/api/socket/message", {
     //   userId: user?.user_id,
     //   chatId,
