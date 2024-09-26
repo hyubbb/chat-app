@@ -55,7 +55,7 @@ export const ChatInput = ({ user, dmInfo }: ChatInputProps) => {
             className="w-full rounded-md border px-3 py-2 pl-10 focus:outline-none focus:ring-2 focus:ring-blue-500"
             value={message}
             onChange={(e) => setMessage(e.target.value)}
-            disabled={dmInfo?.other_user_leave}
+            disabled={!!dmInfo?.other_user_leave}
           />
         </div>
       </form>

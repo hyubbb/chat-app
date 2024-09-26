@@ -50,7 +50,7 @@ export default function RoomCreateModal({
       return allRoomsData.some(({ room_name }) => room_name == room);
     },
 
-    [allRoomsData, roomTitle],
+    [allRoomsData],
   );
 
   const fetchRoomPost = useCallback(
