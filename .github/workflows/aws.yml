@@ -19,11 +19,11 @@ jobs:
       - name: Install dependencies
         run: npm ci # 3. 의존성 설치
 
-      - name: Build
-        run: npm run build # 4. 프로젝트 빌드
-
       - name: Set environment variables
         run: echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> $GITHUB_ENV
+
+      - name: Build
+        run: npm run build # 4. 프로젝트 빌드
 
       - name: Deploy to EC2
         env:
