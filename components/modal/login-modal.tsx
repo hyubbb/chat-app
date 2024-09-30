@@ -17,7 +17,7 @@ export const LoginModal = () => {
     id: "",
     password: "",
   });
-  const setToken = useAuthStore((state) => state.setToken);
+  // const setToken = useAuthStore((state) => state.setToken);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -26,11 +26,10 @@ export const LoginModal = () => {
         id: userInfo.id,
         password: userInfo.password,
       });
-      const { success, token } = res.data;
+      const { success } = res.data;
       if (!success) {
         return alert("아이디 또는 비밀번호가 일치하지 않습니다.");
       }
-      setToken(token);
       setUserInfo({ id: "", password: "" });
       setIsMenuModalOpen(false);
       setIsLoginModalOpen(false);

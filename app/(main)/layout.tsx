@@ -1,13 +1,15 @@
 import { HeaderMenu } from "@/components/menu/header-menu";
 import { SideMenu } from "@/components/menu/side-menu";
-import { fetchData } from "../actions/actions";
+import { fetchData } from "@/app/actions/actions";
 
 import React from "react";
 import { cookies } from "next/headers";
 
 const MainLayout = async ({ children }: { children: React.ReactNode }) => {
   // JWT쿠키 정보를 가져와서 user 정보를 가져온다.
-  const { user, dmList, categories } = await fetchData();
+  const data = await fetchData();
+
+  const { user, dmList, categories } = data;
 
   return (
     <div className="flex h-full flex-col">

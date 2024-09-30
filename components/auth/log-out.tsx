@@ -8,12 +8,7 @@ import Image from "next/image";
 import { useRouter, usePathname } from "next/navigation";
 
 export const Logout = ({ user }: { user: UserType }) => {
-  const {
-    isEditModalOpen,
-    setIsEditModalOpen,
-    isMenuModalOpen,
-    setIsMenuModalOpen,
-  } = useStore();
+  const { setIsEditModalOpen, setIsMenuModalOpen } = useStore();
   const queryClient = useQueryClient();
   const router = useRouter();
   const pathname = usePathname()?.split("/")[2];
@@ -22,6 +17,8 @@ export const Logout = ({ user }: { user: UserType }) => {
   const { clearToken } = useAuthStore();
   const handleLogout = async () => {
     try {
+      // 로그아웃 요청
+      // 서버측 JWT 쿠키, 리프레시 토큰 삭제
       const res = await axios.post(
         "/api/user/logout",
         { user },
@@ -30,13 +27,19 @@ export const Logout = ({ user }: { user: UserType }) => {
 
       if (res.status !== 200) throw new Error("로그아웃 실패");
 
-      queryClient.setQueryData(["user"], []);
-      queryClient.removeQueries({ queryKey: ["messages", mNumber] });
+      // 불필요한 query 제거
+      queryClient.removeQueries({ queryKey: ["user"] });
+      queryClient.removeQueries({ queryKey: ["messages"] });
       queryClient.removeQueries({ queryKey: ["dmList"] });
       queryClient.removeQueries({ queryKey: ["joinRoomList"] });
-      delete axios.defaults.headers.common["chat-token"];
+
+      // 로그인관련 토큰 제거
       clearToken();
+
+      // 메뉴 모달 닫기
       setIsMenuModalOpen(false);
+
+      // 메인페이지로 이동
       router.push("/");
     } catch (error) {
       console.error("로그아웃 실패 : ", error);

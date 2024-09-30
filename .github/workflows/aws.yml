@@ -16,28 +16,21 @@ jobs:
         with:
           node-version: "18.19.1"
 
-      - name: Install dependencies
-        run: npm ci # 3. 의존성 설치
-
-      - name: Set environment variables
+      - name: Set environment variables # 환경변수 설정
         run: echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> $GITHUB_ENV
-
-      - name: Build
-        run: npm run build # 4. 프로젝트 빌드
 
       - name: Deploy to EC2
         env:
           PRIVATE_KEY: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
           HOST: ${{ secrets.EC2_HOST }}
           USER: ${{ secrets.EC2_USER }}
-          JWT_SECRET: ${{ secrets.JWT_SECRET }}
         run: |
           echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
-          scp -o StrictHostKeyChecking=no -i private_key -r .next/* ${USER}@${HOST}:~/chat-app/.next
           ssh -o StrictHostKeyChecking=no -i private_key ${USER}@${HOST} '
             cd ~/chat-app
             git pull origin main
+            npm install
             npm run build
             pm2 delete all || true
-            pm2 start "npm run start" --name "chat-app"  
+            pm2 start "npm run start" --name "chat-app"
           '

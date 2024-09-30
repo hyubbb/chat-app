@@ -75,8 +75,7 @@ export const useDirectSocket = ({
 
   // DM 관련 소켓 이벤트설정
   useEffect(() => {
-    if (!socket || !isConnected || toId) return;
-
+    if (!socket || !isConnected || !toId) return;
     socket.on("directMessages", handleMessageUpdate);
     socket.on("joinDmList", handleDmListUpdate);
     socket.on("leaveDm", handleLeaveDM);
@@ -86,5 +85,5 @@ export const useDirectSocket = ({
       socket.off("joinDmList", handleDmListUpdate);
       socket.off("leaveDm", handleLeaveDM);
     };
-  }, [socket, isConnected, handleMessageUpdate, handleDmListUpdate]);
+  }, [socket, isConnected, handleMessageUpdate, handleDmListUpdate, toId]);
 };

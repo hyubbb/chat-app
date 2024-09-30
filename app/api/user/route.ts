@@ -5,59 +5,37 @@ import { dateName } from "@/util/utils";
 import { AWS_BUCKET, AWS_S3 } from "@/lib/aws-s3";
 import { DeleteObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3";
 import { getUserInfo, updateUser } from "@/lib/service/service";
+import { handleRefreshToken } from "@/app/actions/actions";
 
-const SECRET_KEY = process.env.JWT_SECRET as string;
-
+const SECRET_KEY = process.env.JWT_ACCESS_SECRET as string;
 const generateJWT = (user: UserType) => {
-  const payload = {
-    id: user.id,
-    user_id: user.user_id,
-    user_name: user.user_name,
-    photo_url: user.photo_url,
-    role: user.role,
-  };
+  const payload = { ...user };
 
-  const options = {
-    expiresIn: "1h", // 토큰 만료 시간 (예: 1시간)
-  };
-
-  return jwt.sign(payload, SECRET_KEY, options);
+  return jwt.sign(payload, SECRET_KEY, {
+    expiresIn: "1m", // 15분
+  });
 };
 
-// 토큰값을 확인한 후, 사용자 정보 가져오기
+// 처음 웹페이지에 접근했을때, 토큰값을 확인한 후, 사용자 정보 가져오기
 export async function GET(request: NextRequest) {
-  const tokenCookie = request.cookies.get("chat-token");
-
-  if (!tokenCookie) {
-    return NextResponse.json({ user: null }, { status: 200 });
+  const accessToken = request.cookies.get("access-token")?.value;
+  // 액세스 토큰만 확인
+  if (!accessToken) {
+    return handleRefreshToken();
   }
-  const token = tokenCookie.value;
 
   try {
-    if (!token) {
-      return new Response(JSON.stringify({ message: "Token not provided" }), {
-        status: 400,
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-    }
-    const decoded = jwt.verify(token, SECRET_KEY);
-    if (typeof decoded !== "object" || decoded === null) {
-      return new Response(JSON.stringify({ message: "Invalid token" }), {
-        status: 403,
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-    }
-
-    return NextResponse.json({ user: decoded as UserType }, { status: 200 });
+    // 액세스 토큰 검증
+    const user = jwt.verify(accessToken, SECRET_KEY) as UserType;
+    return NextResponse.json({ user }, { status: 200 });
   } catch (err) {
-    return NextResponse.json({ message: "Invalid token" }, { status: 403 });
+    if (err instanceof jwt.TokenExpiredError) {
+      // 액세스 토큰이 만료된 경우에만 리프레시 토큰 사용
+      return handleRefreshToken();
+    }
+    return NextResponse.json({ user: null }, { status: 401 });
   }
 }
-
 // 사용자 정보 수정
 export async function PATCH(request: NextRequest) {
   try {
@@ -70,7 +48,8 @@ export async function PATCH(request: NextRequest) {
     let photoUrl;
     if (files.length > 0 && files[0] instanceof File) {
       const photoName = dateName(files[0]);
-      const Body = (await files[0]?.arrayBuffer()) as Buffer;
+      const arrayBuffer = await files[0]?.arrayBuffer();
+      const Body = Buffer.from(arrayBuffer);
       photoUrl = `https://${AWS_BUCKET}.s3.amazonaws.com/temp/${photoName}`;
       AWS_S3.send(
         new PutObjectCommand({
@@ -108,7 +87,7 @@ export async function PATCH(request: NextRequest) {
       { status: 200 },
     );
 
-    response.cookies.set("chat-token", newToken, {
+    response.cookies.set("access-token", newToken, {
       httpOnly: true,
       secure: false,
       path: "/",

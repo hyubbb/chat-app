@@ -1,12 +1,16 @@
 import { test, expect } from "@playwright/test";
 
+<<<<<<< HEAD
 const LOCALHOST = "http://localhost:3000";
+=======
+const LOCALHOST = process.env.BASE_URL as string;
+>>>>>>> 7e50f8a (feat: JWT토큰 리프레시 토큰 추가)
 
 test("[로그인 모달 테스트]", async ({ page }) => {
   await page.goto(LOCALHOST);
   await test.step("1. 로그인 확인", async () => {
     // 로그인 버튼 클릭
-    const buttonsElm = page.locator("#login-btn button");
+    const buttonsElm = page.locator("#auth-btn button");
     await buttonsElm.nth(1).click();
     // login dialog가 열렸는지 확인
     await expect(page.locator("div#login-modal")).toBeVisible();
@@ -25,7 +29,7 @@ test("[로그인 모달 테스트]", async ({ page }) => {
     await expect(page.locator("#user-icon")).toBeVisible();
   });
 
-  await test.step("2. 로그인 아웃", async () => {
+  await test.step("2. 로그아웃", async () => {
     // 로그아웃 버튼 클릭
     const logoutElm = page.locator("#logout-btn button");
     await logoutElm.nth(1).click();
@@ -36,7 +40,7 @@ test("[로그인 모달 테스트]", async ({ page }) => {
 
   await test.step("3. 아이디 실패", async () => {
     // 로그인 버튼 클릭
-    const buttonsElm = page.locator("#login-btn button");
+    const buttonsElm = page.locator("#auth-btn button");
     await buttonsElm.nth(1).click();
     // login dialog가 열렸는지 확인
     await expect(page.locator("div#login-modal")).toBeVisible();
@@ -44,9 +48,6 @@ test("[로그인 모달 테스트]", async ({ page }) => {
     // 아이디 틀리기
     await page.fill("input#id", "admin@");
     await page.fill("input#password", "admin");
-
-    // // button중에서 텍스트가 완료인것
-    // await page.click("button:has-text('완료')");
 
     // alert 발생을 감지하고 처리하는 Promise 설정
     const dialogPromise = page.waitForEvent("dialog");
@@ -79,15 +80,3 @@ test("[로그인 모달 테스트]", async ({ page }) => {
     await dialog.dismiss();
   });
 });
-
-// test("get started link", async ({ page }) => {
-//   await page.goto(LOCALHOST);
-
-//   // Click the get started link.
-//   await page.getByRole("link", { name: "Get started" }).click();
-
-//   // Expects page to have a heading with the name of Installation.
-//   await expect(
-//     page.getByRole("heading", { name: "Installation" }),
-//   ).toBeVisible();
-// });

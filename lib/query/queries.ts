@@ -16,7 +16,7 @@ export const CHECK_USER_EXISTS = `
 `;
 
 export const LOGIN_USER = `
-  SELECT user_id, id, user_name, password, photo_url, role
+  SELECT user_id, id, user_name, photo_url, role, refresh_token
   FROM users
   WHERE id = ? AND password = ? 
 `;
@@ -118,8 +118,8 @@ SELECT * FROM (
         m.sent_at DESC
     LIMIT ?
 ) AS sub
- ORDER BY 
-        sent_at DESC;
+    ORDER BY 
+        message_id DESC;
 `;
 
 export const GET_DIRECT_MESSAGE_AFTER = `
@@ -311,3 +311,7 @@ UPDATE direct_rooms SET other_user_leave = 1 WHERE room_id = ?;`;
 // DM 나가기
 export const DELETE_DM_CHAT_ROOM = `
 DELETE FROM direct_rooms WHERE user_id = ? AND room_id = ?;`;
+
+export const SAVE_REFRESH_TOKEN = `
+UPDATE users SET refresh_token = ? WHERE user_id = ?;
+`;

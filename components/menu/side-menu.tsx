@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import React, { useState } from "react";
 import { Plus, XCircle } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import {
@@ -66,8 +66,8 @@ export const SideMenu = ({
   const { setSelected, selected } = useRoomStore();
 
   const { data: user } = useUserQuery(initUser);
-  const { dmList: dmList } = useDirectQuery({ user: user, initDmList });
-  const { data: categories } = useCategoryQuery({ user: user, initCategories });
+  const { dmList: dmList } = useDirectQuery({ user, initDmList });
+  const { data: categories } = useCategoryQuery({ initCategories });
   const { joinRoomData, isJoinRoomError, isJoinRoomLoading } = useRoomQuery({
     userId: user?.user_id,
   });

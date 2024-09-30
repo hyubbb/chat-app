@@ -9,6 +9,7 @@ import { Loader2 } from "lucide-react";
 import { useChatScroll } from "@/hooks/use-chat-scroll";
 import { useMessageQuery } from "@/hooks/use-message.query";
 import { useMessageSocket } from "@/hooks/use-message-socket";
+import { v4 as uuidv4 } from "uuid";
 
 type ChatMessageProps = {
   user: UserType | null;
@@ -96,10 +97,10 @@ export const ChatMessage = ({
 
       <div className="mt-auto flex flex-col-reverse">
         {messagesData?.pages?.map((group, i) => (
-          <Fragment key={i}>
+          <Fragment key={`group_${i}`}>
             {group.messages.map((data: messagesType) => (
               <ChatItem
-                key={`${data.message_id}_${data.sent_at}`}
+                key={`${data.message_id}_${data.sent_at}_${uuidv4().slice(0, 8)}`}
                 message={data}
                 user={user}
                 directMessage={directMessage}
@@ -112,7 +113,12 @@ export const ChatMessage = ({
 
       <div ref={bottomRef} />
 
-      <FileUploadModal user={user} chatId={chatId} type="message" />
+      <FileUploadModal
+        user={user}
+        chatId={chatId}
+        bottomRef={bottomRef}
+        type="message"
+      />
     </div>
   );
 };

@@ -21,13 +21,14 @@ export const ChatInput = ({ user, chatId, bottomRef }: ChatInputProps) => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!message) return;
-    if (isSending) return; // 메시지 전송 중에는 입력창 비활성화
-    setMessage("");
-    setIsSending(true); // 메시지 전송 상태 변경
+    if (!message.trim()) return; // 메시지가 없으면 전송 중지
+    // if (isSending) return; // 메시지 전송 중에는 입력창 비활성화
+    setMessage(""); // 메시지 초기화
+    // setIsSending(true); // 메세지 전송 중, 입력창 비활성화
     const startTime = performance.now(); // 메시지 전송 시점 기록
 
     // socket.io 방식
+    // 메세지 전송 처리
     socket?.emit(
       "sendMessage",
       {
@@ -38,11 +39,11 @@ export const ChatInput = ({ user, chatId, bottomRef }: ChatInputProps) => {
       },
       (data: any) => {
         if (data.success) {
-          setIsSending(false);
           setTimeout(() => {
             bottomRef?.current?.scrollIntoView({ behavior: "instant" });
           }, 100);
         }
+        // setIsSending(false); // 입력상태 활성
       },
     );
 
@@ -75,7 +76,7 @@ export const ChatInput = ({ user, chatId, bottomRef }: ChatInputProps) => {
             placeholder="메시지를 입력하세요..."
             className="w-full rounded-md border px-3 py-2 pl-10 focus:outline-none focus:ring-2 focus:ring-blue-500"
             value={message}
-            disabled={isSending}
+            // disabled={isSending}
             onChange={(e) => setMessage(e.target.value)}
           />
         </div>

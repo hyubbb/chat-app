@@ -27,6 +27,7 @@ import {
   LEAVE_ROOM,
   LOGIN_USER,
   PATCH_DM_CHAT_ROOM,
+  SAVE_REFRESH_TOKEN,
   SENT_MESSAGE,
   UPDATE_USER,
   USER_ENTERED_ROOM,
@@ -201,8 +202,8 @@ export const sendMessageAndGetMessages = async ({
   try {
     // 첫 입장과, 퇴장시에 시스템 메세지를 보내고, 그 이외에는 일반 메세지를 보내는 로직
     // 아니면 첫입장시에만 전체메세지를 불러오고, 그 이후에는 새로운 메세지만 불러오는 로직
-    let result;
-
+    let perPage = MESSAGES_PER_PAGE;
+    let newCursor = cursor;
     const resSentMessage = (await executeQuery(SENT_MESSAGE, [
       userId,
       chatId,
@@ -211,21 +212,22 @@ export const sendMessageAndGetMessages = async ({
     ])) as ResultSetHeader;
 
     if (cursor === undefined) {
-      cursor = resSentMessage.insertId + 1;
-      MESSAGES_PER_PAGE = 1;
+      newCursor = resSentMessage.insertId + 1;
+      perPage = 1;
     }
-
-    result = (await executeQuery(GET_MESSAGE_AFTER, [
+    const result = (await executeQuery(GET_MESSAGE_AFTER, [
       userId,
       chatId,
-      cursor,
-      MESSAGES_PER_PAGE + "",
+      newCursor,
+      perPage + "",
     ])) as messagesType[];
+    if (result.length !== 0) {
+      if (!init) {
+        // 입력 메세지와, 시스템메세지을떄 마지막 메세지만 반환
+        const lastMessage = result[result?.length - 1];
 
-    if (!init) {
-      // 입력 메세지와, 시스템메세지을떄 마지막 메세지만 반환
-      const lastMessage = result[result?.length - 1];
-      result = lastMessage;
+        return lastMessage;
+      }
     }
     return result;
   } catch (error) {
@@ -468,5 +470,17 @@ export const deleteDMRoom = async (chatId: string, userId: number) => {
     await executeQuery(DELETE_DM_CHAT_ROOM, [chatId, userId, chatId, userId]);
   } catch (error) {
     console.error("방 나가기 중 오류 발생:", error);
+  }
+};
+
+export const serverRefreshToken = async (
+  userId: number,
+  refreshToken: string,
+) => {
+  try {
+    await executeQuery(SAVE_REFRESH_TOKEN, [refreshToken, userId]);
+  } catch (error) {
+    console.error("리프레시 토큰 저장 중 오류 발생:", error);
+    throw error;
   }
 };

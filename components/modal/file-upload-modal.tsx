@@ -10,12 +10,14 @@ type FileUploadModalProps = {
   user: UserType | null;
   chatId: number;
   type: string;
+  bottomRef?: React.RefObject<HTMLDivElement>;
 };
 
 export const FileUploadModal = ({
   user,
   chatId,
   type,
+  bottomRef,
 }: FileUploadModalProps) => {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
@@ -52,13 +54,24 @@ export const FileUploadModal = ({
       });
     }
 
-    socket?.emit("sendMessage", {
-      photoName: imageName,
-      userId: user?.user_id,
-      chatId,
-      startTime,
-      photo: imageUrl,
-    });
+    socket?.emit(
+      "sendMessage",
+      {
+        photoName: imageName,
+        userId: user?.user_id,
+        chatId,
+        startTime,
+        photo: imageUrl,
+      },
+      (data: any) => {
+        // 메세지 성공시 콜백함수
+        if (data.success) {
+          setTimeout(() => {
+            bottomRef?.current?.scrollIntoView({ behavior: "instant" });
+          }, 100);
+        }
+      },
+    );
     // return await axios.post("/api/socket/message", formData, {
     //   headers: { "Content-Type": "multipart/form-data" },
     // });

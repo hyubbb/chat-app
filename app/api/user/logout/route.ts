@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 쿠키 삭제
+    // 로그아웃 성공 응답
     const response = NextResponse.json(
       {
         success: true,
@@ -22,14 +22,9 @@ export async function POST(request: NextRequest) {
       { status: 200 },
     );
 
-    // 쿠키 삭제 설정
-    response.cookies.set("chat-token", "", {
-      httpOnly: true,
-      secure: false,
-      maxAge: 0,
-      path: "/",
-      sameSite: "lax",
-    });
+    // 로그아웃 성공 응답에서 쿠키 삭제 설정
+    response.cookies.delete("access-token");
+    response.cookies.delete("refresh-token");
 
     return response;
   } catch (error) {

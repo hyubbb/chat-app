@@ -100,7 +100,6 @@ export default async function handler(
         message,
         type,
       });
-
       res?.socket?.server?.io?.to(`dm_${roomId}`).emit("directMessages", {
         messages: result,
         messages_type: "direct",

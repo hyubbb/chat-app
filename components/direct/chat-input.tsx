@@ -22,7 +22,7 @@ export const ChatInput = ({ user, dmInfo }: ChatInputProps) => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (!message) return;
+    if (!message.trim()) return;
 
     const startTime = performance.now(); // 메시지 전송 시점 기록
     setMessage("");

@@ -21,13 +21,11 @@ const ChatPage = async ({ params }: ChatPageProps) => {
   const info = await getChat(params?.chatId);
   const enteredUsers = await getRoomMembers(params?.chatId);
   return (
-    <>
-      <ChatRoom
-        chatId={+params.chatId}
-        roomInfo={info}
-        usersList={enteredUsers}
-      />
-    </>
+    <ChatRoom
+      chatId={+params.chatId}
+      roomInfo={info}
+      usersList={enteredUsers}
+    />
   );
 };
 export default ChatPage;

@@ -5,10 +5,6 @@ export const metadata = {
 };
 
 const HomePage = async () => {
-  return (
-    <>
-      <RoomList />
-    </>
-  );
+  return <RoomList />;
 };
 export default HomePage;

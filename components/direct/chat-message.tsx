@@ -1,11 +1,11 @@
+import React from "react";
 import { messagesType, UserType } from "@/types";
 import { dateFormatted } from "@/util/utils";
 import axios from "axios";
 import { Trash } from "lucide-react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 import { useEffect, useRef } from "react";
-import { Loading } from "../loading";
+import { Loading } from "@/components/loading";
 import { FileUploadModal } from "../modal/file-upload-modal";
 
 type ChatMessageProps = {

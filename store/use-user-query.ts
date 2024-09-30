@@ -1,5 +1,5 @@
 "use client";
-import { defaultUser, UserType } from "@/types";
+import { UserType } from "@/types";
 import { useQuery } from "@tanstack/react-query";
 import { useAuthStore } from "./authStore";
 import axios from "axios";
@@ -13,7 +13,7 @@ export const useUserQuery = (initUser?: UserType) => {
         withCredentials: true,
       },
     });
-    return data.user;
+    return data ? data.user : null;
   };
 
   const { data, isError, isLoading, refetch } = useQuery<UserType | null>({

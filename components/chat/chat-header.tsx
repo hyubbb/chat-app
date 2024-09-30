@@ -27,6 +27,8 @@ export const ChatHeader = ({
   const router = useRouter();
   const [listModal, setListModal] = useState<boolean>(false);
 
+  // 방 나가기
+
   const handleLeaveRoom = async () => {
     const { data } = await axios.patch(`/api/socket/chat/${chatId}`, {
       userId: user?.user_id,
@@ -41,6 +43,7 @@ export const ChatHeader = ({
     setListModal(!listModal);
   };
 
+  // 유저 디렉트 메시지 이동
   const directMessage = ({ userId }: { userId: number | null }) => {
     if (userId !== user?.user_id) {
       router.push(`/direct/${userId}`);

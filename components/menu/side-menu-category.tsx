@@ -1,3 +1,4 @@
+import React from "react";
 import { CategoriesType } from "@/types";
 import { ChevronDown, ChevronRight } from "lucide-react";
 
