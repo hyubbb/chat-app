@@ -22,11 +22,15 @@ jobs:
       - name: Build
         run: npm run build # 4. 프로젝트 빌드
 
+      - name: Set environment variables
+        run: echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> $GITHUB_ENV
+
       - name: Deploy to EC2
         env:
           PRIVATE_KEY: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
           HOST: ${{ secrets.EC2_HOST }}
           USER: ${{ secrets.EC2_USER }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
         run: |
           echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
           scp -o StrictHostKeyChecking=no -i private_key -r .next/* ${USER}@${HOST}:~/chat-app/.next

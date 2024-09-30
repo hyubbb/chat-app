@@ -10,12 +10,12 @@ type RoomCreateModalProps = {
   user: UserType | null;
 };
 
-export default function RoomCreateModal({
+export const RoomCreateModal = ({
   isOpen,
   onClose,
   categories,
   user,
-}: RoomCreateModalProps) {
+}: RoomCreateModalProps) => {
   const [roomTitle, setRoomTitle] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
   const [newCategory, setNewCategory] = useState("");
@@ -181,4 +181,4 @@ export default function RoomCreateModal({
       </div>
     </div>
   );
-}
+};

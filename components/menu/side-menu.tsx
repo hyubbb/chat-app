@@ -1,18 +1,31 @@
 "use client";
-import { useRoomStore } from "@/hooks/use-room-store";
+import { useState } from "react";
+import { Plus, XCircle } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
 import {
   CategoriesType,
   CollapseStateType,
   dmListType,
   UserType,
 } from "@/types";
-import { Plus, XCircle } from "lucide-react";
-import { usePathname, useRouter } from "next/navigation";
-import { useState } from "react";
-import RoomCreateModal from "../room/room-create-modal";
+import { cn } from "@/util/utils";
+
+import { useUserQuery } from "@/store/use-user-query";
+import { useStore } from "@/store/use-store";
+import { UseEsc } from "@/hooks/useEsc";
+import { useRoomStore } from "@/hooks/use-room-store";
+import { useRoomQuery } from "@/hooks/use-room-query";
+import { useCategoryQuery } from "@/hooks/use-category-query";
+import { useDirectQuery } from "@/hooks/use-direct-query";
+
+import { RoomCreateModal } from "@/components/room/room-create-modal";
+import { Logout } from "@/components/auth/log-out";
+import { Login } from "@/components/auth/log-in";
+import { Loading } from "@/components/loading";
 import { SideMenuDirect } from "./side-menu-direct";
 import { SideMenuCategory } from "./side-menu-category";
 import { SideMenuEntered } from "./side-menu-entered";
+<<<<<<< HEAD
 import { useCategoryQuery } from "@/hooks/use-category-query";
 import { useRoomQuery } from "@/hooks/use-room-query";
 import { useUserQuery } from "@/store/use-user-query";
@@ -23,6 +36,8 @@ import { Logout } from "../auth/log-out";
 import { Login } from "../auth/log-in";
 import { useStore } from "@/store/use-store";
 import { UseEsc } from "@/hooks/useEsc";
+=======
+>>>>>>> f6cd10d (ci/cd 수정)
 
 type SideMenuProps = {
   user: UserType;

@@ -15,6 +15,7 @@ export const useChatScroll = ({
 }: ChatScrollProps) => {
   const [hasInitialized, setHasInitialized] = useState(false);
 
+  // 스크롤 이벤트 핸들러 등록
   useEffect(() => {
     const topDiv = chatRef?.current;
     const handleScroll = () => {
@@ -29,6 +30,7 @@ export const useChatScroll = ({
     return () => topDiv?.removeEventListener("scroll", handleScroll);
   }, [shouldLoadMore, loadMore, chatRef]);
 
+  // 스크롤 자동 스크롤 처리
   useEffect(() => {
     const topDiv = chatRef?.current;
     const bottomDiv = bottomRef?.current;
@@ -46,6 +48,7 @@ export const useChatScroll = ({
         topDiv.scrollHeight - topDiv.scrollTop - topDiv.clientHeight;
       return distanceFromBottom <= 100;
     };
+
     if (shouldAutoScroll()) {
       setTimeout(() => {
         bottomRef?.current?.scrollIntoView({ behavior: "smooth" });

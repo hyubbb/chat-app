@@ -17,12 +17,11 @@ const generateJWT = (user: UserType) => {
     role: user.role,
   };
 
-  const secretKey = process.env.JWT_SECRET as string; // 환경 변수에서 비밀 키를 가져옵니다
   const options = {
     expiresIn: "1h", // 토큰 만료 시간 (예: 1시간)
   };
 
-  return jwt.sign(payload, secretKey, options);
+  return jwt.sign(payload, SECRET_KEY, options);
 };
 
 // 토큰값을 확인한 후, 사용자 정보 가져오기

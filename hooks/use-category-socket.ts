@@ -10,8 +10,8 @@ export const useCategorySocket = () => {
   const { socket, isConnected } = useStore();
   const queryClient = useQueryClient();
 
+  // 카테고리 리스트 업데이트
   const handleCategoryList = (data: any) => {
-    // 카테고리 리스트 업데이트
     queryClient.setQueryData(["categoryList"], data);
     // 각 카테고리의 rooms 데이터 업데이트
     data.forEach((category: any) => {

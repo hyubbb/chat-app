@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const SECRET_KEY = process.env.JWT_SECRET as string;
-
 // 로그아웃 처리를 하고, JWT쿠키 삭제
 export async function POST(request: NextRequest) {
   try {
