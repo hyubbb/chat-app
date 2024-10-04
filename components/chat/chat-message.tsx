@@ -79,7 +79,6 @@ export const ChatMessage = ({
       className="flex flex-1 flex-col gap-y-2 overflow-y-auto overflow-x-hidden dark:text-zinc-300"
     >
       {!hasNextPage && <div className="flex-1" />}
-
       {hasNextPage && (
         <div className="flex justify-center">
           {isFetchingNextPage ? (
@@ -94,7 +93,6 @@ export const ChatMessage = ({
           )}
         </div>
       )}
-
       <div className="mt-auto flex flex-col-reverse">
         {messagesData?.pages?.map((group, i) => (
           <Fragment key={`group_${i}`}>
@@ -110,9 +108,7 @@ export const ChatMessage = ({
           </Fragment>
         ))}
       </div>
-
       <div ref={bottomRef} />
-
       <FileUploadModal
         user={user}
         chatId={chatId}
