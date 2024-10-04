@@ -1,8 +1,8 @@
 "use client";
 
-import { useStore } from "@/store/use-store";
+import React, { useEffect, useState } from "react";
 import { ErrorProps } from "next/error";
-import { useEffect, useState } from "react";
+import { useStore } from "@/store/use-store";
 import { io as ClientIO } from "socket.io-client";
 
 export const SocketProvider = ({ children }: { children: React.ReactNode }) => {

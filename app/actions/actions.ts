@@ -109,7 +109,7 @@ export const handleRefreshToken = async () => {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
-      maxAge: 15 * 60, // 15분
+      maxAge: 1 * 60, // 15분
       path: "/",
     });
 
