@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
     // 리프레시 토큰을 쿠키에 저장
     response.cookies.set("refresh-token", refreshToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: false,
       path: "/",
       maxAge: 7 * 24 * 60 * 60, // 7일
       sameSite: "lax",

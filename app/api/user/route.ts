@@ -91,7 +91,7 @@ export async function PATCH(request: NextRequest) {
       httpOnly: true,
       secure: false,
       path: "/",
-      maxAge: 86400,
+      maxAge: 1 * 60, // 15분
       sameSite: "lax",
     });
 

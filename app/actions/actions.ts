@@ -107,8 +107,8 @@ export const handleRefreshToken = async () => {
     // 새로운 액세스 토큰을 쿠키에 저장
     response.cookies.set("access-token", newAccessToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      secure: false,
+      sameSite: "lax",
       maxAge: 1 * 60, // 15분
       path: "/",
     });
