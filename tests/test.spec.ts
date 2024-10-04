@@ -1,10 +1,6 @@
 import { test, expect } from "@playwright/test";
 
-<<<<<<< HEAD
-const LOCALHOST = "http://localhost:3000";
-=======
 const LOCALHOST = process.env.BASE_URL as string;
->>>>>>> 7e50f8a (feat: JWT토큰 리프레시 토큰 추가)
 
 test("[로그인 모달 테스트]", async ({ page }) => {
   await page.goto(LOCALHOST);

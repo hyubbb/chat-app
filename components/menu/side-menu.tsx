@@ -21,23 +21,10 @@ import { useDirectQuery } from "@/hooks/use-direct-query";
 import { RoomCreateModal } from "@/components/room/room-create-modal";
 import { Logout } from "@/components/auth/log-out";
 import { Login } from "@/components/auth/log-in";
-import { Loading } from "@/components/loading";
 import { SideMenuDirect } from "./side-menu-direct";
 import { SideMenuCategory } from "./side-menu-category";
 import { SideMenuEntered } from "./side-menu-entered";
-<<<<<<< HEAD
-import { useCategoryQuery } from "@/hooks/use-category-query";
-import { useRoomQuery } from "@/hooks/use-room-query";
-import { useUserQuery } from "@/store/use-user-query";
 import { useCategorySocket } from "@/hooks/use-category-socket";
-import { useDirectQuery } from "@/hooks/use-direct-query";
-import { cn } from "@/util/utils";
-import { Logout } from "../auth/log-out";
-import { Login } from "../auth/log-in";
-import { useStore } from "@/store/use-store";
-import { UseEsc } from "@/hooks/useEsc";
-=======
->>>>>>> f6cd10d (ci/cd 수정)
 
 type SideMenuProps = {
   user: UserType;

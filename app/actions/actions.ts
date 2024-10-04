@@ -9,23 +9,16 @@ import {
   getCategoryRooms,
   getUserInfo,
 } from "@/lib/service/service";
-import { redirect } from "next/navigation";
 
-<<<<<<< HEAD
-const SECRET_KEY = process.env.JWT_SECRET as string;
-
-=======
 // JWT 시크릿 키를 환경 변수에서 가져옵니다.
 const ACCESS_KEY = process.env.JWT_ACCESS_SECRET as string;
 const REFRESH_SECRET = process.env.JWT_REFRESH_SECRET as string;
-// TODO: ACCESS_KEY가 undefined일 경우 처리 로직 추가 필요
 if (!ACCESS_KEY) {
   throw new Error("JWT_SECRET is not defined");
 }
 
 // 초기의 왼쪽 메뉴 목록을 가져온다.
 // user정보, DM List, 참여중인 채팅방 목록을 가져온다.
->>>>>>> 7e50f8a (feat: JWT토큰 리프레시 토큰 추가)
 export const fetchData = async () => {
   const userResponse = await fetchCookiesUser();
   const userData = await userResponse?.json();
@@ -48,16 +41,6 @@ export const fetchData = async () => {
 
 export const fetchCookiesUser = async () => {
   const cookieStore = cookies();
-<<<<<<< HEAD
-  const token = cookieStore.get("chat-token")?.value;
-  try {
-    if (!token) return null;
-
-    const decoded = jwt.verify(token, SECRET_KEY);
-    return NextResponse.json({ user: decoded as UserType }, { status: 200 });
-  } catch (err) {
-    return NextResponse.json({ message: "Invalid token" }, { status: 403 });
-=======
   const accessToken = cookieStore.get("access-token")?.value;
   // 액세스 토큰만 확인
   if (!accessToken) {
@@ -76,7 +59,6 @@ export const fetchCookiesUser = async () => {
       return handleRefreshToken();
     }
     return NextResponse.json({ user: null }, { status: 403 });
->>>>>>> 7e50f8a (feat: JWT토큰 리프레시 토큰 추가)
   }
 };
 

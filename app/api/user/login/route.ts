@@ -3,13 +3,9 @@ import { UserType } from "@/types";
 import jwt from "jsonwebtoken";
 import { NextRequest, NextResponse } from "next/server";
 
-<<<<<<< HEAD
-const SECRET_KEY = process.env.JWT_SECRET as string;
-=======
 // JWT 비밀 키를 환경 변수에서 가져옴
 const ACCESS_SECRET_KEY = process.env.JWT_ACCESS_SECRET as string;
 const REFRESH_SECRET_KEY = process.env.JWT_REFRESH_SECRET as string;
->>>>>>> 7e50f8a (feat: JWT토큰 리프레시 토큰 추가)
 
 // 로그인 처리를 하고, JWT를 생성하여 쿠키에 저장
 export async function POST(request: NextRequest) {
@@ -20,16 +16,12 @@ export async function POST(request: NextRequest) {
 
     // 사용자정보가 서버에 존재하지 않는 경우
     if (!user) {
-<<<<<<< HEAD
-      return NextResponse.json({ success: false });
-=======
       return NextResponse.json({
         success: false,
         message: "사용자를 찾을 수 없습니다.",
         status: 404,
         user: null,
       });
->>>>>>> 7e50f8a (feat: JWT토큰 리프레시 토큰 추가)
     }
 
     // 액세스 토큰 생성
@@ -42,13 +34,10 @@ export async function POST(request: NextRequest) {
       { expiresIn: "7d" }, // 리프레시 토큰의 유효 기간을 7일로 설정
     );
 
-<<<<<<< HEAD
-    // // JWT를 HttpOnly 쿠키로 설정
-=======
     // 로그인 성공 메세지 반환 및 쿠키에 JWT 저장
->>>>>>> 7e50f8a (feat: JWT토큰 리프레시 토큰 추가)
+
     const response = NextResponse.json(
-      { success: true, token },
+      { success: true, accessToken },
       { status: 200 },
     );
 
@@ -57,11 +46,7 @@ export async function POST(request: NextRequest) {
       httpOnly: true,
       secure: false,
       path: "/",
-<<<<<<< HEAD
-      maxAge: 86400,
-=======
       maxAge: 1 * 60, // 15분으로 설정 (JWT expiresIn과 일치)
->>>>>>> 7e50f8a (feat: JWT토큰 리프레시 토큰 추가)
       sameSite: "lax",
     });
 

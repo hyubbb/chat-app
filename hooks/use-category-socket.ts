@@ -4,7 +4,6 @@
 import { useEffect } from "react";
 import { useStore } from "../store/use-store";
 import { useQueryClient } from "@tanstack/react-query";
-import { UserType } from "@/types";
 
 export const useCategorySocket = () => {
   const { socket, isConnected } = useStore();

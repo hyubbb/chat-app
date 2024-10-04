@@ -1,5 +1,5 @@
 "use client";
-import { ElementRef, useEffect, useRef } from "react";
+import React, { ElementRef, useEffect, useRef } from "react";
 import { redirect } from "next/navigation";
 
 import { useStore } from "@/store/use-store";
