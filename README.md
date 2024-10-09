@@ -13,7 +13,7 @@ JWT, Socket.io, MySQL, RDS, S3, EC2, Github Actions
 ## 아키텍쳐
 
  
- <img width="741" alt="image" src="https://github.com/user-attachments/assets/3001ee49-e656-42f1-aea9-6c4ddaec2127">
+<img width="765" alt="image" src="https://github.com/user-attachments/assets/0c050f90-4088-4080-b932-a23120cee071">
 
 
 ## 대표 구현 내역 - 실시간채팅
