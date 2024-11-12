@@ -2,13 +2,6 @@ import { NextApiResponseServerIo } from "@/types";
 import { NextApiRequest } from "next";
 import { Server as NetServer } from "http";
 import { Server as ServerIO } from "socket.io";
-import { dateName } from "@/util/utils";
-import { AWS_BUCKET, AWS_S3 } from "@/lib/aws-s3";
-import { PutObjectCommand } from "@aws-sdk/client-s3";
-import {
-  enteredDMList,
-  sendMessageAndGetMessages,
-} from "@/lib/service/service";
 import { socketHandlers } from "./socketHandler";
 
 const ServerHandler = (req: NextApiRequest, res: NextApiResponseServerIo) => {
