@@ -19,7 +19,7 @@ JWT, Socket.io, MySQL, RDS, S3, EC2, Github Actions
 ## 대표 구현 내역 - 실시간채팅
 
  
-<img width="688" alt="2" src="https://github.com/user-attachments/assets/a01c5b20-7012-4dac-b412-66c5f3e884c9">
+<img width="765" alt="image 복사본" src="https://github.com/user-attachments/assets/e258a5b1-bc74-46fd-8535-d6332b660911">
 
 
 ## JWT 토큰 활용
