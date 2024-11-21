@@ -29,23 +29,20 @@ JWT, Socket.io, MySQL, RDS, S3, EC2, Github Actions
  
 ## 기능
 
-
-- Github action을 이용하여 `CI/CD` 자동화 처리
-- 실시간 메세지 통신
-    - `socket.io` 를 이용하여 실시간 통신
-- 무한 스크롤 기능
-    - `useInfiniteQuery`를 사용하여 채팅방 이전메세지 불러오기를 구현
+- `socket.io` 를 이용하여 실시간 통신
+- 무한스크롤 기능 구현을 위하여`useInfiniteQuery`를 사용
+    - 채팅메시지를 로드할때 limit에 나눠서 불러오기 위해 사용
     - 게시글ID를 기반으로한 페이지네이션, 로드된 마지막 메시지의 ID를 커서로 지정
 - 이미지 저장 ( 유저아이콘 변경, 채팅 이미지 전송 )
     - 유저의 이미지나 채팅시의 이미지를 `S3`에 저장
-    - 이미지 변경이나 삭제시 `S3`에서도 이미지 파일 제거.
-- 모바일 디자인 대응
-    - `tailwindcss`를 이용하여 모바일 대응
-- 데이터 캐싱 관리
-    - `tanstack query`를 이용하여 채팅방 별 메시지를 Key별로 관리
-- `JWT`를 사용하여 유저정보 유지
+    - 이미지 변경이나 삭제시 `S3`에서도 이미지 파일 제거
+- `tailwindcss`를 이용하여 모바일 대응
+- 상태관리를 위하여 Zustand와 Tanstack query를 사용
+    - Modal과같은 단순 상태관리에는 Zustand를 사용, 캐싱처리 관리가 필요한 데이터는 Tanstack을 사용
+- `JWT`를 활용한 로그인 기능
     - 서버에서 생성한 토큰 값을 클라이언트의 쿠키에 저장하여 로그인 정보 확인
-    - `Access Token`과 `Refresh Token`을 사용하여 토큰 탈취 위험 감소
+    - 토큰 탈취의 위험을 방지하고자 `Access Token`과 `Refresh Token`을 사용하여 토큰 탈취 위험 감소
+- Github action을 이용하여 `CI/CD` 자동화 처리
 
 
 ## 해결하고자 한 문제
