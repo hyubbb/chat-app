@@ -10,6 +10,11 @@ socket.io를 이용한 실시간 채팅 사이트입니다.
 - React, Next.js, Tanstack query, Typescript, Zustand, Tailwindcss
 JWT, Socket.io, MySQL, RDS, S3, EC2, Github Actions
 
+Tanstack-query : 수많은 채팅 메시지를 캐싱하여 사용하기 위해서 
+JWT : 로그인정보를 매번 서버에 접속하지않고 쿠키데이터로 처리
+Zustand : Modal의 상태관리에 사용되어짐
+S3 : 이미지 저장소
+
 ## 아키텍쳐
 
  
