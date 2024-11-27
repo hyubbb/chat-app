@@ -11,6 +11,7 @@ import {
   DELETE_MESSAGES,
   DELETE_ROOM_MEMBERS,
   DELETE_TEXT_MESSAGE,
+  GET_ALL_ROOMS,
   GET_CATEGORY,
   GET_CATEGORY_ROOMS,
   GET_CHAT_ROOM_INFO,
@@ -110,6 +111,11 @@ export const loginUser = async (id: string, password: string) => {
 
 export async function getCategoryRooms() {
   const result = await executeQuery(GET_CATEGORY_ROOMS);
+  return result;
+}
+
+export async function getAllRooms() {
+  const result = await executeQuery(GET_ALL_ROOMS);
   return result;
 }
 

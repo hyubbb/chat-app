@@ -52,6 +52,19 @@ export const CREATE_CATEGORY = `
     INSERT INTO categories (category_name) VALUES (?)
   `;
 
+export const GET_ALL_ROOMS = `
+SELECT DISTINCT
+    cr.chat_id,
+    cr.room_name,
+    cr.user_id,
+    (SELECT COUNT(*) 
+    FROM room_members rm2 
+    WHERE rm2.chat_id = cr.chat_id ) AS user_count
+FROM 
+    room_members rm
+JOIN 
+    chat_rooms cr ON rm.chat_id = cr.chat_id;`;
+
 export const CREATE_CHAT_ROOM = `
     INSERT INTO chat_rooms (category_id, room_name, user_id) VALUES (?, ?, ?)
   `;

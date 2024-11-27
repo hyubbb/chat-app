@@ -100,6 +100,7 @@ export default async function handler(
         message,
         type,
       });
+
       res?.socket?.server?.io?.to(`dm_${roomId}`).emit("directMessages", {
         messages: result,
         messages_type: "direct",
@@ -136,12 +137,14 @@ export default async function handler(
           }),
         );
       }
-      res?.socket?.server?.io?.to(`dm_${dmRoomId}`).emit("directMessages", {
-        roomId: dmRoomId,
-        messages: result,
-        messages_type: "deleted",
-        dmRoomId,
-      });
+      res?.socket?.server?.io
+        ?.to(`dm_${dmRoomId}:${userId}`)
+        .emit("directMessages", {
+          roomId: dmRoomId,
+          messages: result,
+          messages_type: "deleted",
+          dmRoomId,
+        });
       res.status(200).json({ success: true });
     } catch (error: any) {
       res.status(500).json({ error: error.message });

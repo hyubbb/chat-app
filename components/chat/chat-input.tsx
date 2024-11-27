@@ -13,18 +13,15 @@ export const ChatInput = ({ user, chatId, bottomRef }: ChatInputProps) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const { socket } = useStore();
   const [message, setMessage] = useState("");
-  const [isSending, setIsSending] = useState(false); // 메시지 전송 상태 관리
   const { setIsUploadModalOpen } = useStore();
   useEffect(() => {
     inputRef?.current?.focus();
-  }, [inputRef, isSending]);
+  }, [inputRef]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!message.trim()) return; // 메시지가 없으면 전송 중지
-    // if (isSending) return; // 메시지 전송 중에는 입력창 비활성화
     setMessage(""); // 메시지 초기화
-    // setIsSending(true); // 메세지 전송 중, 입력창 비활성화
     const startTime = performance.now(); // 메시지 전송 시점 기록
 
     // socket.io 방식
@@ -43,16 +40,8 @@ export const ChatInput = ({ user, chatId, bottomRef }: ChatInputProps) => {
             bottomRef?.current?.scrollIntoView({ behavior: "instant" });
           }, 100);
         }
-        // setIsSending(false); // 입력상태 활성
       },
     );
-
-    // api 호출 방식 비교용 코드
-    // await axios.post("/api/socket/message", {
-    //   userId: user?.user_id,
-    //   chatId,
-    //   message,
-    // });
   };
 
   const HandleFileModal = () => {
@@ -76,7 +65,6 @@ export const ChatInput = ({ user, chatId, bottomRef }: ChatInputProps) => {
             placeholder="메시지를 입력하세요..."
             className="w-full rounded-md border px-3 py-2 pl-10 focus:outline-none focus:ring-2 focus:ring-blue-500"
             value={message}
-            // disabled={isSending}
             onChange={(e) => setMessage(e.target.value)}
           />
         </div>

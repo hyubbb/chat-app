@@ -77,7 +77,7 @@ export const SideMenu = ({
     <aside className="w-64 overflow-y-scroll border-b-2 border-r bg-white scrollbar-hide max-sm:w-full dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
       {/* Direct Messages - 접을 수 있는 기능 */}
 
-      {user && user.id && (
+      {user?.id && (
         <SideMenuDirect
           toggleCollapse={toggleCollapse}
           collapseState={collapseState}

@@ -32,8 +32,10 @@ export default async function handler(
       const chatId = parseInt(req.query.chatId as string, 10);
       const userId = parseInt(req.body.userId, 10);
       const { userName } = req.body;
+
       let result;
       let MESSAGE_TYPE;
+
       if (isNaN(chatId) || isNaN(userId) || !userName) {
         return res.status(400).json({ error: "Invalid request parameters" });
       }
@@ -52,10 +54,12 @@ export default async function handler(
 
       result = await getDirectMessages(DM_ROOM_ID, userId);
       MESSAGE_TYPE = "direct";
+
       const userEnteredRoomList = await enteredDMList(userId);
       const otherUserEnteredRoomList = await enteredDMList(chatId);
+
       // 방문한 방의 목록
-      io.to(`dm_${DM_ROOM_ID}:${userId}`).emit("directMessages", {
+      io.to(`dm_${DM_ROOM_ID}`).emit("directMessages", {
         roomId: DM_ROOM_ID,
         messages: result,
         messages_type: MESSAGE_TYPE,
@@ -104,7 +108,6 @@ export default async function handler(
     if (isSuccess) {
       // 참여중인 채팅방 목록 조회
       const result = await enteredDMList(+userId);
-
       io.to(`dm_${roomId}`).emit("directMessages", {
         roomId,
         messages: resultMessage,

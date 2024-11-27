@@ -25,13 +25,13 @@ export const useDirectQuery = ({
 
   const getMessages = async () => {
     if (!dmRoomId) return [];
-
     try {
       const { data } = await axios.post(`/api/socket/direct/${chatId}`, {
         userId: user?.user_id,
         userName: user?.user_name,
         direct: true,
       });
+
       return data?.data?.messages;
     } catch (error) {
       console.error(error);
@@ -57,7 +57,7 @@ export const useDirectQuery = ({
     queryKey: ["directMessages", dmRoomId],
     queryFn: getMessages,
     initialData: [],
-    enabled: !!dmRoomId,
+    enabled: dmRoomId !== null,
   });
 
   const {

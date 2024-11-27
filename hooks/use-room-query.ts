@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { CategoriesType, RoomsType } from "@/types";
+import { getAllRooms } from "@/lib/service/service";
 
 export const useRoomQuery = ({
   categories,
@@ -8,14 +9,6 @@ export const useRoomQuery = ({
   categories?: CategoriesType | null;
   userId?: number | null;
 }) => {
-  const {
-    data: categoryData,
-    isError: isCategoryError,
-    isLoading: isCategoryLoading,
-  } = useQuery<RoomsType[]>({
-    queryKey: ["categoryRooms", categories?.category_id],
-  });
-
   const getJoinRoom = async () => {
     try {
       const response = await fetch(`/api/socket/user/${userId}`);
@@ -36,12 +29,27 @@ export const useRoomQuery = ({
     enabled: !!userId,
   });
 
+  const getRooms = async () => {
+    const response = await fetch(`/api/room`);
+    const data = await response.json();
+    return data;
+  };
+
+  const {
+    data: roomsData,
+    isError: isRoomsError,
+    isLoading: isRoomsLoading,
+  } = useQuery({
+    queryKey: ["rooms"],
+    queryFn: getRooms,
+  });
+
   return {
-    categoryData,
-    isCategoryError,
-    isCategoryLoading,
     joinRoomData,
     isJoinRoomError,
     isJoinRoomLoading,
+    roomsData,
+    isRoomsError,
+    isRoomsLoading,
   };
 };

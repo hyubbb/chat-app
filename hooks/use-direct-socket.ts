@@ -32,6 +32,7 @@ export const useDirectSocket = ({
     const endTime = performance.now(); // 응답 수신 시점 기록
     const duration = endTime - startTime;
     console.log(`Api-Socket.io 처리 시간: ${duration.toFixed(2)}ms`);
+
     queryClient.setQueryData(
       ["directMessages", roomId],
       (oldData: messagesType[]) => {
@@ -75,7 +76,10 @@ export const useDirectSocket = ({
 
   // DM 관련 소켓 이벤트설정
   useEffect(() => {
-    if (!socket || !isConnected || !toId) return;
+    if (!socket || !isConnected || !toId || !user?.user_id) return;
+    const newDmRoomId: string = createDMRoomId(toId, user.user_id);
+    socket.emit("createDMRoom", { chatId: newDmRoomId, userId: user.user_id });
+
     socket.on("directMessages", handleMessageUpdate);
     socket.on("joinDmList", handleDmListUpdate);
     socket.on("leaveDm", handleLeaveDM);
