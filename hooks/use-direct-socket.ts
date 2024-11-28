@@ -11,6 +11,7 @@ type DirectSocketPropsType = {
   messages_type?: string;
   roomId: string;
   startTime: number;
+  messageId?: string;
 };
 
 export const useDirectSocket = ({
@@ -28,6 +29,7 @@ export const useDirectSocket = ({
     messages_type,
     roomId,
     startTime,
+    messageId,
   }: DirectSocketPropsType) => {
     const endTime = performance.now(); // 응답 수신 시점 기록
     const duration = endTime - startTime;
@@ -40,12 +42,16 @@ export const useDirectSocket = ({
           // 초기 로딩: messages가 배열일 것으로 예상
           return Array.isArray(messages) ? messages : [messages];
         }
+
         // 넘어온 메세지가 배열이 아닌경우: 메세지나, 시스템메세지
         // 배열인경우 기존에 채팅방에 접속중이어서 대화가 있는 경우
+
         if (
           (oldData.length === 1 && !messages_type) ||
           messages_type === "deleted"
         ) {
+          console.log(oldData);
+
           return messages;
         }
         return Array.isArray(messages)

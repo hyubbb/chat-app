@@ -107,7 +107,8 @@ export default async function handler(
         roomId,
         startTime,
       });
-      res.status(200).json({ success: true });
+
+      res.status(200).json({ success: true, messages: result });
     } catch (error: any) {
       res.status(500).json({ error: error.message });
     }
@@ -137,14 +138,16 @@ export default async function handler(
           }),
         );
       }
+
       res?.socket?.server?.io
         ?.to(`dm_${dmRoomId}:${userId}`)
         .emit("directMessages", {
           roomId: dmRoomId,
           messages: result,
           messages_type: "deleted",
-          dmRoomId,
+          messageId,
         });
+
       res.status(200).json({ success: true });
     } catch (error: any) {
       res.status(500).json({ error: error.message });

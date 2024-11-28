@@ -1,5 +1,6 @@
 import { useStore } from "@/store/use-store";
-import { dmListType, UserType } from "@/types";
+import { dmListType, messagesType, UserType } from "@/types";
+import { useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { Plus } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
@@ -18,6 +19,8 @@ export const ChatInput = ({ user, dmInfo }: ChatInputProps) => {
   useEffect(() => {
     inputRef?.current?.focus();
   }, [inputRef]);
+
+  const queryClient = useQueryClient();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

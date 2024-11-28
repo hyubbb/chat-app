@@ -370,7 +370,7 @@ export const deleteMessageAndGetMessages = async (
   type: string = "message",
 ) => {
   await executeQuery(DELETE_TEXT_MESSAGE, [messageId]);
-  const roomId = createDMRoomId(userId, +chatId);
+  console.log(userId, chatId);
   let result;
 
   if (type == "message") {
@@ -383,7 +383,7 @@ export const deleteMessageAndGetMessages = async (
   } else {
     result = (await executeQuery(GET_DIRECT_MESSAGE_AFTER, [
       userId,
-      roomId,
+      chatId,
     ])) as messagesType[];
   }
 
