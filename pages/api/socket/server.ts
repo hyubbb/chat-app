@@ -5,28 +5,42 @@ import { Server as ServerIO } from "socket.io";
 import { socketHandlers } from "./socketHandler";
 
 const ServerHandler = (req: NextApiRequest, res: NextApiResponseServerIo) => {
-  if (!res.socket.server.io) {
+  if (!res.socket.server || !res.socket.server.io) {
     console.log("Initializing Socket.io");
     const path = "/api/socket/server";
     const httpServer: NetServer = res.socket.server as any;
     const io = new ServerIO(httpServer, {
       path: path,
-      addTrailingSlash: false,
-      maxHttpBufferSize: 1e8, // 10MB
+      cors: { origin: "*" }, // CORS 설정 추가
+      maxHttpBufferSize: 1e7, // 적절한 버퍼 크기
     });
 
     res.socket.server.io = io;
 
     io.on("connection", (socket) => {
-      console.log("서버 connection");
+      console.log("[SERVER] connection");
 
       socketHandlers(socket, io);
       socket.on("disconnect", () => {
-        console.log("서버 disconnected");
+        console.log("[SERVER] disconnected");
+      });
+
+      socket.on("offer", ({ sdp, chatId }) => {
+        console.log("[SERVER] offer", chatId);
+        socket.to(`dm_${chatId}`).emit("offer", { sdp });
+      });
+
+      socket.on("answer", ({ sdp, chatId }) => {
+        console.log("[SERVER] answer", chatId);
+        socket.to(`dm_${chatId}`).emit("answer", { sdp });
+      });
+
+      socket.on("ice-candidate", ({ candidate, chatId }) => {
+        socket.to(`dm_${chatId}`).emit("ice-candidate", { candidate });
       });
     });
   } else {
-    console.log("Socketio is already set up");
+    console.log("Socket.io is already set up");
   }
 
   res.end();

@@ -50,8 +50,6 @@ export const useDirectSocket = ({
           (oldData.length === 1 && !messages_type) ||
           messages_type === "deleted"
         ) {
-          console.log(oldData);
-
           return messages;
         }
         return Array.isArray(messages)

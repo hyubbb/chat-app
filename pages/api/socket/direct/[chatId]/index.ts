@@ -58,8 +58,8 @@ export default async function handler(
       const userEnteredRoomList = await enteredDMList(userId);
       const otherUserEnteredRoomList = await enteredDMList(chatId);
 
-      // 방문한 방의 목록
-      io.to(`dm_${DM_ROOM_ID}`).emit("directMessages", {
+      // 첫 메세지 불러오기
+      io.to(`dm_${DM_ROOM_ID}:${userId}`).emit("directMessages", {
         roomId: DM_ROOM_ID,
         messages: result,
         messages_type: MESSAGE_TYPE,

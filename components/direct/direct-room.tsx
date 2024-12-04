@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { redirect } from "next/navigation";
 
 import { useStore } from "@/store/use-store";
@@ -12,6 +12,7 @@ import { ChatMessage } from "./chat-message";
 import { useDirectSocket } from "@/hooks/use-direct-socket";
 import { useDirectQuery } from "@/hooks/use-direct-query";
 import { Loading } from "../loading";
+import Video from "./video";
 
 export const DirectRoom = ({ chatId }: { chatId: number }) => {
   const { setIsLoginModalOpen } = useStore();
@@ -24,6 +25,7 @@ export const DirectRoom = ({ chatId }: { chatId: number }) => {
   });
 
   const dmInfo = dmList?.find((dm) => dm.other_id === chatId) || null;
+
   useEffect(() => {
     if (chatId === user?.user_id) return redirect("/");
   }, [chatId, user]);
@@ -43,6 +45,8 @@ export const DirectRoom = ({ chatId }: { chatId: number }) => {
   return (
     <>
       <ChatHeader user={user} chatId={chatId} dmInfo={dmInfo} />
+      {/* 영상통화 UI */}
+
       <ChatMessage
         messages={messages}
         user={user}

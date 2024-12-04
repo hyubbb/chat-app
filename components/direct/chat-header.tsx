@@ -8,6 +8,7 @@ import {
   Trash2,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import Video from "./video";
 
 type ChatHeaderProps = {
   user: UserType | null;
@@ -36,21 +37,25 @@ export const ChatHeader = ({ user, chatId, dmInfo }: ChatHeaderProps) => {
         <MessageSquare size={20} className="text-blue-500" />
         <h2 className="font-semibold">{dmInfo?.other_name}</h2>
       </div>
-      <div className="group relative cursor-pointer">
-        <EllipsisVertical size={20} />
-        <div className="absolute right-0 top-0 hidden w-max flex-col gap-2 rounded-md bg-zinc-900 p-2 group-hover:flex">
-          <button
-            onClick={handleLeaveDM}
-            className="flex items-center gap-2 rounded-md p-2 text-left text-zinc-200 hover:bg-red-500 hover:text-zinc-100"
-          >
-            <MessageCircleOff size={16} /> <span>방 나가기</span>
-          </button>
 
-          {user?.role === "admin" && (
-            <button className="flex items-center gap-2 rounded-md p-2 text-left text-zinc-200 hover:bg-blue-100 hover:text-zinc-900">
-              <Trash2 size={16} /> <span>방 삭제</span>
+      <div className="relative flex cursor-pointer items-center justify-center gap-3">
+        {/* <Video dmInfo={dmInfo} /> */}
+        <div className="group">
+          <EllipsisVertical size={20} />
+          <div className="absolute right-0 top-0 hidden w-max flex-col gap-2 rounded-md bg-zinc-900 p-2 group-hover:flex">
+            <button
+              onClick={handleLeaveDM}
+              className="flex items-center gap-2 rounded-md p-2 text-left text-zinc-200 hover:bg-red-500 hover:text-zinc-100"
+            >
+              <MessageCircleOff size={16} /> <span>방 나가기</span>
             </button>
-          )}
+
+            {user?.role === "admin" && (
+              <button className="flex items-center gap-2 rounded-md p-2 text-left text-zinc-200 hover:bg-blue-100 hover:text-zinc-900">
+                <Trash2 size={16} /> <span>방 삭제</span>
+              </button>
+            )}
+          </div>
         </div>
       </div>
     </div>

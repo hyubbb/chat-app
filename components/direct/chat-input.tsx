@@ -1,6 +1,5 @@
 import { useStore } from "@/store/use-store";
 import { dmListType, messagesType, UserType } from "@/types";
-import { useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { Plus } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
@@ -20,15 +19,13 @@ export const ChatInput = ({ user, dmInfo }: ChatInputProps) => {
     inputRef?.current?.focus();
   }, [inputRef]);
 
-  const queryClient = useQueryClient();
-
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (!message.trim()) return;
 
-    const startTime = performance.now(); // 메시지 전송 시점 기록
     setMessage("");
+    const startTime = performance.now(); // 메시지 전송 시점 기록
     const res = await axios.post("/api/socket/direct", {
       userId: user?.user_id,
       roomId: dmInfo?.room_id,

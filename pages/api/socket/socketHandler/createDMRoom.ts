@@ -6,7 +6,7 @@ export const createDMRoomHandler = (socket: Socket) => {
     ({ chatId, userId }: { chatId: string; userId: string }) => {
       socket.join(`dm_${chatId}:${userId}`);
       socket.join(`dm_${chatId}`);
-      console.log(`Created dmRoom for ${chatId}`);
+      console.log(`Created dmRoom for ${chatId}, userId: ${userId}`);
     },
   );
 };
