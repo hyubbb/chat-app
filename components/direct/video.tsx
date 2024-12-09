@@ -69,7 +69,7 @@ const Video = ({ dmInfo }: { dmInfo: dmListType | null }) => {
   useEffect(() => {
     if (!socket) return;
 
-    socket.on("offer", async ({ sdp }) => {
+    socket.on("offer", async ({ sdp }: { sdp: RTCSessionDescriptionInit }) => {
       console.log("[client] offer", peerConnectionRef.current);
 
       // if (!peerConnectionRef.current) return;
@@ -87,7 +87,7 @@ const Video = ({ dmInfo }: { dmInfo: dmListType | null }) => {
       socket.emit("answer", { sdp: answer, chatId: dmInfo?.room_id });
     });
 
-    socket.on("answer", async ({ sdp }) => {
+    socket.on("answer", async ({ sdp }: { sdp: RTCSessionDescriptionInit }) => {
       console.log("[client] answer", peerConnectionRef.current);
       if (!peerConnectionRef.current) return;
       console.log("answer");
@@ -96,13 +96,16 @@ const Video = ({ dmInfo }: { dmInfo: dmListType | null }) => {
       );
     });
 
-    socket.on("ice-candidate", async ({ candidate }) => {
-      if (!peerConnectionRef.current) return;
+    socket.on(
+      "ice-candidate",
+      async ({ candidate }: { candidate: RTCIceCandidateInit }) => {
+        if (!peerConnectionRef.current) return;
 
-      await peerConnectionRef.current.addIceCandidate(
-        new RTCIceCandidate(candidate),
-      );
-    });
+        await peerConnectionRef.current.addIceCandidate(
+          new RTCIceCandidate(candidate),
+        );
+      },
+    );
   }, [socket]);
   return (
     <div className="flex items-center justify-center">
