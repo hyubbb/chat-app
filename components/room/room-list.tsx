@@ -28,9 +28,13 @@ export const RoomList = () => {
     }
   }, [roomsData, roomsInCategory]);
 
-  const handleChatClick = (chat: any) => {
-    setSelectedChat(chat);
-    router.push(`/chat/${chat.chat_id}`);
+  const handleChatClick = (chat_id: number) => {
+    const room = rooms.find((room) => room.chat_id == chat_id);
+    console.log(room);
+    if (room) {
+      setSelectedChat(room);
+      router.push(`/chat/${chat_id}`);
+    }
   };
 
   const handleDelete = async (chat_id: number) => {
@@ -54,7 +58,7 @@ export const RoomList = () => {
                 <div
                   key={chat_id}
                   className="group cursor-pointer rounded-lg bg-white p-4 shadow transition hover:shadow-md"
-                  onClick={() => handleChatClick(roomsData[idx])}
+                  onClick={() => handleChatClick(chat_id)}
                 >
                   <div className="flex items-center justify-between">
                     <h3 className="font-semibold">{room_name}</h3>

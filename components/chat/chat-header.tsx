@@ -44,9 +44,9 @@ export const ChatHeader = ({
   };
 
   // 유저 디렉트 메시지 이동
-  const directMessage = ({ userId }: { userId: number | null }) => {
-    if (userId !== user?.user_id) {
-      router.push(`/direct/${userId}`);
+  const directMessage = ({ id }: { id: number | null }) => {
+    if (id !== user?.user_id) {
+      router.push(`/direct/${id}`);
     }
   };
 
@@ -84,36 +84,43 @@ export const ChatHeader = ({
         </div>
 
         {listModal && (
-          <div className="absolute right-0 top-0 z-20 w-[200px] rounded-md bg-zinc-900 p-3 pl-6 shadow-lg">
+          <div className="absolute right-0 top-0 z-20 w-max min-w-[200px] rounded-md bg-zinc-900 p-3 pl-6 shadow-lg">
             <div
               onClick={() => setListModal(false)}
               className="flex justify-end"
             >
               <X />
             </div>
-            <div className="flex flex-col gap-y-4">
-              {usersList?.map((user: UserType) => (
-                <div
-                  onClick={() => directMessage({ userId: user?.user_id })}
-                  key={user.user_id}
-                  className="flex items-center gap-2"
-                >
-                  {user?.photo_url ? (
-                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-200">
-                      <Image
-                        src={user.photo_url}
-                        alt={user.user_name}
-                        width={32}
-                        height={32}
-                        className="rounded-full"
-                      />
-                    </div>
-                  ) : (
-                    <div className="h-8 w-8 rounded-full bg-black"></div>
-                  )}
-                  <span className="text-zinc-200">{user?.user_name}</span>
-                </div>
-              ))}
+            <div className="flex flex-col gap-3">
+              {usersList?.map(({ id, user_name, photo_url }: UserType) => {
+                const isCurrentUser = user_name === user?.user_name;
+
+                return (
+                  <div
+                    key={id}
+                    onClick={() => !isCurrentUser && directMessage({ id })}
+                    className={`flex items-center gap-2 ${!isCurrentUser ? "cursor-pointer" : "cursor-default"}`}
+                  >
+                    {user?.photo_url ? (
+                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-200">
+                        <Image
+                          src={photo_url}
+                          alt={user_name}
+                          width={32}
+                          height={32}
+                          className="rounded-full"
+                        />
+                      </div>
+                    ) : (
+                      <div className="h-8 w-8 rounded-full bg-black"></div>
+                    )}
+                    <span className="text-zinc-200">{user_name}</span>
+                    {isCurrentUser && (
+                      <span className="text-zinc-600">(본인)</span>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </div>
         )}
