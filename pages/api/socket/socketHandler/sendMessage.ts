@@ -39,7 +39,7 @@ export const sendMessageHandler = (socket: Socket, io: any) => {
         message,
         type,
       });
-
+      console.log(result);
       // socket으로 메세지가 비동기로 빠르게 전송이될때 메세지가 중복으로 전송되는 현상을 막기위해 추가
       const newResult = { ...result, content: message };
 

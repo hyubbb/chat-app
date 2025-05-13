@@ -175,10 +175,10 @@ export const getMessages = async (
 ) => {
   try {
     const initCursor = cursor === undefined ? 99999999 : cursor;
-
+    console.log(chatId, userId, initCursor, MESSAGES_PER_PAGE);
     let res = (await executeQuery(GET_MESSAGE_AFTER, [
-      userId,
-      chatId,
+      userId + "",
+      chatId + "",
       initCursor,
       MESSAGES_PER_PAGE + "",
     ])) as messagesType[];
