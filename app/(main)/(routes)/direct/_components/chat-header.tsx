@@ -8,7 +8,7 @@ import {
   Trash2,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import Video from "./video";
+import Video from "@/components/video";
 
 type ChatHeaderProps = {
   user: UserType | null;

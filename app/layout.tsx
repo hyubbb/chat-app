@@ -3,7 +3,9 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { SocketProvider } from "@/components/providers/socket-providers";
 import { QueryProvider } from "@/components/providers/query-provider";
+import { ToastContainer } from "@/components/ui/toast-container";
 import localFont from "next/font/local";
+import { ConfirmDialogProvider } from "@/components/providers/confirm-dialog-provider";
 
 const pretendard = localFont({
   src: "../public/fonts/Pretendard.woff2",
@@ -26,7 +28,11 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${pretendard.variable} font-pretendard`}>
         <SocketProvider>
-          <QueryProvider>{children}</QueryProvider>
+          <QueryProvider>
+            {children}
+            <ToastContainer />
+            <ConfirmDialogProvider />
+          </QueryProvider>
         </SocketProvider>
       </body>
     </html>

@@ -6,8 +6,8 @@ import { EllipsisVertical } from "lucide-react";
 import { useStore } from "@/store/use-store";
 import { useUserQuery } from "@/store/use-user-query";
 
-import { Login } from "@/components/auth/log-in";
-import { Logout } from "@/components/auth/log-out";
+import { Login } from "@/app/(auth)/_components/log-in";
+import { Logout } from "@/app/(auth)/_components/log-out";
 import { LoginModal } from "@/components/modal/login-modal";
 import { EditModal } from "@/components/modal/edit-modal";
 import { UserType } from "@/types";

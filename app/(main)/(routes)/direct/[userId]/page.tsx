@@ -1,4 +1,4 @@
-import { DirectRoom } from "@/components/direct/direct-room";
+import { DirectRoom } from "@/app/(main)/(routes)/direct/_components/direct-room";
 
 export const metadata = {
   title: "DIRECT CHAT",

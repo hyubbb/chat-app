@@ -1,6 +1,6 @@
 import { useSignUpForm } from "@/hooks/use-signup-form";
 import { useSignUpSubmit } from "@/hooks/use-signup-submit";
-import { UseEsc } from "@/hooks/use-esc";
+import { useEsc } from "@/hooks/use-esc";
 import { useStore } from "@/store/use-store";
 import { useFormType } from "@/types";
 import { X } from "lucide-react";
@@ -12,7 +12,7 @@ export const SignUpModal = () => {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const { setIsSignUpModalOpen, isSignUpModalOpen } = useStore();
   const methods = useSignUpForm();
-  UseEsc(setIsSignUpModalOpen);
+  useEsc(setIsSignUpModalOpen);
   const { register, handleSubmit, errors, reset, watch } = methods;
   const { onSubmit, handleFileChange } = useSignUpSubmit(
     setIsSignUpModalOpen,

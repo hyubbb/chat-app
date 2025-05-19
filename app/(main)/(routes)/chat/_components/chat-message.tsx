@@ -1,15 +1,16 @@
 import { messagesType, UserType } from "@/types";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import { ElementRef, Fragment, RefObject, useState } from "react";
-import { Loading } from "../loading";
-import { FileUploadModal } from "../modal/file-upload-modal";
+import { ElementRef, Fragment, RefObject, useEffect, useState } from "react";
 import { ChatItem } from "./chat-item";
 import { Loader2 } from "lucide-react";
 import { useChatScroll } from "@/hooks/use-chat-scroll";
-import { useMessageQuery } from "@/hooks/use-message.query";
 import { useMessageSocket } from "@/hooks/use-message-socket";
 import { v4 as uuidv4 } from "uuid";
+import { useMessageQuery } from "@/hooks/use-message-query";
+import { Loading } from "@/components/loading";
+import { FileUploadModal } from "@/components/modal/file-upload-modal";
+import { useToastStore } from "@/store/use-toast-store";
 
 type ChatMessageProps = {
   user: UserType | null;
@@ -25,7 +26,8 @@ export const ChatMessage = ({
   bottomRef,
 }: ChatMessageProps) => {
   const router = useRouter();
-
+  const { showToast } = useToastStore();
+  const [hasInitialized, setHasInitialized] = useState(true);
   // useInfiniteQuery를 사용하여 메시지 데이터를 가져옴
   const {
     data: messagesData,
@@ -33,6 +35,7 @@ export const ChatMessage = ({
     hasNextPage,
     isFetchingNextPage,
     status,
+    reset,
   } = useMessageQuery({
     chatId,
     user,
@@ -41,11 +44,20 @@ export const ChatMessage = ({
   // socket.on을 사용하여 메시지 소켓을 가져옴
   useMessageSocket({ chatId });
 
-  useChatScroll({
+  const handleAlert = () => {
+    showToast("새로운 메시지가 있습니다.", "success");
+  };
+
+  const { showNewMessageAlert, handleAlertClick } = useChatScroll({
     chatRef,
     bottomRef,
     loadMore: fetchNextPage,
     shouldLoadMore: !isFetchingNextPage && !!hasNextPage,
+    hasNewMessage: true,
+    messagesData: messagesData,
+    onNewMessageNotificationClick: handleAlert,
+    hasInitialized,
+    setHasInitialized,
   });
 
   const directMessage = ({ userId }: { userId: number }) => {
@@ -69,9 +81,16 @@ export const ChatMessage = ({
     }
   };
 
+  useEffect(() => {
+    console.log("reset");
+    // reset();
+  }, []);
+
   if (status === "pending") {
     return <Loading />;
   }
+
+  console.log("hasInitialized", hasInitialized);
 
   return (
     <div
@@ -109,6 +128,7 @@ export const ChatMessage = ({
         ))}
       </div>
       <div ref={bottomRef} />
+      <div id="bottom-marker" />
       <FileUploadModal
         user={user}
         chatId={chatId}

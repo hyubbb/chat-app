@@ -6,7 +6,8 @@ import { Trash } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useRef } from "react";
 import { Loading } from "@/components/loading";
-import { FileUploadModal } from "../modal/file-upload-modal";
+import { FileUploadModal } from "../../../../../components/modal/file-upload-modal";
+import { useConfirmStore } from "@/store/use-confirm-store";
 
 type ChatMessageProps = {
   messages: messagesType[];
@@ -22,6 +23,7 @@ export const ChatMessage = ({
   isLoading,
 }: ChatMessageProps) => {
   const bottomRef = useRef<HTMLDivElement>(null);
+  const { showConfirm } = useConfirmStore();
   useEffect(() => {
     bottomRef?.current?.scrollIntoView({ behavior: "smooth" });
   }, [bottomRef, messages]);
@@ -35,16 +37,19 @@ export const ChatMessage = ({
     message_type?: string;
     content?: string;
   }) => {
-    const isDelete = confirm("삭제 하시겠습니까?");
-    if (isDelete) {
-      await axios.patch(`/api/socket/direct`, {
-        messageId: message_id,
-        userId: user?.user_id,
-        chatId,
-        message_type,
-        content,
-      });
-    }
+    showConfirm({
+      title: "메시지 삭제",
+      message: "이 메시지를 삭제하시겠습니까?",
+      onConfirm: async () => {
+        await axios.patch(`/api/socket/direct`, {
+          messageId: message_id,
+          userId: user?.user_id,
+          chatId,
+          message_type,
+          content,
+        });
+      },
+    });
   };
   if (isLoading) return <Loading />;
   return (

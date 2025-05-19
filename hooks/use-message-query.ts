@@ -1,6 +1,10 @@
 "use client";
 
-import { useInfiniteQuery } from "@tanstack/react-query";
+import {
+  QueryClient,
+  useInfiniteQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import { messagesType, UserType } from "@/types";
 import axios from "axios";
 import { useCallback } from "react";
@@ -30,7 +34,7 @@ export const useMessageQuery = ({
 }: MessageQueryProps) => {
   const { isConnected } = useStore();
   const isUser = user !== null;
-
+  const queryClient = useQueryClient();
   // 메시지 조회 함수를 useCallback으로 최적화
   const getMessages = useCallback(
     async ({
@@ -72,12 +76,18 @@ export const useMessageQuery = ({
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, status } =
     queryResult;
 
+  // 사용자 정의 reset 함수 생성
+  const resetMessages = useCallback(() => {
+    queryClient.resetQueries({ queryKey: ["messages", chatId] });
+  }, [queryClient, chatId]);
+
   return {
     data,
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
     status,
+    reset: resetMessages,
     // 추가적인 헬퍼 함수나 계산된 값을 여기에 제공할 수 있음
     isError: status === "error",
     isLoading: isLoading,

@@ -11,8 +11,8 @@ import { ChatHeader } from "./chat-header";
 import { ChatMessage } from "./chat-message";
 import { useDirectSocket } from "@/hooks/use-direct-socket";
 import { useDirectQuery } from "@/hooks/use-direct-query";
-import { Loading } from "../loading";
-import Video from "./video";
+import { Loading } from "../../../../../components/loading";
+import Video from "../../../../../components/video";
 
 export const DirectRoom = ({ chatId }: { chatId: number }) => {
   const { setIsLoginModalOpen } = useStore();

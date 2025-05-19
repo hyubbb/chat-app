@@ -175,7 +175,6 @@ export const getMessages = async (
 ) => {
   try {
     const initCursor = cursor === undefined ? 99999999 : cursor;
-    console.log(chatId, userId, initCursor, MESSAGES_PER_PAGE);
     let res = (await executeQuery(GET_MESSAGE_AFTER, [
       userId + "",
       chatId + "",
@@ -370,7 +369,6 @@ export const deleteMessageAndGetMessages = async (
   type: string = "message",
 ) => {
   await executeQuery(DELETE_TEXT_MESSAGE, [messageId]);
-  console.log(userId, chatId);
   let result;
 
   if (type == "message") {
@@ -409,7 +407,6 @@ export const directMessagesJoinRoom = async (
   const room_id = createDMRoomId(userId, chatId);
   try {
     await executeQuery(JOIN_DIRECT_ROOMS, [room_id, userId, chatId]);
-    await executeQuery(JOIN_DIRECT_ROOMS, [room_id, chatId, userId]);
   } catch (error) {
     console.error("방 입장 중 오류 발생:", error);
     throw error;

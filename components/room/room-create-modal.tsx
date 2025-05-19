@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { X, Plus } from "lucide-react";
 import { CategoriesType, RoomsType, UserType } from "@/types";
 import axios from "axios";
+import { useToastStore } from "@/store/use-toast-store";
 
 type RoomCreateModalProps = {
   isOpen: boolean;
@@ -21,6 +22,7 @@ export const RoomCreateModal = ({
   const [newCategory, setNewCategory] = useState("");
   const [isNewCategory, setIsNewCategory] = useState(false);
   const [allRoomsData, setAllRoomsData] = useState<RoomsType[]>([]);
+  const { showToast } = useToastStore();
 
   // 전체의 채팅방 데이터를 가져옴, 채팅방 이름이 중복되는지 확인하기 위해서
   useEffect(() => {
@@ -70,7 +72,7 @@ export const RoomCreateModal = ({
 
     // 카테고리명 또는 채팅방 이름이 중복되는지 확인
     if (isDuplicateCategory(category) || isDuplicateRoom(roomTitle)) {
-      alert("중복된 카테고리 또는 채팅방 이름입니다.");
+      showToast("중복된 카테고리 또는 채팅방 이름입니다.", "error");
       return;
     }
 
@@ -87,6 +89,7 @@ export const RoomCreateModal = ({
     fetchRoomPost,
     clearForm,
     onClose,
+    showToast,
   ]);
 
   const handleClose = () => {

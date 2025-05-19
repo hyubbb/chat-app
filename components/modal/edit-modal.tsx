@@ -1,6 +1,6 @@
 import { useSignUpForm } from "@/hooks/use-signup-form";
 import { useSignUpSubmit } from "@/hooks/use-signup-submit";
-import { UseEsc } from "@/hooks/use-esc";
+import { useEsc } from "@/hooks/use-esc";
 import { useStore } from "@/store/use-store";
 import { useFormType, UserType } from "@/types";
 import { X } from "lucide-react";
@@ -27,7 +27,7 @@ export const EditModal = ({ user }: { user: UserType | null }) => {
     setIsEditModalOpen(false);
   };
 
-  UseEsc(setIsEditModalOpen);
+  useEsc(setIsEditModalOpen);
 
   useEffect(() => {
     if (isEditModalOpen && inputRef.current) {

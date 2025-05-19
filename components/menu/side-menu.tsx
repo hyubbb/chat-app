@@ -12,15 +12,15 @@ import { cn } from "@/util/utils";
 
 import { useUserQuery } from "@/store/use-user-query";
 import { useStore } from "@/store/use-store";
-import { UseEsc } from "@/hooks/use-esc";
+import { useEsc } from "@/hooks/use-esc";
 import { useRoomStore } from "@/store/use-room-store";
 import { useRoomQuery } from "@/hooks/use-room-query";
 import { useCategoryQuery } from "@/hooks/use-category-query";
 import { useDirectQuery } from "@/hooks/use-direct-query";
 
 import { RoomCreateModal } from "@/components/room/room-create-modal";
-import { Logout } from "@/components/auth/log-out";
-import { Login } from "@/components/auth/log-in";
+import { Logout } from "@/app/(auth)/_components/log-out";
+import { Login } from "@/app/(auth)/_components/log-in";
 import { SideMenuDirect } from "./side-menu-direct";
 import { SideMenuCategory } from "./side-menu-category";
 import { SideMenuEntered } from "./side-menu-entered";
@@ -47,7 +47,7 @@ export const SideMenu = ({
   });
 
   useCategorySocket();
-  UseEsc(setIsModalOpen);
+  useEsc(setIsModalOpen);
 
   const { isMenuModalOpen, setIsMenuModalOpen } = useStore();
   const { setSelected, selected } = useRoomStore();

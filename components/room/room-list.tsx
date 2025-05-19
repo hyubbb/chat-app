@@ -30,7 +30,6 @@ export const RoomList = () => {
 
   const handleChatClick = (chat_id: number) => {
     const room = rooms.find((room) => room.chat_id == chat_id);
-    console.log(room);
     if (room) {
       setSelectedChat(room);
       router.push(`/chat/${chat_id}`);

@@ -1,6 +1,7 @@
-import { UseEsc } from "@/hooks/use-esc";
+import { useEsc } from "@/hooks/use-esc";
 import { useAuthStore } from "@/store/authStore";
 import { useStore } from "@/store/use-store";
+import { useToastStore } from "@/store/use-toast-store";
 import axios from "axios";
 import { X } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
@@ -12,7 +13,8 @@ export const LoginModal = () => {
   const router = useRouter();
   const { isLoginModalOpen, setIsLoginModalOpen, setIsMenuModalOpen } =
     useStore();
-  UseEsc(setIsLoginModalOpen);
+  const { showToast } = useToastStore();
+  useEsc(setIsLoginModalOpen);
   const [userInfo, setUserInfo] = useState({
     id: "",
     password: "",
@@ -28,13 +30,15 @@ export const LoginModal = () => {
       });
       const { success } = res.data;
       if (!success) {
-        return alert("아이디 또는 비밀번호가 일치하지 않습니다.");
+        showToast("아이디 또는 비밀번호가 일치하지 않습니다.", "error");
+        return;
       }
       setUserInfo({ id: "", password: "" });
       setIsMenuModalOpen(false);
       setIsLoginModalOpen(false);
     } catch (error) {
       console.error("Error getting user:", error);
+      showToast("로그인 중 오류가 발생했습니다.", "error");
     }
   };
   const handleClose = () => {

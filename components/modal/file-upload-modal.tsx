@@ -1,4 +1,4 @@
-import { UseEsc } from "@/hooks/use-esc";
+import { useEsc } from "@/hooks/use-esc";
 import { useStore } from "@/store/use-store";
 import { UserType } from "@/types";
 import axios from "axios";
@@ -24,7 +24,7 @@ export const FileUploadModal = ({
   const [imageName, setImageName] = useState<string | null>(null);
   const { setIsUploadModalOpen, isUploadModalOpen } = useStore();
   const { socket } = useStore();
-  UseEsc(setIsUploadModalOpen);
+  useEsc(setIsUploadModalOpen);
 
   const handleClose = () => {
     setIsUploadModalOpen(false);

@@ -91,7 +91,7 @@ export const ChatItem = ({
             {dateFormatted(sent_at)}
           </span>
         </div>
-        <div className="group flex w-full cursor-pointer items-center gap-x-2">
+        <div className="group flex w-fit cursor-pointer items-center gap-x-2">
           {message_type === "deleted" ? (
             <div className="text-md text-gray-500">
               <span>{content}</span>

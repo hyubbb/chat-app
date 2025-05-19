@@ -1,5 +1,5 @@
 import { LogIn, UserPlus } from "lucide-react";
-import { SignUpModal } from "../modal/signup-modal";
+import { SignUpModal } from "../../../components/modal/signup-modal";
 import { useStore } from "@/store/use-store";
 
 export const Login = () => {
