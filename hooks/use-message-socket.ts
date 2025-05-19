@@ -13,6 +13,9 @@ type MessageUpdateProps = {
   nextCursor?: number;
 };
 
+/**
+ * 특정 채팅방의 실시간 메시지 처리를 위한 소켓 훅
+ */
 export const useMessageSocket = ({ chatId }: { chatId: number }) => {
   const { socket, isConnected } = useStore();
   const queryClient = useQueryClient();
@@ -26,41 +29,54 @@ export const useMessageSocket = ({ chatId }: { chatId: number }) => {
     ({ chatId, messages, messages_type, startTime }: MessageUpdateProps) => {
       if (chatId !== chatIdRef.current) return;
 
-      const endTime = performance.now();
-      const duration = endTime - startTime;
-      console.log(`Socket.IO 처리 시간: ${duration.toFixed(2)}ms`);
+      if (process.env.NODE_ENV === "development") {
+        const endTime = performance.now();
+        const duration = endTime - startTime;
+        console.log(`Socket.IO 처리 시간: ${duration.toFixed(2)}ms`);
+      }
 
-      queryClient.setQueryData(["messages", chatId], (oldData: any) => {
-        if (!messages) return oldData;
+      type QueryDataType = {
+        pages: Array<{
+          messages: messagesType[];
+          nextCursor?: number;
+        }>;
+        pageParams: Array<unknown>;
+      };
 
-        const newMessages = Array.isArray(messages) ? messages : [messages];
-        const nextCursorKey =
-          newMessages.length >= 20
-            ? newMessages[newMessages.length - 1]?.message_id
-            : undefined;
+      queryClient.setQueryData(
+        ["messages", chatId],
+        (oldData: QueryDataType | undefined) => {
+          if (!messages) return oldData;
 
-        if (
-          !oldData ||
-          !oldData.pages ||
-          !oldData.pages.length ||
-          !messages_type
-        ) {
-          return {
-            pages: [{ messages: newMessages, nextCursor: nextCursorKey }],
-            pageParams: [undefined],
+          const newMessages = Array.isArray(messages) ? messages : [messages];
+          const nextCursorKey =
+            newMessages.length >= 20
+              ? newMessages[newMessages.length - 1]?.message_id
+              : undefined;
+
+          if (
+            !oldData ||
+            !oldData.pages ||
+            !oldData.pages.length ||
+            !messages_type
+          ) {
+            return {
+              pages: [{ messages: newMessages, nextCursor: nextCursorKey }],
+              pageParams: [undefined],
+            };
+          }
+
+          const updatedFirstPage = {
+            messages: [...newMessages, ...oldData.pages[0].messages],
+            nextCursor: oldData.pages[0].nextCursor || nextCursorKey,
           };
-        }
 
-        const updatedFirstPage = {
-          messages: [...newMessages, ...oldData.pages[0].messages],
-          nextCursor: oldData.pages[0].nextCursor || nextCursorKey,
-        };
-
-        return {
-          ...oldData,
-          pages: [updatedFirstPage, ...oldData.pages.slice(1)],
-        };
-      });
+          return {
+            ...oldData,
+            pages: [updatedFirstPage, ...oldData.pages.slice(1)],
+          };
+        },
+      );
     },
     [queryClient],
   );
@@ -69,21 +85,32 @@ export const useMessageSocket = ({ chatId }: { chatId: number }) => {
     ({ chatId, messages }: MessageUpdateProps) => {
       if (chatId !== chatIdRef.current) return;
 
-      queryClient.setQueryData(["messages", chatId], (oldData: any) => {
-        if (!oldData) return oldData;
+      type QueryDataType = {
+        pages: Array<{
+          messages: messagesType[];
+          nextCursor?: number;
+        }>;
+        pageParams: Array<unknown>;
+      };
 
-        const newMessage = Array.isArray(messages) ? messages[0] : messages;
-        const updatedPages = oldData.pages.map((page: any) => ({
-          ...page,
-          messages: page.messages.map((oldMessage: messagesType) =>
-            oldMessage.message_id === newMessage.message_id
-              ? newMessage
-              : oldMessage,
-          ),
-        }));
+      queryClient.setQueryData(
+        ["messages", chatId],
+        (oldData: QueryDataType | undefined) => {
+          if (!oldData?.pages) return oldData;
 
-        return { ...oldData, pages: updatedPages };
-      });
+          const newMessage = Array.isArray(messages) ? messages[0] : messages;
+          const updatedPages = oldData.pages.map((page) => ({
+            ...page,
+            messages: page.messages.map((oldMessage: messagesType) =>
+              oldMessage.message_id === newMessage.message_id
+                ? newMessage
+                : oldMessage,
+            ),
+          }));
+
+          return { ...oldData, pages: updatedPages };
+        },
+      );
     },
     [queryClient],
   );

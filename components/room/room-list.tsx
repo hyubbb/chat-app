@@ -4,7 +4,7 @@ import axios from "axios";
 import { useRouter } from "next/navigation";
 import { Trash } from "lucide-react";
 import { CategoriesType, RoomsType } from "@/types";
-import { useRoomStore } from "@/hooks/use-room-store";
+import { useRoomStore } from "@/store/use-room-store";
 import { useRoomQuery } from "@/hooks/use-room-query";
 import { useUserQuery } from "@/store/use-user-query";
 

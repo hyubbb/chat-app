@@ -1,6 +1,6 @@
 import { useSignUpForm } from "@/hooks/use-signup-form";
 import { useSignUpSubmit } from "@/hooks/use-signup-submit";
-import { UseEsc } from "@/hooks/useEsc";
+import { UseEsc } from "@/hooks/use-esc";
 import { useStore } from "@/store/use-store";
 import { useFormType } from "@/types";
 import { X } from "lucide-react";

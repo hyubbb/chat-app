@@ -1,4 +1,4 @@
-import { useRoomStore } from "@/hooks/use-room-store";
+import { useRoomStore } from "@/store/use-room-store";
 import { dmListType, UserType } from "@/types";
 import axios from "axios";
 import {

@@ -1,4 +1,4 @@
-import { UseEsc } from "@/hooks/useEsc";
+import { UseEsc } from "@/hooks/use-esc";
 import { useAuthStore } from "@/store/authStore";
 import { useStore } from "@/store/use-store";
 import axios from "axios";

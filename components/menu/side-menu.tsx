@@ -12,8 +12,8 @@ import { cn } from "@/util/utils";
 
 import { useUserQuery } from "@/store/use-user-query";
 import { useStore } from "@/store/use-store";
-import { UseEsc } from "@/hooks/useEsc";
-import { useRoomStore } from "@/hooks/use-room-store";
+import { UseEsc } from "@/hooks/use-esc";
+import { useRoomStore } from "@/store/use-room-store";
 import { useRoomQuery } from "@/hooks/use-room-query";
 import { useCategoryQuery } from "@/hooks/use-category-query";
 import { useDirectQuery } from "@/hooks/use-direct-query";

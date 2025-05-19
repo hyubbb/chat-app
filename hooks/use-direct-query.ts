@@ -1,54 +1,73 @@
+"use client";
+
 import { useQuery } from "@tanstack/react-query";
 import { dmListType, messagesType, UserType } from "@/types";
 import axios from "axios";
 import { createDMRoomId } from "@/util/utils";
 import { useEffect, useState } from "react";
 
-type useDirectQueryType = {
+interface UseDirectQueryProps {
   user: UserType | null;
   chatId?: number | null;
   initDmList?: dmListType[] | null;
-};
+}
 
+/**
+ * DM 메시지와 DM 목록을 조회하는 커스텀 훅
+ */
 export const useDirectQuery = ({
   user,
   chatId = null,
   initDmList,
-}: useDirectQueryType) => {
+}: UseDirectQueryProps) => {
   const [dmRoomId, setDmRoomId] = useState<string | null>(null);
+
+  // chatId와 user 정보로 DM 방 ID 생성
   useEffect(() => {
     if (chatId && user?.user_id) {
-      const newDmRoomId: string = createDMRoomId(chatId, user?.user_id);
+      const newDmRoomId: string = createDMRoomId(chatId, user.user_id);
       setDmRoomId(newDmRoomId);
     }
   }, [chatId, user]);
 
-  const getMessages = async () => {
-    if (!dmRoomId) return [];
+  /**
+   * 특정 DM 방의 메시지 목록을 조회
+   * @returns 메시지 배열 또는 빈 배열
+   */
+  const getMessages = async (): Promise<messagesType[]> => {
+    if (!dmRoomId || !chatId || !user?.user_id) return [];
+
     try {
       const { data } = await axios.post(`/api/socket/direct/${chatId}`, {
-        userId: user?.user_id,
-        userName: user?.user_name,
+        userId: user.user_id,
+        userName: user.user_name,
         direct: true,
       });
 
-      return data?.data?.messages;
+      return data?.data?.messages || [];
     } catch (error) {
-      console.error(error);
+      console.error("DM 메시지 조회 실패:", error);
+      return [];
     }
   };
 
-  const getDmList = async () => {
-    // DM방이 눌릴때마다 실행이되네?
-    if (user?.user_id == null) return [];
+  /**
+   * 사용자의 DM 목록 조회
+   * @returns DM 방 목록 또는 빈 배열
+   */
+  const getDmList = async (): Promise<dmListType[]> => {
+    if (!user?.user_id) return [];
+
     try {
-      const { data } = await axios.get(`/api/socket/direct/${user?.user_id}`);
-      return data.result;
+      const { data } = await axios.get(`/api/socket/direct/${user.user_id}`);
+      return data.result || [];
     } catch (error) {
-      console.error(error);
+      console.error("DM 목록 조회 실패:", error);
+      return [];
     }
   };
 
+  // DM 메시지 조회 쿼리
   const {
     data: messages,
     isError: messagesError,
@@ -60,6 +79,7 @@ export const useDirectQuery = ({
     enabled: dmRoomId !== null,
   });
 
+  // DM 목록 조회 쿼리
   const {
     data: dmList,
     isError: dmListError,
