@@ -7,16 +7,27 @@ import { messagesType } from "@/types";
 
 type MessageUpdateProps = {
   chatId: number;
-  messages: messagesType | messagesType[];
+  messages: messagesType;
   messages_type?: string;
   startTime: number;
   nextCursor?: number;
+  user_id?: number;
+};
+
+type UseMessageSocketProps = {
+  chatId: number;
+  userId: number;
+  onMessageReceive?: () => void; // ✅ 콜백 옵션 추가
 };
 
 /**
  * 특정 채팅방의 실시간 메시지 처리를 위한 소켓 훅
  */
-export const useMessageSocket = ({ chatId }: { chatId: number }) => {
+export const useMessageSocket = ({
+  chatId,
+  userId,
+  onMessageReceive,
+}: UseMessageSocketProps) => {
   const { socket, isConnected } = useStore();
   const queryClient = useQueryClient();
   const chatIdRef = useRef(chatId);
@@ -26,8 +37,23 @@ export const useMessageSocket = ({ chatId }: { chatId: number }) => {
   }, [chatId]);
 
   const handleMessageUpdate = useCallback(
-    ({ chatId, messages, messages_type, startTime }: MessageUpdateProps) => {
-      if (chatId !== chatIdRef.current) return;
+    (props: MessageUpdateProps) => {
+      const {
+        chatId: incomingChatId,
+        messages,
+        messages_type,
+        startTime,
+      } = props;
+
+      if (incomingChatId !== chatIdRef.current) return;
+
+      // 콜백 실행: 새 메시지가 이 방에 들어왔을 때만
+      if (
+        typeof onMessageReceive === "function" &&
+        messages.user_id !== userId
+      ) {
+        onMessageReceive();
+      }
 
       if (process.env.NODE_ENV === "development") {
         const endTime = performance.now();

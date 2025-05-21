@@ -23,7 +23,7 @@ export const ChatRoom = ({
 }) => {
   const { setIsLoginModalOpen } = useStore();
   const { data: user, isLoading: userIsLoading } = useUserQuery();
-  const chatRef = useRef<ElementRef<"div">>(null);
+
   const bottomRef = useRef<ElementRef<"div">>(null);
 
   useRoomSocket({ chatId, user: user });
@@ -49,12 +49,7 @@ export const ChatRoom = ({
         roomInfo={roomInfo}
         usersList={usersList}
       />
-      <ChatMessage
-        user={user}
-        chatId={chatId}
-        chatRef={chatRef}
-        bottomRef={bottomRef}
-      />
+      <ChatMessage user={user} chatId={chatId} bottomRef={bottomRef} />
       <ChatInput user={user} chatId={chatId} bottomRef={bottomRef} />
     </>
   );

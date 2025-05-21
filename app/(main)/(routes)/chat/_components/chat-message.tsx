@@ -1,7 +1,14 @@
 import { messagesType, UserType } from "@/types";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import { ElementRef, Fragment, RefObject, useEffect, useState } from "react";
+import {
+  ElementRef,
+  Fragment,
+  RefObject,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { ChatItem } from "./chat-item";
 import { Loader2 } from "lucide-react";
 import { useChatScroll } from "@/hooks/use-chat-scroll";
@@ -15,19 +22,17 @@ import { useToastStore } from "@/store/use-toast-store";
 type ChatMessageProps = {
   user: UserType | null;
   chatId: number;
-  chatRef: RefObject<ElementRef<"div">>;
   bottomRef: RefObject<ElementRef<"div">>;
 };
 
-export const ChatMessage = ({
-  user,
-  chatId,
-  chatRef,
-  bottomRef,
-}: ChatMessageProps) => {
+export const ChatMessage = ({ user, chatId, bottomRef }: ChatMessageProps) => {
   const router = useRouter();
   const { showToast } = useToastStore();
   const [hasInitialized, setHasInitialized] = useState(true);
+  const [hasNewMessage, setHasNewMessage] = useState(false);
+  const [containerWidth, setContainerWidth] = useState(0);
+  const chatRef = useRef<HTMLDivElement>(null);
+  const newMessageRef = useRef<HTMLDivElement>(null);
   // useInfiniteQuery를 사용하여 메시지 데이터를 가져옴
   const {
     data: messagesData,
@@ -41,20 +46,44 @@ export const ChatMessage = ({
     user,
   });
 
+  const handleLoadMore = async () => {
+    const container = chatRef.current;
+    if (!container) return;
+
+    const previousScrollHeight = container.scrollHeight;
+
+    await fetchNextPage(); // 메시지 불러오기 (렌더링이 이 다음에 발생)
+
+    requestAnimationFrame(() => {
+      const newScrollHeight = container.scrollHeight;
+      const diff = newScrollHeight - previousScrollHeight;
+
+      // 기존 위치를 유지하기 위해 scrollTop을 증가시켜 줌
+      container.scrollTop = container.scrollTop + diff;
+    });
+  };
+
   // socket.on을 사용하여 메시지 소켓을 가져옴
-  useMessageSocket({ chatId });
+  useMessageSocket({
+    chatId,
+    userId: user?.user_id,
+    onMessageReceive: () => {
+      setHasNewMessage(true); // 새로운 메시지가 왔음을 알림
+      // showToast("새로운 메시지가 있습니다.", "success");
+    },
+  });
 
   const handleAlert = () => {
-    showToast("새로운 메시지가 있습니다.", "success");
+    // showToast("새로운 메시지가 있습니다.", "success");
   };
 
   const { showNewMessageAlert, handleAlertClick } = useChatScroll({
     chatRef,
-    bottomRef,
-    loadMore: fetchNextPage,
+    loadMore: handleLoadMore,
     shouldLoadMore: !isFetchingNextPage && !!hasNextPage,
-    hasNewMessage: true,
-    messagesData: messagesData,
+    hasNewMessage,
+    setHasNewMessage,
+    messagesData,
     onNewMessageNotificationClick: handleAlert,
     hasInitialized,
     setHasInitialized,
@@ -82,20 +111,39 @@ export const ChatMessage = ({
   };
 
   useEffect(() => {
-    console.log("reset");
-    // reset();
-  }, []);
+    if (hasInitialized) {
+      console.log("reset됨?");
+      reset();
+    }
+  }, [reset, hasInitialized]);
+
+  useEffect(() => {
+    if (chatRef.current) {
+      const updateWidth = () => {
+        const width = chatRef.current?.getBoundingClientRect().width || 0;
+        setContainerWidth(width);
+      };
+
+      // 초기 너비 설정
+      updateWidth();
+
+      // 창 크기가 변경될 때 너비 업데이트
+      window.addEventListener("resize", updateWidth);
+
+      return () => {
+        window.removeEventListener("resize", updateWidth);
+      };
+    }
+  }, [chatRef]);
 
   if (status === "pending") {
     return <Loading />;
   }
 
-  console.log("hasInitialized", hasInitialized);
-
   return (
     <div
       ref={chatRef}
-      className="flex flex-1 flex-col gap-y-2 overflow-y-auto overflow-x-hidden dark:text-zinc-300"
+      className="relative flex flex-1 flex-col gap-y-2 overflow-y-auto overflow-x-hidden dark:text-zinc-300"
     >
       {!hasNextPage && <div className="flex-1" />}
       {hasNextPage && (
@@ -104,7 +152,7 @@ export const ChatMessage = ({
             <Loader2 className="my-5 h-6 w-6 animate-spin text-zinc-500" />
           ) : (
             <button
-              onClick={() => fetchNextPage()}
+              onClick={handleLoadMore}
               className="my-4 text-sm text-zinc-500 transition hover:text-zinc-600 dark:text-zinc-400 dark:hover:text-zinc-300"
             >
               이전 메시지 불러오기
@@ -112,7 +160,10 @@ export const ChatMessage = ({
           )}
         </div>
       )}
-      <div className="mt-auto flex flex-col-reverse">
+      <div
+        id="chat-message-container"
+        className="mt-auto flex flex-col-reverse"
+      >
         {messagesData?.pages?.map((group, i) => (
           <Fragment key={`group_${i}`}>
             {group.messages.map((data: messagesType) => (
@@ -129,6 +180,24 @@ export const ChatMessage = ({
       </div>
       <div ref={bottomRef} />
       <div id="bottom-marker" />
+
+      {hasNewMessage && (
+        <div
+          className="fixed bottom-3 z-10 flex w-full justify-end px-4"
+          style={{
+            maxWidth: containerWidth ? `${containerWidth}px` : "auto",
+            right: "50%",
+            transform: "translateX(50%)",
+          }}
+        >
+          <button
+            onClick={handleAlertClick}
+            className="h-[40px] rounded-full bg-blue-500 px-4 py-2 text-white shadow-lg transition hover:bg-blue-600"
+          >
+            ⬇ 새로운 메시지 보기
+          </button>
+        </div>
+      )}
       <FileUploadModal
         user={user}
         chatId={chatId}
