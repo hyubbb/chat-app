@@ -24,20 +24,6 @@ const ServerHandler = (req: NextApiRequest, res: NextApiResponseServerIo) => {
       socket.on("disconnect", () => {
         console.log("[SERVER] disconnected");
       });
-
-      socket.on("offer", ({ sdp, chatId }) => {
-        console.log("[SERVER] offer", chatId);
-        socket.to(`dm_${chatId}`).emit("offer", { sdp });
-      });
-
-      socket.on("answer", ({ sdp, chatId }) => {
-        console.log("[SERVER] answer", chatId);
-        socket.to(`dm_${chatId}`).emit("answer", { sdp });
-      });
-
-      socket.on("ice-candidate", ({ candidate, chatId }) => {
-        socket.to(`dm_${chatId}`).emit("ice-candidate", { candidate });
-      });
     });
   } else {
     console.log("Socket.io is already set up");

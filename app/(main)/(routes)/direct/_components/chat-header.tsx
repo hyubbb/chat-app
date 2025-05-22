@@ -39,7 +39,7 @@ export const ChatHeader = ({ user, chatId, dmInfo }: ChatHeaderProps) => {
       </div>
 
       <div className="relative flex cursor-pointer items-center justify-center gap-3">
-        {/* <Video dmInfo={dmInfo} /> */}
+        <Video dmInfo={dmInfo} />
         <div className="group">
           <EllipsisVertical size={20} />
           <div className="absolute right-0 top-0 hidden w-max flex-col gap-2 rounded-md bg-zinc-900 p-2 group-hover:flex">

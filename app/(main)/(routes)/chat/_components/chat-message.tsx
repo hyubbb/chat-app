@@ -66,7 +66,7 @@ export const ChatMessage = ({ user, chatId, bottomRef }: ChatMessageProps) => {
   // socket.on을 사용하여 메시지 소켓을 가져옴
   useMessageSocket({
     chatId,
-    userId: user?.user_id,
+    userId: user?.user_id || 0,
     onMessageReceive: () => {
       setHasNewMessage(true); // 새로운 메시지가 왔음을 알림
       // showToast("새로운 메시지가 있습니다.", "success");
