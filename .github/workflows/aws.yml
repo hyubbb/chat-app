@@ -17,6 +17,9 @@ jobs:
         with:
           node-version: "18.19.1"
 
+      - name: Set environment variables # 환경변수 설정
+        run: echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> $GITHUB_ENV
+
       - name: Install and Build
         run: |
           npm install
