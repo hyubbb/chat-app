@@ -23,9 +23,6 @@ jobs:
           npm run build
           zip -r build.zip .next public package.json .env
 
-      - name: Set environment variables # 환경변수 설정
-        run: echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> $GITHUB_ENV
-
       - name: Copy build files to EC2
         env:
           HOST: ${{ secrets.EC2_HOST }}
@@ -34,6 +31,9 @@ jobs:
         run: |
           echo "$KEY" > private_key && chmod 600 private_key
           scp -o StrictHostKeyChecking=no -i private_key build.zip ${USER}@${HOST}:~/chat-app/
+
+      - name: Set environment variables # 환경변수 설정
+        run: echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> $GITHUB_ENV
 
       - name: Deploy on EC2
         env:

@@ -10,14 +10,35 @@ const nextConfig = {
     return config;
   },
   images: {
-    domains: [
-      "lh3.googleusercontent.com",
-      "i.pinimg.com",
-      "chat-app-s3-hyub.s3.ap-northeast-2.amazonaws.com",
-      "chat-app-s3-hyub.s3.amazonaws.com",
-      "chat2-bucket.s3.amazonaws.com",
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "lh3.googleusercontent.com",
+        pathname: "**",
+      },
+      {
+        protocol: "https",
+        hostname: "i.pinimg.com",
+        pathname: "**",
+      },
+      {
+        protocol: "https",
+        hostname: "chat-app-s3-hyub.s3.ap-northeast-2.amazonaws.com",
+        pathname: "**",
+      },
+      {
+        protocol: "https",
+        hostname: "chat-app-s3-hyub.s3.amazonaws.com",
+        pathname: "**",
+      },
+      {
+        protocol: "https",
+        hostname: "chat2-bucket.s3.amazonaws.com",
+        pathname: "**",
+      },
     ],
   },
+
   async headers() {
     return [
       {

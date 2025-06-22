@@ -31,7 +31,9 @@ export const fetchData = async () => {
   ]);
 
   const dmListData = user ? await dmListResponse?.json() : null;
-  const categoriesData = (await categoriesResponse.json()) && null;
+  const categoriesData = categoriesResponse.ok
+    ? await categoriesResponse.json()
+    : null;
 
   return {
     user,
