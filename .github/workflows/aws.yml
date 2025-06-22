@@ -1,4 +1,4 @@
-name: Deploy built app to EC2
+name: Deploy to EC2
 
 on:
   push:
@@ -9,41 +9,28 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v2 # 1. 코드 체크아웃
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v2
+      - name: Use Node.js
+        uses: actions/setup-node@v2 # 2. Node.js 설정
         with:
           node-version: "18.19.1"
 
-      - name: Install and Build
-        env:
-          JWT_SECRET: ${{ secrets.JWT_SECRET }}
-        run: |
-          npm install
-          npm run build
-          zip -r build.zip .next public package.json .env.local
+      - name: Set environment variables # 환경변수 설정
+        run: echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> $GITHUB_ENV
 
-      - name: Copy build files to EC2
+      - name: Deploy to EC2
         env:
+          PRIVATE_KEY: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
           HOST: ${{ secrets.EC2_HOST }}
           USER: ${{ secrets.EC2_USER }}
-          KEY: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
         run: |
-          echo "$KEY" > private_key && chmod 600 private_key
-          scp -o StrictHostKeyChecking=no -i private_key build.zip ${USER}@${HOST}:~/chat-app/
-
-      - name: Deploy on EC2
-        env:
-          HOST: ${{ secrets.EC2_HOST }}
-          USER: ${{ secrets.EC2_USER }}
-          KEY: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
-        run: |
+          echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
           ssh -o StrictHostKeyChecking=no -i private_key ${USER}@${HOST} '
             cd ~/chat-app
-            unzip -o build.zip
-            npm install --omit=dev
+            git pull origin main
+            npm install
+            npm run build
             pm2 delete all || true
             pm2 start "npm run start" --name "chat-app"
-          '
+          '|
