@@ -18,6 +18,8 @@ jobs:
           node-version: "18.19.1"
 
       - name: Install and Build
+        env:
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
         run: |
           npm install
           npm run build
@@ -31,9 +33,6 @@ jobs:
         run: |
           echo "$KEY" > private_key && chmod 600 private_key
           scp -o StrictHostKeyChecking=no -i private_key build.zip ${USER}@${HOST}:~/chat-app/
-
-      - name: Set environment variables # 환경변수 설정
-        run: echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> $GITHUB_ENV
 
       - name: Deploy on EC2
         env:
