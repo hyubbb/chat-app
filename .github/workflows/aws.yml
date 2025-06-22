@@ -17,14 +17,13 @@ jobs:
         with:
           node-version: "18.19.1"
 
-      - name: Set environment variables # 환경변수 설정
-        run: echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" > .env.local
-
       - name: Install and Build
+        env:
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
         run: |
           npm install
           npm run build
-          zip -r build.zip .next public package.json .env .env.local
+          zip -r build.zip .next public package.json .env.local
 
       - name: Copy build files to EC2
         env:
