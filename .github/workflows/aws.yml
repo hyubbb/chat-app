@@ -33,4 +33,4 @@ jobs:
             npm run build
             pm2 delete all || true
             pm2 start "npm run start" --name "chat-app"
-          '|
+          '
