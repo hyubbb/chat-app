@@ -12,7 +12,7 @@ export const RoomList = () => {
   const { selected: roomsInCategory, setSelectedChat } = useRoomStore();
   const { data: user } = useUserQuery();
   const router = useRouter();
-  const [rooms, setRooms] = useState<RoomsType[]>([]);
+  const [rooms, setRooms] = useState<any>([]);
 
   // 선택된 카테고리(roomsInCategory)의 채팅방 목록을 가져옴
   const { roomsData } = useRoomQuery({
@@ -29,7 +29,7 @@ export const RoomList = () => {
   }, [roomsData, roomsInCategory]);
 
   const handleChatClick = (chat_id: number) => {
-    const room = rooms.find((room) => room.chat_id == chat_id);
+    const room = rooms.find((room: any) => room.chat_id == chat_id);
     if (room) {
       setSelectedChat(room);
       router.push(`/chat/${chat_id}`);
