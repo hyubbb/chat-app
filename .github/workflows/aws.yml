@@ -7,8 +7,6 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    env:
-      JWT_SECRET: ${{ secrets.JWT_SECRET }}
 
     steps:
       - uses: actions/checkout@v2
@@ -18,20 +16,17 @@ jobs:
         with:
           node-version: "18.19.1"
 
-      - name: Create env file
-        run: |
-          echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" > .env
+      - name: Install dependencies
+        run: npm install
 
-      - name: Install and Build
+      - name: Build
+        run: npm run build
         env:
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
-        run: |
-          npm install
-          npm run build
 
-      - name: Zip the build files
+      - name: Create deployment package
         run: |
-          zip -r build.zip .next .env package.json package-lock.json
+          tar -czf deploy.tar.gz .next node_modules package.json package-lock.json
 
       - name: Deploy to EC2
         env:
@@ -40,11 +35,25 @@ jobs:
           USER: ${{ secrets.EC2_USER }}
         run: |
           echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
-          scp -o StrictHostKeyChecking=no -i private_key build.zip ${USER}@${HOST}:~/chat-app/
+          # 기존 배포 파일 백업
           ssh -o StrictHostKeyChecking=no -i private_key ${USER}@${HOST} '
             cd ~/chat-app
-            unzip -o build.zip
-            npm install --omit=dev
+            if [ -d ".next" ]; then
+              mv .next .next_backup
+            fi'
+
+          # 새로운 배포 파일 전송
+          scp -o StrictHostKeyChecking=no -i private_key deploy.tar.gz ${USER}@${HOST}:~/chat-app/
+
+          # 배포 및 서버 재시작
+          ssh -o StrictHostKeyChecking=no -i private_key ${USER}@${HOST} '
+            cd ~/chat-app
+            tar -xzf deploy.tar.gz
+            rm deploy.tar.gz
             pm2 delete all || true
             pm2 start "npm run start" --name "chat-app"
-          '
+            
+            # 백업 삭제
+            if [ -d ".next_backup" ]; then
+              rm -rf .next_backup
+            fi'
