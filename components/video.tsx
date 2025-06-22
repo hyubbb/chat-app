@@ -111,7 +111,7 @@ const Video = ({ dmInfo }: { dmInfo: dmListType | null }) => {
         socket.emit("answer", {
           sdp: answer,
           chatId: dmInfo?.room_id,
-          userName: dmInfo?.name || "사용자", // 사용자 이름 추가
+          userName: dmInfo?.other_name || "사용자", // 사용자 이름 추가
         });
       },
     );
