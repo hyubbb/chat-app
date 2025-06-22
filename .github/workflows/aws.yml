@@ -18,6 +18,8 @@ jobs:
           node-version: "18.19.1"
 
       - name: Install and Build
+        env:
+          JWT_ACCESS_SECRET: ${{ secrets.JWT_SECRET }}
         run: |
           npm install
           npm run build
