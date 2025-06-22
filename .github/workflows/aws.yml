@@ -19,14 +19,25 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Update .env file
+        run: |
+          if [ -f ".env" ]; then
+            # JWT_SECRET이 이미 있다면 업데이트, 없다면 추가
+            if grep -q "JWT_SECRET=" .env; then
+              sed -i "s/JWT_SECRET=.*/JWT_SECRET=${{ secrets.JWT_SECRET }}/" .env
+            else
+              echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env
+            fi
+          else
+            echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" > .env
+          fi
+
       - name: Build
         run: npm run build
-        env:
-          JWT_SECRET: ${{ secrets.JWT_SECRET }}
 
       - name: Create deployment package
         run: |
-          tar -czf deploy.tar.gz .next node_modules package.json package-lock.json
+          tar -czf deploy.tar.gz .next node_modules package.json package-lock.json .env
 
       - name: Deploy to EC2
         env:
