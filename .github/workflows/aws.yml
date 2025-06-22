@@ -24,7 +24,7 @@ jobs:
         run: |
           npm install
           npm run build
-          zip -r build.zip .next public package.json .env
+          zip -r build.zip .next public package.json .env .env.local
 
       - name: Copy build files to EC2
         env:
