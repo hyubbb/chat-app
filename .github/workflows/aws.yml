@@ -17,9 +17,10 @@ jobs:
         with:
           node-version: "18.19.1"
 
+      - name: Set environment variables
+        run: echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> $GITHUB_ENV
+
       - name: Install and Build
-        env:
-          JWT_SECRET: ${{ secrets.JWT_SECRET }}
         run: |
           npm install
           npm run build
@@ -44,6 +45,7 @@ jobs:
             cd ~/chat-app
             unzip -o build.zip
             npm install --omit=dev
+            echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" > .env
             pm2 delete all || true
             pm2 start "npm run start" --name "chat-app"
           '
