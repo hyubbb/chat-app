@@ -13,6 +13,7 @@ import {
 // JWT 시크릿 키를 환경 변수에서 가져옵니다.
 const ACCESS_KEY = process.env.JWT_ACCESS_SECRET as string;
 const REFRESH_SECRET = process.env.JWT_REFRESH_SECRET as string;
+
 if (!ACCESS_KEY) {
   throw new Error("JWT_SECRET is not defined");
 }
