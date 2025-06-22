@@ -7,6 +7,8 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    env:
+      JWT_SECRET: ${{ secrets.JWT_SECRET }}
 
     steps:
       - uses: actions/checkout@v2
@@ -21,6 +23,8 @@ jobs:
           echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" > .env
 
       - name: Install and Build
+        env:
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
         run: |
           npm install
           npm run build
