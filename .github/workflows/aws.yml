@@ -9,35 +9,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v2 # 1. 코드 체크아웃
 
       - name: Use Node.js
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v2 # 2. Node.js 설정
         with:
           node-version: "18.19.1"
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Update .env file
-        run: |
-          if [ -f ".env" ]; then
-            # JWT_SECRET이 이미 있다면 업데이트, 없다면 추가
-            if grep -q "JWT_SECRET=" .env; then
-              sed -i "s/JWT_SECRET=.*/JWT_SECRET=${{ secrets.JWT_SECRET }}/" .env
-            else
-              echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env
-            fi
-          else
-            echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" > .env
-          fi
-
-      - name: Build
-        run: npm run build
-
-      - name: Create deployment package
-        run: |
-          tar -czf deploy.tar.gz .next node_modules package.json package-lock.json .env
 
       - name: Deploy to EC2
         env:
@@ -46,25 +23,10 @@ jobs:
           USER: ${{ secrets.EC2_USER }}
         run: |
           echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
-          # 기존 배포 파일 백업
           ssh -o StrictHostKeyChecking=no -i private_key ${USER}@${HOST} '
             cd ~/chat-app
-            if [ -d ".next" ]; then
-              mv .next .next_backup
-            fi'
-
-          # 새로운 배포 파일 전송
-          scp -o StrictHostKeyChecking=no -i private_key deploy.tar.gz ${USER}@${HOST}:~/chat-app/
-
-          # 배포 및 서버 재시작
-          ssh -o StrictHostKeyChecking=no -i private_key ${USER}@${HOST} '
-            cd ~/chat-app
-            tar -xzf deploy.tar.gz
-            rm deploy.tar.gz
+            git pull origin main
+            npm install
+            npm run build
             pm2 delete all || true
             pm2 start "npm run start" --name "chat-app"
-            
-            # 백업 삭제
-            if [ -d ".next_backup" ]; then
-              rm -rf .next_backup
-            fi'
