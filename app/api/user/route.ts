@@ -51,7 +51,7 @@ export async function PATCH(request: NextRequest) {
       const arrayBuffer = await files[0]?.arrayBuffer();
       const Body = Buffer.from(arrayBuffer);
       photoUrl = `https://${AWS_BUCKET}.s3.amazonaws.com/temp/${photoName}`;
-      AWS_S3.send(
+      await AWS_S3.send(
         new PutObjectCommand({
           Bucket: `${AWS_BUCKET}`,
           Key: `temp/${photoName}`, // 저장시 넣고 싶은 파일 이름
@@ -63,7 +63,7 @@ export async function PATCH(request: NextRequest) {
       const urlParts = oldPhotoUrl?.split("/");
       const fileName = urlParts?.[urlParts?.length - 1]; // 경로의 마지막 부분이 파일 이름
 
-      AWS_S3.send(
+      await AWS_S3.send(
         new DeleteObjectCommand({
           Bucket: `${AWS_BUCKET}`,
           Key: `temp/${fileName}`,
