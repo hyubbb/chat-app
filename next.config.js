@@ -23,12 +23,12 @@ const nextConfig = {
       },
       {
         protocol: "https",
-        hostname: "chat-app-s3-hyub.s3.ap-northeast-2.amazonaws.com",
+        hostname: "chat2-bucket.s3.ap-northeast-2.amazonaws.com",
         pathname: "**",
       },
       {
         protocol: "https",
-        hostname: "chat-app-s3-hyub.s3.amazonaws.com",
+        hostname: "chat2-bucket.s3.amazonaws.com",
         pathname: "**",
       },
       {
