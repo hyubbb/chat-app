@@ -40,7 +40,7 @@ export async function GET(request: NextRequest) {
 export async function PATCH(request: NextRequest) {
   try {
     const formData = await request.formData();
-    const files = formData.getAll("photo") as File[];
+    const files = formData.getAll("photo") as any;
     const name = formData.get("userName") as string;
     const userId = formData.get("userId") as string;
     const oldPhotoUrl = (formData.get("oldPhotoUrl") as string) || "";
@@ -49,7 +49,7 @@ export async function PATCH(request: NextRequest) {
     if (files.length > 0 && typeof files[0]?.arrayBuffer === "function") {
       const photoName = dateName(files[0]);
       const arrayBuffer = await files[0]?.arrayBuffer();
-      const Body = Buffer.from(arrayBuffer as unknown as ArrayBuffer);
+      const Body = Buffer.from(arrayBuffer);
       photoUrl = `https://${AWS_BUCKET}.s3.amazonaws.com/temp/${photoName}`;
       await AWS_S3.send(
         new PutObjectCommand({
