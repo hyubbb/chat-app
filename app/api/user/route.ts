@@ -49,8 +49,9 @@ export async function PATCH(request: NextRequest) {
     if (files.length > 0 && files[0] instanceof File) {
       const photoName = dateName(files[0]);
       const arrayBuffer = await files[0]?.arrayBuffer();
-      const Body = Buffer.from(arrayBuffer);
+      const Body = Buffer.from(arrayBuffer as unknown as ArrayBuffer);
       photoUrl = `https://${AWS_BUCKET}.s3.amazonaws.com/temp/${photoName}`;
+      console.log(photoUrl);
       await AWS_S3.send(
         new PutObjectCommand({
           Bucket: `${AWS_BUCKET}`,
@@ -60,6 +61,7 @@ export async function PATCH(request: NextRequest) {
         }),
       );
 
+      console.log("111111");
       const urlParts = oldPhotoUrl?.split("/");
       const fileName = urlParts?.[urlParts?.length - 1]; // 경로의 마지막 부분이 파일 이름
 
@@ -69,6 +71,7 @@ export async function PATCH(request: NextRequest) {
           Key: `temp/${fileName}`,
         }),
       );
+      console.log("222222");
     } else {
       photoUrl = formData.get("photo") as string;
     }

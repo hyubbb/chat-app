@@ -115,14 +115,16 @@ export const EditModal = ({ user }: { user: UserType | null }) => {
               />
               {previewUrl && (
                 <div className="mt-6 flex items-center gap-x-3 text-zinc-200">
-                  <Image
-                    src={previewUrl}
-                    alt="Profile preview"
-                    width={40}
-                    height={40}
-                    priority
-                    className="rounded-full bg-white"
-                  />
+                  <div className="h-10 w-10 overflow-hidden rounded-full bg-white">
+                    <Image
+                      src={previewUrl}
+                      alt="Profile preview"
+                      width={40}
+                      height={40}
+                      className="h-full w-full rounded-full"
+                      priority
+                    />
+                  </div>
                   <span>{userName}</span>
                 </div>
               )}

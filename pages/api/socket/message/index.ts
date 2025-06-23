@@ -128,7 +128,7 @@ export default async function handler(
       if (message_type === "image") {
         const urlParts = content?.split("/");
         const fileName = urlParts?.[urlParts?.length - 1]; // 경로의 마지막 부분이 파일 이름
-        AWS_S3.send(
+        await AWS_S3.send(
           new DeleteObjectCommand({
             Bucket: `${AWS_BUCKET}`,
             Key: `messages/${fileName}`,

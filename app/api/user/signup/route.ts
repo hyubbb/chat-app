@@ -35,7 +35,8 @@ export async function POST(request: NextRequest) {
     let photoUrl;
     if (files.length > 0 && files[0] instanceof File) {
       const photoName = dateName(files[0]);
-      const Body = (await files[0]?.arrayBuffer()) as Buffer;
+      const arrayBuffer = await files[0]?.arrayBuffer();
+      const Body = Buffer.from(arrayBuffer as unknown as ArrayBuffer);
       photoUrl = `https://${AWS_BUCKET}.s3.amazonaws.com/temp/${photoName}`;
       await AWS_S3.send(
         new PutObjectCommand({
