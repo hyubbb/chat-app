@@ -46,7 +46,7 @@ export async function PATCH(request: NextRequest) {
     const oldPhotoUrl = (formData.get("oldPhotoUrl") as string) || "";
 
     let photoUrl;
-    if (files.length > 0 && files[0] instanceof File) {
+    if (files.length > 0 && typeof files[0]?.arrayBuffer === "function") {
       const photoName = dateName(files[0]);
       const arrayBuffer = await files[0]?.arrayBuffer();
       const Body = Buffer.from(arrayBuffer as unknown as ArrayBuffer);
