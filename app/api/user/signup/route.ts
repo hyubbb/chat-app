@@ -8,7 +8,7 @@ import { dateName } from "@/util/utils";
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
-    const files = formData.getAll("photo") as File[];
+    const files = formData.getAll("photo") as any;
     const id = formData.get("id");
     const name = formData.get("userName");
     const password = formData.get("password");

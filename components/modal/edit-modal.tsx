@@ -52,11 +52,12 @@ export const EditModal = ({ user }: { user: UserType | null }) => {
     }
   }, [previewUrl]);
 
-  const onSubmitWrapper = (data: useFormType) => {
+  const onSubmitWrapper = async (data: useFormType) => {
     if (data?.photo?.length === 0) {
       data = { ...data, photo: user?.photo_url as string };
     }
-    onSubmit(data, reset, true);
+    await onSubmit(data, reset, true);
+    // window.location.reload();
   };
 
   if (!isEditModalOpen) return null;
@@ -121,7 +122,7 @@ export const EditModal = ({ user }: { user: UserType | null }) => {
                       alt="Profile preview"
                       width={40}
                       height={40}
-                      className="h-full w-full rounded-full"
+                      className="h-full w-full rounded-full object-cover"
                       priority
                     />
                   </div>

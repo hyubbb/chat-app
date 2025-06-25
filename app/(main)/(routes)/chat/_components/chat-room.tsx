@@ -1,6 +1,6 @@
 "use client";
 import React, { ElementRef, useEffect, useRef } from "react";
-import { redirect } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 
 import { useStore } from "@/store/use-store";
 import { useMessageSocket } from "@/hooks/use-message-socket";
@@ -11,6 +11,7 @@ import { RoomsType } from "@/types";
 import { ChatInput } from "./chat-input";
 import { ChatHeader } from "./chat-header";
 import { ChatMessage } from "./chat-message";
+import { useQueryClient } from "@tanstack/react-query";
 
 export const ChatRoom = ({
   chatId,
@@ -23,13 +24,18 @@ export const ChatRoom = ({
 }) => {
   const { setIsLoginModalOpen } = useStore();
   const { data: user, isLoading: userIsLoading } = useUserQuery();
-
   const bottomRef = useRef<ElementRef<"div">>(null);
-
+  const queryClient = useQueryClient();
+  const router = useRouter();
   useRoomSocket({ chatId, user: user });
+
   useEffect(() => {
     if (!chatId) return redirect("/");
-  }, [chatId]);
+
+    queryClient.invalidateQueries({
+      queryKey: ["joinRoomList"],
+    });
+  }, [chatId, queryClient]);
 
   useEffect(() => {
     if (userIsLoading) {

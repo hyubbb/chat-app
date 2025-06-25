@@ -28,8 +28,14 @@ export const useRoomSocket = ({ chatId, user }: UseRoomSocketProps) => {
   const handleJoinRoom = useCallback(
     (data: JoinRoomData[]) => {
       try {
-        // 접속중인 채팅방 목록 업데이트
+        // 캐시 업데이트
         queryClient.setQueryData(["joinRoomList"], data);
+
+        // 서버와 데이터 동기화를 위한 쿼리 무효화
+        queryClient.invalidateQueries({
+          queryKey: ["joinRoomList"],
+          exact: true,
+        });
       } catch (error) {
         console.error("채팅방 참여자 목록 업데이트 중 오류 발생:", error);
       }

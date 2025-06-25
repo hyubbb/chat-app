@@ -31,11 +31,6 @@ const nextConfig = {
         hostname: "chat2-bucket.s3.amazonaws.com",
         pathname: "**",
       },
-      {
-        protocol: "https",
-        hostname: "chat2-bucket.s3.amazonaws.com",
-        pathname: "**",
-      },
     ],
   },
 

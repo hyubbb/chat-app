@@ -4,6 +4,10 @@ import axios from "axios";
 import { useCallback } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useFormType } from "@/types";
+import { Toast } from "@/components/ui/toast";
+import { useToastStore } from "@/store/use-toast-store";
+import { useAlertModal } from "@/store/use-alert-modal";
+import { useConfirmStore } from "@/store/use-confirm-store";
 
 interface SubmitProps {
   data: useFormType;
@@ -55,6 +59,8 @@ export const useSignUpSubmit = (
   userPhotoUrl?: string | null,
 ) => {
   const queryClient = useQueryClient();
+  const alertModal = useAlertModal();
+  const { showConfirm } = useConfirmStore();
 
   // 폼 제출 뮤테이션
   const mutation = useMutation({
@@ -92,35 +98,57 @@ export const useSignUpSubmit = (
   const onSubmit = useCallback(
     async (data: useFormType, reset: () => void, isEdit: boolean = false) => {
       try {
-        const result = await mutation.mutateAsync({
+        const { data: result } = await mutation.mutateAsync({
           data,
           isEdit,
           userPhotoUrl,
         });
 
-        if (result.data.success) {
+        if (result.success) {
           // 성공 시 폼 초기화 및 모달 닫기
           reset();
           setIsEditModalOpen(false);
           setPreviewUrl(null);
 
           // 성공 메시지 표시
-          if (result.data.type === "new") {
-            alert("회원가입이 완료되었습니다.");
+          if (result.type === "new") {
+            alertModal.open({
+              title: "회원가입 완료",
+              description: "회원가입이 완료되었습니다.",
+              confirmLabel: "확인",
+              onConfirm: () => {
+                window.location.href = "/login";
+              },
+            });
           } else {
-            alert("사용자 정보가 업데이트되었습니다.");
+            alertModal.open({
+              title: "수정 완료",
+              description: "회원정보가 수정되었습니다.",
+              confirmLabel: "확인",
+              onConfirm: () => {
+                window.location.reload();
+              },
+            });
           }
         }
       } catch (error) {
         // 에러 처리
         if (error instanceof Error) {
-          alert(error.message);
+          alertModal.open({
+            title: "오류",
+            description: error.message,
+            confirmLabel: "확인",
+          });
         } else {
-          alert("오류가 발생했습니다. 새로고침 후 다시 시도해 주세요!");
+          alertModal.open({
+            title: "오류",
+            description: "오류가 발생했습니다. 새로고침 후 다시 시도해 주세요!",
+            confirmLabel: "확인",
+          });
         }
       }
     },
-    [mutation, setIsEditModalOpen, setPreviewUrl, userPhotoUrl],
+    [mutation, setIsEditModalOpen, setPreviewUrl, userPhotoUrl, alertModal],
   );
 
   /**

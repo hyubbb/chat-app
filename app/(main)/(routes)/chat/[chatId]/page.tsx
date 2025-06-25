@@ -1,6 +1,7 @@
 import { getChatInfo, getRoomMembers } from "@/lib/service/service";
 import { RoomsType } from "@/types";
 import { ChatRoom } from "../_components/chat-room";
+import { useEffect } from "react";
 
 export const metadata = {
   title: "ROOM CHAT",
@@ -20,6 +21,7 @@ const getChat = async (chatId: number) => {
 const ChatPage = async ({ params }: ChatPageProps) => {
   const info = await getChat(params?.chatId);
   const enteredUsers = await getRoomMembers(params?.chatId);
+
   return (
     <ChatRoom
       chatId={+params.chatId}
