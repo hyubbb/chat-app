@@ -68,7 +68,6 @@ export const useChatScroll = ({
   // 새 메시지 알림 처리
   useEffect(() => {
     if (hasInitialized) return; // 초기화 전에는 알림 표시 안함
-    console.log("hasNewMessage", hasNewMessage);
     if (hasNewMessage) {
       const chatContainer = chatRef?.current;
       if (!chatContainer) return;

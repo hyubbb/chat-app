@@ -20,7 +20,7 @@ export const useUserQuery = (initUser?: UserType) => {
     queryKey: ["user"],
     initialData: initUser || null,
     queryFn: loginAuth,
-    enabled: !!token,
+    // enabled: !!token,
   });
 
   return { data, isError, isLoading, refetch };

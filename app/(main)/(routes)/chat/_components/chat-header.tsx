@@ -73,10 +73,10 @@ export const ChatHeader = ({
           queryClient.invalidateQueries({
             queryKey: ["joinRoomList"],
           }),
-          // rooms 쿼리도 갱신 (전체 채팅방 목록)
-          queryClient.invalidateQueries({
-            queryKey: ["rooms"],
-          }),
+          // // rooms 쿼리도 갱신 (전체 채팅방 목록)
+          // queryClient.invalidateQueries({
+          //   queryKey: ["rooms"],
+          // }),
         ]);
 
         router.refresh();

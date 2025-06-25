@@ -33,7 +33,7 @@ export const useDirectSocket = ({
   }: DirectSocketPropsType) => {
     const endTime = performance.now(); // 응답 수신 시점 기록
     const duration = endTime - startTime;
-    console.log(`Api-Socket.io 처리 시간: ${duration.toFixed(2)}ms`);
+    // console.log(`Api-Socket.io 처리 시간: ${duration.toFixed(2)}ms`);
 
     queryClient.setQueryData(
       ["directMessages", roomId],

@@ -58,7 +58,7 @@ export const useMessageSocket = ({
       if (process.env.NODE_ENV === "development") {
         const endTime = performance.now();
         const duration = endTime - startTime;
-        console.log(`Socket.IO 처리 시간: ${duration.toFixed(2)}ms`);
+        // console.log(`Socket.IO 처리 시간: ${duration.toFixed(2)}ms`);
       }
 
       type QueryDataType = {

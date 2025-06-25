@@ -6,57 +6,57 @@ import { useStore } from "@/store/use-store";
 import { useMessageSocket } from "@/hooks/use-message-socket";
 import { useRoomSocket } from "@/hooks/use-room-socket";
 import { useUserQuery } from "@/store/use-user-query";
-import { RoomsType } from "@/types";
+import { RoomsType, UserType } from "@/types";
 
 import { ChatInput } from "./chat-input";
 import { ChatHeader } from "./chat-header";
 import { ChatMessage } from "./chat-message";
 import { useQueryClient } from "@tanstack/react-query";
 
-export const ChatRoom = ({
-  chatId,
-  roomInfo,
-  usersList,
-}: {
-  chatId: number;
-  roomInfo: RoomsType;
-  usersList: any;
-}) => {
-  const { setIsLoginModalOpen } = useStore();
-  const { data: user, isLoading: userIsLoading } = useUserQuery();
-  const bottomRef = useRef<ElementRef<"div">>(null);
-  const queryClient = useQueryClient();
-  const router = useRouter();
-  useRoomSocket({ chatId, user: user });
+const ChatRoom = React.memo(
+  ({
+    chatId,
+    roomInfo,
+    usersList,
+  }: {
+    chatId: number;
+    roomInfo: RoomsType;
+    usersList: any;
+  }) => {
+    console.log("개시발아");
+    // const { setIsLoginModalOpen } = useStore();
+    const { data: user, isLoading: userIsLoading } = useUserQuery();
+    const bottomRef = useRef<ElementRef<"div">>(null);
 
-  useEffect(() => {
-    if (!chatId) return redirect("/");
+    useRoomSocket({ chatId, user });
 
-    queryClient.invalidateQueries({
-      queryKey: ["joinRoomList"],
-    });
-  }, [chatId, queryClient]);
+    useEffect(() => {
+      if (!chatId) return redirect("/");
+    }, [chatId]);
 
-  useEffect(() => {
-    if (userIsLoading) {
-      return; // 로딩 중일 때는 아무것도 하지 않음
-    }
+    useEffect(() => {
+      if (userIsLoading) {
+        return;
+      }
 
-    if (!user) {
-      setIsLoginModalOpen(true); // 로딩이 완료되고 유저가 없을 때 모달을 열기
-    }
-  }, [user, userIsLoading, setIsLoginModalOpen]);
+      if (!user) {
+        // setIsLoginModalOpen(true);
+      }
+    }, [user, userIsLoading]);
 
-  return (
-    <>
-      <ChatHeader
-        user={user}
-        chatId={chatId}
-        roomInfo={roomInfo}
-        usersList={usersList}
-      />
-      <ChatMessage user={user} chatId={chatId} bottomRef={bottomRef} />
-      <ChatInput user={user} chatId={chatId} bottomRef={bottomRef} />
-    </>
-  );
-};
+    return (
+      <>
+        <ChatHeader
+          user={user}
+          chatId={chatId}
+          roomInfo={roomInfo}
+          usersList={usersList}
+        />
+        <ChatMessage user={user} chatId={chatId} bottomRef={bottomRef} />
+        <ChatInput user={user} chatId={chatId} bottomRef={bottomRef} />
+      </>
+    );
+  },
+);
+
+export default ChatRoom;

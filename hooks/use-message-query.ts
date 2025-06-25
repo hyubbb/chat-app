@@ -45,13 +45,13 @@ export const useMessageQuery = ({
       if (!isUser) return { messages: [], nextCursor: undefined };
 
       try {
+        console.log("메시지 조회");
         const { data } = await axios.post(`/api/socket/chat/${chatId}`, {
           userId: user?.user_id,
           userName: user?.user_name,
           direct,
           cursor: pageParam,
         });
-
         return data.data || { messages: [], nextCursor: undefined };
       } catch (error) {
         console.error("메시지 조회 중 오류 발생:", error);
@@ -60,7 +60,7 @@ export const useMessageQuery = ({
         return { messages: [], nextCursor: undefined };
       }
     },
-    [chatId, user, direct, isUser],
+    [isUser, direct, chatId],
   );
 
   // useInfiniteQuery를 사용한 무한 스크롤 구현
@@ -68,9 +68,11 @@ export const useMessageQuery = ({
     queryKey: ["messages", chatId],
     queryFn: getMessages,
     getNextPageParam: (lastPage) => lastPage?.nextCursor,
-    refetchInterval: isConnected ? false : 1000, // 소켓 연결이 끊겼을 때만 주기적으로 갱신
     initialPageParam: undefined,
-    refetchOnMount: false,
+    // refetchInterval: isConnected ? false : 1000,
+    // refetchOnMount: false,
+    // staleTime: 1000 * 60,
+    // retry: false,
   });
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, status } =

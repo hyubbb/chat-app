@@ -81,7 +81,7 @@ export default async function handler(
         nextCursor: newCursor,
         messages_type: MESSAGE_TYPE,
       });
-      // 방문한 방의 목록
+      // // 방문한 방의 목록
       const userEnteredRoomList = await enteredRoomList(userId);
       io.to(`userRoom:${userId}`).emit("joinRoomList", userEnteredRoomList);
       res.status(200).json({

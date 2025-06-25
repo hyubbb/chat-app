@@ -14,7 +14,7 @@ export default async function handler(
       return res.status(400).json({ error: "Invalid request" });
     }
     const result = await enteredRoomList(+userId);
-    res?.socket?.server?.io?.to(userId).emit("joinRoomList", result);
+    // res?.socket?.server?.io?.to(userId).emit("joinRoomList", result);
     res.status(200).json(result);
   }
 }
