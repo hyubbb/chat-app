@@ -63,6 +63,7 @@ export const useRoomSocket = ({ chatId, user }: UseRoomSocketProps) => {
       isInitialMount.current = false;
 
       socket.emit("joinRoom", { userId: user.user_id });
+      socket.emit("createChatRoom", { chatId });
       hasJoined.current = true;
 
       socket.on("joinRoomList", handleJoinRoom);

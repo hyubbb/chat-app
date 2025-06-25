@@ -7,7 +7,7 @@ import { videoHandler } from "./videoHandler";
 
 export const socketHandlers = (socket: Socket, io: any) => {
   joinRoomHandler(socket, io);
-  // createChatRoomHandler(socket);
+  createChatRoomHandler(socket);
   createDMRoomHandler(socket);
   sendMessageHandler(socket, io);
   videoHandler(socket, io);
