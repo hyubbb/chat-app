@@ -6,9 +6,9 @@ import { useStore } from "@/store/use-store";
 import { useRoomSocket } from "@/hooks/use-room-socket";
 import { useUserQuery } from "@/store/use-user-query";
 import { RoomsType, UserType } from "@/types";
-import { Header } from "./chat/Header";
-import { Message } from "./chat/Message";
-import { Input } from "./chat/Input";
+import { Header } from "./chat-components/Header";
+import { Message } from "./chat-components/Message";
+import { Input } from "./chat-components/Input";
 
 const ChatRoom = React.memo(
   ({
