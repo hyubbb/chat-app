@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Plus, XCircle } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import {
@@ -17,6 +17,7 @@ import { useRoomStore } from "@/store/use-room-store";
 import { useRoomQuery } from "@/hooks/use-room-query";
 import { useCategoryQuery } from "@/hooks/use-category-query";
 import { useDirectQuery } from "@/hooks/use-direct-query";
+import { useQueryClient } from "@tanstack/react-query";
 
 import { RoomCreateModal } from "@/components/room/room-create-modal";
 import { Logout } from "@/app/(auth)/_components/log-out";
@@ -58,6 +59,53 @@ export const SideMenu = ({
   const { joinRoomData, isJoinRoomError, isJoinRoomLoading } = useRoomQuery({
     userId: user?.user_id,
   });
+
+  // 전역 DM 소켓 로직 - 모든 페이지에서 실행
+  const { socket, isConnected } = useStore();
+  const queryClient = useQueryClient();
+
+  useEffect(() => {
+    if (!socket || !isConnected || !user?.user_id) {
+      console.log(`❌ 전역 DM 이벤트 등록 실패:`, {
+        socket: !!socket,
+        isConnected,
+        userId: user?.user_id,
+      });
+      return;
+    }
+
+    console.log(`🌐 전역 DM 이벤트 리스너 등록 - 사용자: ${user.user_id}`);
+    console.log(`🔗 Socket 연결 상태:`, socket.connected);
+
+    // 사용자를 userRoom에 join시키기
+    socket.emit("joinRoom", { userId: user.user_id.toString() });
+    console.log(`🔗 사용자 ${user.user_id}를 userRoom에 join 시킴`);
+
+    const handleRefreshDmList = () => {
+      console.log("🔥🔥🔥 refreshDmList 이벤트 수신!!! 🔥🔥🔥");
+      console.log("📱 현재 사용자 ID:", user?.user_id);
+      console.log("⏰ 수신 시간:", new Date().toLocaleTimeString());
+
+      if (user?.user_id) {
+        console.log("🚀🚀🚀 dmList 갱신 시작!!! 🚀🚀🚀");
+        queryClient.invalidateQueries({
+          queryKey: ["dmList", user.user_id],
+        });
+        queryClient.refetchQueries({
+          queryKey: ["dmList", user.user_id],
+        });
+        console.log("✅✅✅ dmList 갱신 완료!!! ✅✅✅");
+      }
+    };
+
+    socket.on("refreshDmList", handleRefreshDmList);
+
+    return () => {
+      console.log(`🌐 전역 DM 이벤트 리스너 해제 - 사용자: ${user.user_id}`);
+      socket.off("refreshDmList", handleRefreshDmList);
+    };
+  }, [socket, isConnected, user?.user_id, queryClient]);
+
   const handleCategoryClick = (category: CategoriesType) => {
     setSelected(category);
     setIsMenuModalOpen(false);

@@ -6,7 +6,7 @@ import { Trash } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useRef } from "react";
 import { Loading } from "@/components/loading";
-import { FileUploadModal } from "../../../../../components/modal/file-upload-modal";
+import { FileUploadModal } from "../../../../../../components/modal/file-upload-modal";
 import { useConfirmStore } from "@/store/use-confirm-store";
 
 type ChatMessageProps = {
@@ -52,6 +52,7 @@ export const ChatMessage = ({
     });
   };
   if (isLoading) return <Loading />;
+
   return (
     <div className="mt-auto flex flex-col gap-y-2 overflow-y-auto dark:text-zinc-300">
       {/* Chat messages would go here */}

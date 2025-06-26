@@ -1,5 +1,6 @@
 import { useRoomStore } from "@/store/use-room-store";
 import { dmListType, UserType } from "@/types";
+import { useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import {
   EllipsisVertical,
@@ -18,16 +19,28 @@ type ChatHeaderProps = {
 
 export const ChatHeader = ({ user, chatId, dmInfo }: ChatHeaderProps) => {
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   const handleLeaveDM = async () => {
-    const { data } = await axios.patch(`/api/socket/direct/${chatId}`, {
-      userId: user?.user_id,
-      userName: user?.user_name,
-      roomId: dmInfo?.room_id,
-      otherUserLeave: dmInfo?.other_user_leave,
-    });
-    if (data?.success) {
-      router.push("/");
+    try {
+      const { data } = await axios.patch(`/api/socket/direct/${chatId}`, {
+        userId: user?.user_id,
+        userName: user?.user_name,
+        roomId: dmInfo?.room_id,
+        otherUserLeave: dmInfo?.other_user_leave,
+      });
+
+      if (data?.success) {
+        // dmList 즉시 업데이트
+        if (user?.user_id) {
+          queryClient.invalidateQueries({
+            queryKey: ["dmList", user.user_id],
+          });
+        }
+        router.push("/");
+      }
+    } catch (error) {
+      console.error("방 나가기 실패:", error);
     }
   };
 

@@ -114,13 +114,23 @@ export default async function handler(
         messages_type: "system",
       });
 
+      // 나간 사용자의 dmList 업데이트
       const userEnteredRoomList = await enteredDMList(userId);
       io.to(`userRoom:${userId}`).emit("joinDmList", userEnteredRoomList);
       io.to(`userRoom:${userId}`).emit("leaveDm", roomId);
-      res.status(200).json({ result, success: true });
-    }
 
-    res.status(400).json({ success: false });
+      // 상대방(남은 사용자)에게도 dmList 업데이트 알림
+      const otherUserId = +chatId;
+      const otherUserEnteredRoomList = await enteredDMList(otherUserId);
+      io.to(`userRoom:${otherUserId}`).emit(
+        "joinDmList",
+        otherUserEnteredRoomList,
+      );
+
+      res.status(200).json({ result, success: true });
+    } else {
+      res.status(400).json({ success: false });
+    }
   }
 
   if (req.method === "DELETE") {

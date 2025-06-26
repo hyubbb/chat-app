@@ -24,6 +24,15 @@ export const useDirectSocket = ({
   const { socket, isConnected } = useStore();
   const queryClient = useQueryClient();
 
+  // 훅 실행 확인을 위한 로그
+  console.log(
+    "🎯 useDirectSocket 훅 실행됨 - 사용자:",
+    user?.user_id,
+    "toId:",
+    toId,
+  );
+  console.log("🌐 Socket 상태:", { socket: !!socket, isConnected });
+
   const handleMessageUpdate = ({
     messages,
     messages_type,
@@ -57,14 +66,39 @@ export const useDirectSocket = ({
           : [...oldData, messages];
       },
     );
-  };
 
-  const handleDmListUpdate = (data: any) => {
-    queryClient.setQueryData(["dmList"], data);
+    // 새 메시지를 받았을 때 dmList도 갱신 (상대방으로부터 메시지가 온 경우)
+    if (
+      messages_type === "direct" &&
+      user?.user_id &&
+      !Array.isArray(messages)
+    ) {
+      console.log("📨 새 DM 메시지 수신 - dmList 갱신 시작");
+      queryClient.invalidateQueries({
+        queryKey: ["dmList", user.user_id],
+      });
+      queryClient.refetchQueries({
+        queryKey: ["dmList", user.user_id],
+      });
+      console.log("✅ 메시지 수신 후 dmList 갱신 완료");
+    }
   };
 
   const handleLeaveDM = (roomId: string) => {
+    // 메시지 쿼리 제거
     queryClient.removeQueries({ queryKey: ["directMessages", roomId] });
+
+    // dmList 즉시 업데이트
+    if (user?.user_id) {
+      queryClient.invalidateQueries({
+        queryKey: ["dmList", user.user_id],
+      });
+
+      // 강제로 refetch 실행
+      queryClient.refetchQueries({
+        queryKey: ["dmList", user.user_id],
+      });
+    }
   };
 
   // DM 채팅방 입장 -> toId(상대방의ID)가 있을경우
@@ -83,15 +117,13 @@ export const useDirectSocket = ({
     if (!socket || !isConnected || !toId || !user?.user_id) return;
     const newDmRoomId: string = createDMRoomId(toId, user.user_id);
     socket.emit("createDMRoom", { chatId: newDmRoomId, userId: user.user_id });
-
+    console.log("createDMRoom emit");
     socket.on("directMessages", handleMessageUpdate);
-    socket.on("joinDmList", handleDmListUpdate);
     socket.on("leaveDm", handleLeaveDM);
 
     return () => {
       socket.off("directMessages", handleMessageUpdate);
-      socket.off("joinDmList", handleDmListUpdate);
       socket.off("leaveDm", handleLeaveDM);
     };
-  }, [socket, isConnected, handleMessageUpdate, handleDmListUpdate, toId]);
+  }, [socket, isConnected, handleMessageUpdate, toId]);
 };

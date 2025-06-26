@@ -1,6 +1,6 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { dmListType, messagesType, UserType } from "@/types";
 import axios from "axios";
 import { createDMRoomId } from "@/util/utils";
@@ -21,6 +21,7 @@ export const useDirectQuery = ({
   initDmList,
 }: UseDirectQueryProps) => {
   const [dmRoomId, setDmRoomId] = useState<string | null>(null);
+  const queryClient = useQueryClient();
 
   // chatId와 user 정보로 DM 방 ID 생성
   useEffect(() => {
@@ -76,7 +77,7 @@ export const useDirectQuery = ({
     queryKey: ["directMessages", dmRoomId],
     queryFn: getMessages,
     initialData: [],
-    enabled: dmRoomId !== null,
+    enabled: !!(dmRoomId && chatId && user?.user_id),
   });
 
   // DM 목록 조회 쿼리
@@ -84,12 +85,27 @@ export const useDirectQuery = ({
     data: dmList,
     isError: dmListError,
     isLoading: dmListLoading,
+    refetch: refetchDmList,
   } = useQuery<dmListType[]>({
-    queryKey: ["dmList"],
+    queryKey: ["dmList", user?.user_id],
     queryFn: getDmList,
     initialData: initDmList || [],
     enabled: !!user?.user_id,
   });
+
+  // 새로운 DM 방에 접속했을 때 dmList 즉시 invalidate
+  useEffect(() => {
+    if (chatId && user?.user_id && dmList) {
+      const currentDm = dmList.find((dm) => dm.other_id === chatId);
+
+      // 현재 채팅 상대가 dmList에 없으면 즉시 invalidate
+      if (!currentDm) {
+        queryClient.invalidateQueries({
+          queryKey: ["dmList", user.user_id],
+        });
+      }
+    }
+  }, [chatId, user?.user_id, dmList, queryClient]);
 
   return {
     messages,
@@ -98,5 +114,6 @@ export const useDirectQuery = ({
     dmList,
     dmListError,
     dmListLoading,
+    refetchDmList,
   };
 };
