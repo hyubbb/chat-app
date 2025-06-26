@@ -9,7 +9,7 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { ChatItem } from "./item";
+import { ChatItem } from "./Item";
 import { Loader2 } from "lucide-react";
 import { useChatScroll } from "@/hooks/use-chat-scroll";
 import { useMessageSocket } from "@/hooks/use-message-socket";
@@ -18,7 +18,7 @@ import { useMessageQuery } from "@/hooks/use-message-query";
 import { Loading } from "@/components/loading";
 import { FileUploadModal } from "@/components/modal/file-upload-modal";
 import { useToastStore } from "@/store/use-toast-store";
-import NewMessageButton from "../new-message-button";
+import NewMessageButton from "../NewMessageButton";
 
 type ChatMessageProps = {
   user: UserType | null;
@@ -26,7 +26,7 @@ type ChatMessageProps = {
   bottomRef: RefObject<ElementRef<"div">>;
 };
 
-export const ChatMessage = React.memo(
+export const ChatMessage1 = React.memo(
   ({ user, chatId, bottomRef }: ChatMessageProps) => {
     const router = useRouter();
     const { showToast } = useToastStore();
@@ -203,3 +203,5 @@ export const ChatMessage = React.memo(
     );
   },
 );
+
+ChatMessage1.displayName = "ChatMessage1";

@@ -6,11 +6,9 @@ import { useStore } from "@/store/use-store";
 import { useRoomSocket } from "@/hooks/use-room-socket";
 import { useUserQuery } from "@/store/use-user-query";
 import { RoomsType, UserType } from "@/types";
-
-import { ChatInput } from "./chat/input";
-import { ChatHeader } from "./chat/header";
-import { ChatMessage } from "./chat/message";
-import { useQueryClient } from "@tanstack/react-query";
+import { ChatHeader } from "./chat/Header";
+import { ChatMessage } from "./chat/Message";
+import { ChatInput } from "./chat/Input";
 
 const ChatRoom = React.memo(
   ({
@@ -40,7 +38,7 @@ const ChatRoom = React.memo(
       if (!user) {
         setIsLoginModalOpen(true);
       }
-    }, [user, userIsLoading]);
+    }, [user, userIsLoading, setIsLoginModalOpen]);
 
     return (
       <>
@@ -56,5 +54,7 @@ const ChatRoom = React.memo(
     );
   },
 );
+
+ChatRoom.displayName = "ChatRoom";
 
 export default ChatRoom;

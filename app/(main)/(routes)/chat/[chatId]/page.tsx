@@ -1,7 +1,7 @@
 import { getChatInfo, getRoomMembers } from "@/lib/service/service";
 import { RoomsType } from "@/types";
 import { useEffect } from "react";
-import ChatRoom from "../_components/chat-room";
+import ChatRoom from "../_components/ChatRoom";
 
 export const metadata = {
   title: "ROOM CHAT",

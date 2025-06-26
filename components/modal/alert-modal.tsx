@@ -19,6 +19,14 @@ export const AlertModal = () => {
     setShowModal(isOpen);
   }, [isOpen]);
 
+  const handleClose = useCallback(() => {
+    setShowModal(false);
+    setTimeout(() => {
+      close();
+      onClose?.();
+    }, 300);
+  }, [close, onClose]);
+
   useEffect(() => {
     const handleEscKey = (e: KeyboardEvent) => {
       if (e.key === "Escape" && isOpen) {
@@ -35,15 +43,7 @@ export const AlertModal = () => {
       document.body.style.overflow = "unset";
       window.removeEventListener("keydown", handleEscKey);
     };
-  }, [isOpen]);
-
-  const handleClose = useCallback(() => {
-    setShowModal(false);
-    setTimeout(() => {
-      close();
-      onClose?.();
-    }, 300);
-  }, [close, onClose]);
+  }, [isOpen, handleClose]);
 
   const handleConfirm = useCallback(() => {
     setShowModal(false);

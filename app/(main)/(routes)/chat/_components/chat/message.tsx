@@ -17,8 +17,8 @@ import { useMessageQuery } from "@/hooks/use-message-query";
 import { Loading } from "@/components/loading";
 import { FileUploadModal } from "@/components/modal/file-upload-modal";
 import { useToastStore } from "@/store/use-toast-store";
-import { ChatItem } from "./item";
 import NewMessageButton from "../NewMessageButton";
+import { ChatItem } from "./Item";
 
 type ChatMessageProps = {
   user: UserType | null;
@@ -203,3 +203,5 @@ export const ChatMessage = React.memo(
     );
   },
 );
+
+ChatMessage.displayName = "ChatMessage";
