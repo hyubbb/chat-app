@@ -15,7 +15,7 @@ type ChatItemProps = {
   }: Partial<messagesType>) => void;
 };
 
-export const ChatItem = ({
+export const Item = ({
   message,
   user,
   directMessage,

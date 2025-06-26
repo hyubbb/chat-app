@@ -21,7 +21,7 @@ type ChatHeaderProps = {
   usersList: any;
 };
 
-export const ChatHeader = ({
+export const Header = ({
   user,
   chatId,
   roomInfo,

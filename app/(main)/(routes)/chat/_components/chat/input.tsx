@@ -9,7 +9,7 @@ type ChatInputProps = {
   bottomRef: RefObject<ElementRef<"div">>;
 };
 
-export const ChatInput = ({ user, chatId, bottomRef }: ChatInputProps) => {
+export const Input = ({ user, chatId, bottomRef }: ChatInputProps) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const { socket } = useStore();
   const [message, setMessage] = useState("");

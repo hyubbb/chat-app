@@ -18,7 +18,7 @@ import { Loading } from "@/components/loading";
 import { FileUploadModal } from "@/components/modal/file-upload-modal";
 import { useToastStore } from "@/store/use-toast-store";
 import NewMessageButton from "../NewMessageButton";
-import { ChatItem } from "./Item";
+import { Item } from "./Item";
 
 type ChatMessageProps = {
   user: UserType | null;
@@ -26,7 +26,7 @@ type ChatMessageProps = {
   bottomRef: RefObject<ElementRef<"div">>;
 };
 
-export const ChatMessage = React.memo(
+export const Message = React.memo(
   ({ user, chatId, bottomRef }: ChatMessageProps) => {
     const router = useRouter();
     const { showToast } = useToastStore();
@@ -172,7 +172,7 @@ export const ChatMessage = React.memo(
           {messagesData?.pages?.map((group, i) => (
             <Fragment key={`group_${i}`}>
               {group.messages.map((data: messagesType) => (
-                <ChatItem
+                <Item
                   key={`${data.message_id}_${data.sent_at}_${uuidv4().slice(0, 8)}`}
                   message={data}
                   user={user}
@@ -204,4 +204,4 @@ export const ChatMessage = React.memo(
   },
 );
 
-ChatMessage.displayName = "ChatMessage";
+Message.displayName = "ChatMessage";

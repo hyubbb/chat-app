@@ -6,9 +6,9 @@ import { useStore } from "@/store/use-store";
 import { useRoomSocket } from "@/hooks/use-room-socket";
 import { useUserQuery } from "@/store/use-user-query";
 import { RoomsType, UserType } from "@/types";
-import { ChatHeader } from "./chat/Header";
-import { ChatMessage } from "./chat/Message";
-import { ChatInput } from "./chat/Input";
+import { Header } from "./chat/Header";
+import { Message } from "./chat/Message";
+import { Input } from "./chat/Input";
 
 const ChatRoom = React.memo(
   ({
@@ -41,14 +41,14 @@ const ChatRoom = React.memo(
 
     return (
       <>
-        <ChatHeader
+        <Header
           user={user}
           chatId={chatId}
           roomInfo={roomInfo}
           usersList={usersList}
         />
-        <ChatMessage user={user} chatId={chatId} bottomRef={bottomRef} />
-        <ChatInput user={user} chatId={chatId} bottomRef={bottomRef} />
+        <Message user={user} chatId={chatId} bottomRef={bottomRef} />
+        <Input user={user} chatId={chatId} bottomRef={bottomRef} />
       </>
     );
   },
