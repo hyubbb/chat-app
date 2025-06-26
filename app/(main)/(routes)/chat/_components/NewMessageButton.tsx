@@ -16,8 +16,6 @@ const NewMessageButton = ({
       style={{
         maxWidth: containerWidth ? `${containerWidth - menuWidth}px` : "auto",
         left: `calc( ${menuWidth}px + ( 100% - ${menuWidth}px )/2 - ${buttonWidth}px / 2 )`,
-        // transform: "translateX(-50%)",
-
         bottom: "80px",
       }}
     >

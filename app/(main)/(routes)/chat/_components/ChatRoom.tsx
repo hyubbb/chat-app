@@ -34,7 +34,6 @@ const ChatRoom = React.memo(
       if (userIsLoading) {
         return;
       }
-
       if (!user) {
         setIsLoginModalOpen(true);
       }
