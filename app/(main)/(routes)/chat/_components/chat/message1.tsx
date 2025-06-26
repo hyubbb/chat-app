@@ -9,7 +9,7 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { ChatItem } from "./chat-item";
+import { ChatItem } from "./item";
 import { Loader2 } from "lucide-react";
 import { useChatScroll } from "@/hooks/use-chat-scroll";
 import { useMessageSocket } from "@/hooks/use-message-socket";
@@ -18,6 +18,7 @@ import { useMessageQuery } from "@/hooks/use-message-query";
 import { Loading } from "@/components/loading";
 import { FileUploadModal } from "@/components/modal/file-upload-modal";
 import { useToastStore } from "@/store/use-toast-store";
+import NewMessageButton from "../new-message-button";
 
 type ChatMessageProps = {
   user: UserType | null;
@@ -49,11 +50,11 @@ export const ChatMessage = React.memo(
 
     const handleLoadMore = async () => {
       const container = chatRef.current;
-      if (!container) return;
+      if (!container || isFetchingNextPage) return;
 
       const previousScrollHeight = container.scrollHeight;
 
-      // await fetchNextPage(); // 메시지 불러오기 (렌더링이 이 다음에 발생)
+      await fetchNextPage(); // 메시지 불러오기 (렌더링이 이 다음에 발생)
 
       requestAnimationFrame(() => {
         const newScrollHeight = container.scrollHeight;
@@ -187,21 +188,10 @@ export const ChatMessage = React.memo(
         <div id="bottom-marker" />
 
         {hasNewMessage && (
-          <div
-            className="fixed bottom-3 z-10 flex w-full justify-end px-4"
-            style={{
-              maxWidth: containerWidth ? `${containerWidth}px` : "auto",
-              right: "50%",
-              transform: "translateX(50%)",
-            }}
-          >
-            <button
-              onClick={handleAlertClick}
-              className="h-[40px] rounded-full bg-blue-500 px-4 py-2 text-white shadow-lg transition hover:bg-blue-600"
-            >
-              ⬇ 새로운 메시지 보기
-            </button>
-          </div>
+          <NewMessageButton
+            containerWidth={containerWidth}
+            handleAlertClick={handleAlertClick}
+          />
         )}
         <FileUploadModal
           user={user}

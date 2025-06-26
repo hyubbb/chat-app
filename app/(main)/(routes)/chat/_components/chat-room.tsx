@@ -3,14 +3,13 @@ import React, { ElementRef, useEffect, useRef } from "react";
 import { redirect, useRouter } from "next/navigation";
 
 import { useStore } from "@/store/use-store";
-import { useMessageSocket } from "@/hooks/use-message-socket";
 import { useRoomSocket } from "@/hooks/use-room-socket";
 import { useUserQuery } from "@/store/use-user-query";
 import { RoomsType, UserType } from "@/types";
 
-import { ChatInput } from "./chat-input";
-import { ChatHeader } from "./chat-header";
-import { ChatMessage } from "./chat-message";
+import { ChatInput } from "./chat/input";
+import { ChatHeader } from "./chat/header";
+import { ChatMessage } from "./chat/message";
 import { useQueryClient } from "@tanstack/react-query";
 
 const ChatRoom = React.memo(
@@ -23,8 +22,7 @@ const ChatRoom = React.memo(
     roomInfo: RoomsType;
     usersList: any;
   }) => {
-    console.log("개시발아");
-    // const { setIsLoginModalOpen } = useStore();
+    const { setIsLoginModalOpen } = useStore();
     const { data: user, isLoading: userIsLoading } = useUserQuery();
     const bottomRef = useRef<ElementRef<"div">>(null);
 
@@ -40,7 +38,7 @@ const ChatRoom = React.memo(
       }
 
       if (!user) {
-        // setIsLoginModalOpen(true);
+        setIsLoginModalOpen(true);
       }
     }, [user, userIsLoading]);
 

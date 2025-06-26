@@ -46,6 +46,7 @@ export const useMessageQuery = ({
 
       try {
         console.log("메시지 조회");
+
         const { data } = await axios.post(`/api/socket/chat/${chatId}`, {
           userId: user?.user_id,
           userName: user?.user_name,

@@ -79,6 +79,7 @@ export const useChatScroll = ({
         chatContainer.clientHeight;
 
       // 사용자가 아래에 있지 않을 때만 알림 표시
+      // 불러오기가 아닌, 새로운 메시지가 왔을 때만 알림 표시
       if (distanceFromBottom > 100) {
         // setShowNewMessageAlert(true);
         setHasNewMessage(true);

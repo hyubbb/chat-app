@@ -17,7 +17,7 @@ type MessageUpdateProps = {
 type UseMessageSocketProps = {
   chatId: number;
   userId: number;
-  onMessageReceive?: () => void; // ✅ 콜백 옵션 추가
+  onMessageReceive?: ({ messages_type }: { messages_type: string }) => void; // ✅ 콜백 옵션 추가
 };
 
 /**
@@ -52,7 +52,7 @@ export const useMessageSocket = ({
         typeof onMessageReceive === "function" &&
         messages.user_id !== userId
       ) {
-        onMessageReceive();
+        onMessageReceive({ messages_type: messages.message_type });
       }
 
       if (process.env.NODE_ENV === "development") {
