@@ -84,6 +84,13 @@ export default async function handler(
   if (req.method === "PATCH") {
     const { chatId } = req.query;
     const { userId, userName, roomId, otherUserLeave } = req.body;
+
+    console.log("=== DM 방 나가기 디버깅 ===");
+    console.log("userId:", userId);
+    console.log("chatId:", chatId);
+    console.log("roomId:", roomId);
+    console.log("otherUserLeave:", otherUserLeave, typeof otherUserLeave);
+
     if (!userId || !chatId || !userName || !roomId) {
       return res.status(400).json({ error: "Invalid request" });
     }
@@ -105,29 +112,48 @@ export default async function handler(
 
     // 채팅방 나가기
     const isSuccess = await leaveDM(userId, roomId, otherUserLeave);
+    console.log("leaveDM 성공:", isSuccess);
+
     if (isSuccess) {
-      // 참여중인 채팅방 목록 조회
-      const result = await enteredDMList(+userId);
+      // 나간 사용자의 dmList 업데이트
+      const userEnteredRoomList = await enteredDMList(userId);
+      console.log(
+        "나간 사용자의 새로운 dmList:",
+        userEnteredRoomList.length,
+        "개",
+      );
+
+      // 상대방(남은 사용자)에게도 dmList 업데이트 알림
+      const otherUserId = +chatId;
+      const otherUserEnteredRoomList = await enteredDMList(otherUserId);
+      console.log(
+        "상대방의 새로운 dmList:",
+        otherUserEnteredRoomList.length,
+        "개",
+      );
+      console.log(
+        "상대방 dmList 첫번째 항목의 other_user_leave:",
+        otherUserEnteredRoomList[0]?.other_user_leave,
+      );
+
       io.to(`dm_${roomId}`).emit("directMessages", {
         roomId,
         messages: resultMessage,
         messages_type: "system",
       });
 
-      // 나간 사용자의 dmList 업데이트
-      const userEnteredRoomList = await enteredDMList(userId);
       io.to(`userRoom:${userId}`).emit("joinDmList", userEnteredRoomList);
       io.to(`userRoom:${userId}`).emit("leaveDm", roomId);
 
-      // 상대방(남은 사용자)에게도 dmList 업데이트 알림
-      const otherUserId = +chatId;
-      const otherUserEnteredRoomList = await enteredDMList(otherUserId);
       io.to(`userRoom:${otherUserId}`).emit(
         "joinDmList",
         otherUserEnteredRoomList,
       );
 
-      res.status(200).json({ result, success: true });
+      // 추가: 더 확실한 업데이트를 위해 refreshDmList 이벤트도 전송
+      io.to(`userRoom:${otherUserId}`).emit("refreshDmList");
+
+      res.status(200).json({ result: userEnteredRoomList, success: true });
     } else {
       res.status(400).json({ success: false });
     }

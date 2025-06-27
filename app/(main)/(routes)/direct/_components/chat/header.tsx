@@ -23,11 +23,14 @@ export const ChatHeader = ({ user, chatId, dmInfo }: ChatHeaderProps) => {
 
   const handleLeaveDM = async () => {
     try {
+      // 상대방이 이미 나간 상태인지 확인 (other_user_leave가 1인 경우)
+      const isOtherUserAlreadyLeft = dmInfo?.other_user_leave === 1;
+
       const { data } = await axios.patch(`/api/socket/direct/${chatId}`, {
         userId: user?.user_id,
         userName: user?.user_name,
         roomId: dmInfo?.room_id,
-        otherUserLeave: dmInfo?.other_user_leave,
+        otherUserLeave: isOtherUserAlreadyLeft,
       });
 
       if (data?.success) {

@@ -457,8 +457,8 @@ export const leaveDM = async (
     if (otherUserLeave) {
       await executeQuery(DELETE_DM_MESSAGES, [userId, roomId]);
     }
-    // roomId 가 일치하는 방을 전부다 찾아서 other_user_leave을 업데이트 해준다.
-    await executeQuery(PATCH_DM_CHAT_ROOM, [roomId]);
+    // roomId 가 일치하는 방에서 나가는 사용자가 아닌 다른 사용자의 other_user_leave을 업데이트 해준다.
+    await executeQuery(PATCH_DM_CHAT_ROOM, [roomId, userId]);
 
     return res?.affectedRows > 0;
   } catch (error) {

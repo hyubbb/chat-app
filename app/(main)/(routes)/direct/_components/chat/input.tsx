@@ -20,6 +20,21 @@ export const ChatInput = ({ user, chatId, dmInfo }: ChatInputProps) => {
     inputRef?.current?.focus();
   }, [inputRef]);
 
+  console.log("dmInfo:", dmInfo);
+  console.log("dmInfo?.other_user_leave:", dmInfo?.other_user_leave);
+  console.log(
+    "typeof dmInfo?.other_user_leave:",
+    typeof dmInfo?.other_user_leave,
+  );
+  console.log(
+    "dmInfo?.other_user_leave === 1:",
+    dmInfo?.other_user_leave === 1,
+  );
+  console.log("dmInfo?.other_user_leave == 1:", dmInfo?.other_user_leave == 1);
+
+  const isDisabled = dmInfo?.other_user_leave === 1;
+  console.log("isDisabled:", isDisabled);
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -50,7 +65,6 @@ export const ChatInput = ({ user, chatId, dmInfo }: ChatInputProps) => {
     setIsUploadModalOpen(true);
   };
 
-  const isDisabled = !!dmInfo?.other_user_leave;
   const placeholder = isDisabled
     ? "상대방이 대화방을 나가서 메시지를 보낼 수 없습니다."
     : "메시지를 입력하세요...";

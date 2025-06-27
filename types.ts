@@ -74,7 +74,7 @@ export type messagesType = {
 
 export type dmListType = {
   id: number;
-  room_id: number;
+  room_id: string;
   user_id: number;
   other_id: number;
   other_name: string;

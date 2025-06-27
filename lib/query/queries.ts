@@ -273,9 +273,9 @@ WHERE message_id = ?;
 `;
 
 export const JOIN_DIRECT_ROOMS = `
-INSERT INTO direct_rooms (room_id, user_id, other_user_id)
-VALUES (?, ?, ?)
-ON DUPLICATE KEY UPDATE is_connected = 1;
+INSERT INTO direct_rooms (room_id, user_id, other_user_id, other_user_leave)
+VALUES (?, ?, ?, 0)
+ON DUPLICATE KEY UPDATE is_connected = 1, other_user_leave = COALESCE(other_user_leave, 0);
 `;
 
 export const IS_USER_CONNECTED_DM = `
@@ -319,7 +319,7 @@ DELETE FROM messages WHERE user_id = ? AND chat_id = ? AND message_type = "direc
 
 // DM의 상대방이 나갔을때, 채팅제어.
 export const PATCH_DM_CHAT_ROOM = `
-UPDATE direct_rooms SET other_user_leave = 1 WHERE room_id = ?;`;
+UPDATE direct_rooms SET other_user_leave = 1 WHERE room_id = ? AND user_id != ?;`;
 
 // DM 나가기
 export const DELETE_DM_CHAT_ROOM = `
