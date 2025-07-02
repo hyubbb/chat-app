@@ -96,6 +96,8 @@ export interface VideoCallPayload {
   roomId: string;
   userId: number;
   userName: string;
+  callerId: number;
+  callerName: string;
 }
 
 export interface IceCandidatePayload {
@@ -106,6 +108,7 @@ export interface IceCandidatePayload {
 export interface CallEventPayload {
   roomId: string;
   reason?: string;
+  userName: string;
 }
 
 export interface DeviceSettingsPayload {

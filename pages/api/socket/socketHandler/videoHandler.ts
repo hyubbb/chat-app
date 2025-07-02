@@ -4,9 +4,9 @@ import { logger } from "@/lib/logger";
 import {
   VideoCallPayload,
   IceCandidatePayload,
-  CallEventPayload,
   DeviceSettingsPayload,
   QualityMetricsPayload,
+  CallEventPayload,
 } from "@/types";
 
 export const videoHandler = (socket: Socket, io: Server) => {
