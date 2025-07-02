@@ -7,6 +7,7 @@ import {
   Trash2,
   Users,
   X,
+  Video,
 } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -19,6 +20,7 @@ type ChatHeaderProps = {
   chatId: number;
   roomInfo: RoomsType;
   usersList: any;
+  onStartVideoCall?: () => void;
 };
 
 export const Header = ({
@@ -26,6 +28,7 @@ export const Header = ({
   chatId,
   roomInfo,
   usersList,
+  onStartVideoCall,
 }: ChatHeaderProps) => {
   const router = useRouter();
   const queryClient = useQueryClient();
@@ -97,6 +100,13 @@ export const Header = ({
     setListModal(true);
   }, []);
 
+  const handleVideoCall = useCallback(() => {
+    setShowMenu(false);
+    if (onStartVideoCall) {
+      onStartVideoCall();
+    }
+  }, [onStartVideoCall]);
+
   // 유저 디렉트 메시지 이동
   const directMessage = ({ id }: { id: number | null }) => {
     if (id !== user?.user_id) {
@@ -121,29 +131,49 @@ export const Header = ({
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
       >
-        <button className="rounded-full p-2 transition hover:bg-zinc-100 dark:hover:bg-zinc-700">
+        <button
+          className="rounded-full p-2 transition hover:bg-zinc-100 dark:hover:bg-zinc-700"
+          aria-label="채팅방 메뉴"
+          aria-expanded={showMenu}
+          aria-haspopup="menu"
+        >
           <EllipsisVertical size={20} />
         </button>
         <div
           className={`absolute right-0 top-full z-20 mt-1 w-max min-w-[160px] rounded-md bg-white shadow-lg transition-all duration-200 ease-in-out dark:bg-zinc-900 ${showMenu ? "visible translate-y-0 opacity-100" : "invisible -translate-y-2 opacity-0"} `}
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
+          role="menu"
+          aria-orientation="vertical"
         >
           <div className="flex flex-col py-1">
             <button
+              onClick={handleVideoCall}
+              className="flex items-center gap-2 px-4 py-2 text-left text-blue-600 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-950"
+              role="menuitem"
+              aria-label="그룹 영상통화 시작"
+            >
+              <Video size={16} /> <span>영상통화 시작</span>
+            </button>
+            <button
               onClick={handleUserList}
               className="flex items-center gap-2 px-4 py-2 text-left hover:bg-zinc-100 dark:text-zinc-200 dark:hover:bg-zinc-800"
+              role="menuitem"
             >
               <Users size={16} /> <span>유저 목록</span>
             </button>
             <button
               onClick={handleLeaveRoom}
               className="flex items-center gap-2 px-4 py-2 text-left text-red-500 hover:bg-red-50 dark:hover:bg-red-950"
+              role="menuitem"
             >
               <MessageCircleOff size={16} /> <span>방 나가기</span>
             </button>
             {user?.role === "admin" && (
-              <button className="flex items-center gap-2 px-4 py-2 text-left hover:bg-zinc-100 dark:text-zinc-200 dark:hover:bg-zinc-800">
+              <button
+                className="flex items-center gap-2 px-4 py-2 text-left hover:bg-zinc-100 dark:text-zinc-200 dark:hover:bg-zinc-800"
+                role="menuitem"
+              >
                 <Trash2 size={16} /> <span>방 삭제</span>
               </button>
             )}
@@ -151,15 +181,24 @@ export const Header = ({
         </div>
 
         {listModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+            role="dialog"
+            aria-labelledby="user-list-title"
+            aria-modal="true"
+          >
             <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-xl dark:bg-zinc-900">
               <div className="mb-4 flex items-center justify-between">
-                <h3 className="text-lg font-semibold dark:text-zinc-100">
+                <h3
+                  id="user-list-title"
+                  className="text-lg font-semibold dark:text-zinc-100"
+                >
                   참여자 목록
                 </h3>
                 <button
                   onClick={() => setListModal(false)}
                   className="rounded-full p-1 hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                  aria-label="참여자 목록 닫기"
                 >
                   <X size={20} />
                 </button>
@@ -178,6 +217,23 @@ export const Header = ({
                             ? "cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-800"
                             : "cursor-default"
                         }`}
+                        role={!isCurrentUser ? "button" : undefined}
+                        tabIndex={!isCurrentUser ? 0 : undefined}
+                        onKeyDown={
+                          !isCurrentUser
+                            ? (e) => {
+                                if (e.key === "Enter" || e.key === " ") {
+                                  e.preventDefault();
+                                  directMessage({ id });
+                                }
+                              }
+                            : undefined
+                        }
+                        aria-label={
+                          !isCurrentUser
+                            ? `${user_name}님과 개인 메시지`
+                            : undefined
+                        }
                       >
                         {photo_url ? (
                           <div className="h-10 w-10 overflow-hidden rounded-full bg-gray-200">

@@ -1,180 +1,375 @@
 import { useStore } from "@/store/use-store";
 import { useToastStore } from "@/store/use-toast-store";
+import { useVideoStore } from "@/store/use-video-store";
 import { dmListType } from "@/types";
-import { LucideVideo } from "lucide-react";
-import React, { useEffect, useRef, useState } from "react";
+import { logger } from "@/lib/logger";
+import {
+  LucideVideo,
+  LucideVideoOff,
+  LucideMic,
+  LucideMicOff,
+  LucidePhone,
+  LucidePhoneOff,
+  LucideMaximize2,
+  LucideMinimize2,
+  LucideUsers,
+  LucideSettings,
+  LucideLoader2,
+} from "lucide-react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { useVideoCall } from "@/hooks/use-video-call";
+import { DeviceSettings } from "./video/device-settings";
 
-const Video = ({ dmInfo }: { dmInfo: dmListType | null }) => {
+// 소켓 이벤트 타입 정의
+interface OfferPayload {
+  sdp: RTCSessionDescriptionInit;
+  roomId: string;
+  userId: number;
+  userName: string;
+}
+
+interface AnswerPayload {
+  sdp: RTCSessionDescriptionInit;
+  roomId: string;
+}
+
+interface IceCandidatePayload {
+  candidate: RTCIceCandidateInit;
+  roomId: string;
+}
+
+interface CallRejectedPayload {
+  roomId: string;
+  reason?: string;
+}
+
+interface CallEndedPayload {
+  roomId: string;
+}
+
+interface PeerDisconnectedPayload {
+  roomId: string;
+}
+
+interface ScreenSharePayload {
+  roomId: string;
+}
+
+interface VideoProps {
+  dmInfo: dmListType | null;
+}
+
+// 통화 요청/응답 UI 컴포넌트
+const CallRequestUI = ({
+  status,
+  dmInfo,
+  onAccept,
+  onReject,
+}: {
+  status: string;
+  dmInfo: dmListType | null;
+  onAccept: () => void;
+  onReject: () => void;
+}) => {
+  if (status !== "requesting" && status !== "incoming") return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+      <div className="mx-4 w-full max-w-sm rounded-lg bg-white p-6">
+        <div className="flex flex-col items-center justify-center text-center">
+          {status === "requesting" ? (
+            <>
+              <h3 className="mb-2 text-lg font-semibold">통화 연결 중</h3>
+              <p className="mb-4 text-gray-600">
+                {dmInfo?.other_name}님에게 통화를 요청했습니다.
+              </p>
+              <LucideLoader2 className="animate-spin" />
+              <button
+                onClick={onReject}
+                className="mt-4 rounded-lg bg-red-500 px-4 py-2 text-white hover:bg-red-600"
+              >
+                취소
+              </button>
+            </>
+          ) : (
+            <>
+              <h3 className="mb-2 text-lg font-semibold">수신 통화</h3>
+              <p className="mb-4 text-gray-600">
+                {dmInfo?.other_name}님이 통화를 요청했습니다.
+              </p>
+              <div className="flex justify-center gap-4">
+                <button
+                  onClick={onAccept}
+                  className="rounded-lg bg-green-500 px-4 py-2 text-white hover:bg-green-600"
+                >
+                  수락
+                </button>
+                <button
+                  onClick={onReject}
+                  className="rounded-lg bg-red-500 px-4 py-2 text-white hover:bg-red-600"
+                >
+                  거절
+                </button>
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// 비디오 컨트롤 UI 컴포넌트
+const VideoControls = ({
+  isVideoEnabled,
+  isAudioEnabled,
+  isFullscreen,
+  showDeviceSettings,
+  onToggleVideo,
+  onToggleAudio,
+  onToggleFullscreen,
+  onToggleDeviceSettings,
+  onEndCall,
+}: {
+  isVideoEnabled: boolean;
+  isAudioEnabled: boolean;
+  isFullscreen: boolean;
+  showDeviceSettings: boolean;
+  onToggleVideo: () => void;
+  onToggleAudio: () => void;
+  onToggleFullscreen: () => void;
+  onToggleDeviceSettings: () => void;
+  onEndCall: () => void;
+}) => {
+  return (
+    <div className="absolute bottom-4 left-1/2 flex -translate-x-1/2 transform items-center gap-4 rounded-full bg-black/50 p-3">
+      <button
+        onClick={onToggleVideo}
+        className={`rounded-full p-2 ${isVideoEnabled ? "bg-gray-700" : "bg-red-500"}`}
+      >
+        {isVideoEnabled ? <LucideVideo /> : <LucideVideoOff />}
+      </button>
+      <button
+        onClick={onToggleAudio}
+        className={`rounded-full p-2 ${isAudioEnabled ? "bg-gray-700" : "bg-red-500"}`}
+      >
+        {isAudioEnabled ? <LucideMic /> : <LucideMicOff />}
+      </button>
+      <button
+        onClick={onEndCall}
+        className="rounded-full bg-red-500 p-2 hover:bg-red-600"
+      >
+        <LucidePhoneOff />
+      </button>
+      <button
+        onClick={onToggleFullscreen}
+        className="rounded-full bg-gray-700 p-2"
+      >
+        {isFullscreen ? <LucideMinimize2 /> : <LucideMaximize2 />}
+      </button>
+      <button
+        onClick={onToggleDeviceSettings}
+        className="rounded-full bg-gray-700 p-2"
+      >
+        <LucideSettings />
+      </button>
+    </div>
+  );
+};
+
+// 메인 비디오 컴포넌트
+export const Video = ({ dmInfo }: VideoProps) => {
   const { socket, isConnected } = useStore();
   const { showToast } = useToastStore();
+  const {
+    status,
+    isVideoEnabled,
+    isAudioEnabled,
+    isFullscreen,
+    participants,
+    error,
+    selectedVideoDevice,
+    selectedAudioDevice,
+    availableVideoDevices,
+    availableAudioDevices,
+    setStatus,
+    setVideoEnabled,
+    setAudioEnabled,
+    setFullscreen,
+    setParticipants,
+    setError,
+    setCallInfo,
+    setSelectedVideoDevice,
+    setSelectedAudioDevice,
+    reset,
+    setAvailableDevices,
+  } = useVideoStore();
 
-  const localVideoRef = useRef<HTMLVideoElement>(null);
-  const remoteVideoRef = useRef<HTMLVideoElement>(null);
-  const [isCallActive, setIsCallActive] = useState(false);
-  const peerConnectionRef = useRef<RTCPeerConnection | null>(null);
+  const {
+    localVideoRef,
+    remoteVideoRef,
+    initializeMedia,
+    handleCallRequest,
+    handleAcceptCall,
+    handleDeviceChange,
+    rejectCall,
+    endCall,
+  } = useVideoCall(dmInfo);
 
-  // 카메라와 마이크 스트림을 가져오고, localVideoRef와 remoteVideoRef에 할당
-  const initializeMedia = async () => {
-    console.log("initializeMedia");
-    if (!localVideoRef.current || !remoteVideoRef.current) return;
+  const [showDeviceSettings, setShowDeviceSettings] = useState(false);
+  const videoContainerRef = useRef<HTMLDivElement>(null);
 
-    const stream = await navigator.mediaDevices.getUserMedia({
-      video: true,
-      audio: true,
-    });
-    localVideoRef.current.srcObject = stream;
+  // 디바이스 변경 핸들러 - useVideoCall의 함수를 래핑
+  const onDeviceChange = async (deviceId: string, type: "video" | "audio") => {
+    try {
+      await handleDeviceChange(deviceId, type);
 
-    const peerConnection = new RTCPeerConnection({
-      iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
-    });
-
-    stream
-      .getTracks()
-      .forEach((track) => peerConnection.addTrack(track, stream));
-
-    peerConnection.ontrack = (event) => {
-      console.log("ontrack", dmInfo?.id);
-      remoteVideoRef.current!.srcObject = event.streams[0];
-    };
-
-    peerConnection.onicecandidate = (event) => {
-      if (event.candidate) {
-        // Send ICE candidate to the other peer
-        // You can use your existing socket implementation here
-        // console.log("ICE Candidate:", event.candidate);
+      // 스토어 상태 업데이트
+      if (type === "video") {
+        setSelectedVideoDevice(deviceId);
+      } else {
+        setSelectedAudioDevice(deviceId);
       }
-    };
-    peerConnectionRef.current = peerConnection;
-    console.log("initializeMedia end");
-  };
 
-  // 영상통화 시작
-  const startCall = async () => {
-    console.log("startCall");
-    console.log(peerConnectionRef.current);
-    if (!peerConnectionRef.current) return;
-
-    const offer = await peerConnectionRef.current.createOffer();
-    await peerConnectionRef.current.setLocalDescription(offer);
-
-    console.log(dmInfo);
-
-    // 상대방에게 통화 요청과 함께 토스트 알림을 위한 데이터 전송
-    socket.emit("offer", {
-      sdp: offer,
-      roomId: dmInfo?.room_id,
-      userId: dmInfo?.other_id,
-      userName: dmInfo?.other_name || "사용자",
-    });
-
-    // 상대방에게 통화 요청 알림을 보내는 이벤트 추가
-    socket.emit("call-request", {
-      chatId: dmInfo?.room_id,
-      userName: dmInfo?.other_name || "사용자",
-    });
-  };
-
-  const endCall = () => {
-    if (peerConnectionRef.current) {
-      peerConnectionRef.current.close();
-      peerConnectionRef.current = null;
-    }
-    setIsCallActive(false);
-  };
-
-  useEffect(() => {
-    if (!socket) return;
-
-    socket.on(
-      "offer",
-      async ({
-        sdp,
-        userName,
-      }: {
-        sdp: RTCSessionDescriptionInit;
-        userName: string;
-      }) => {
-        console.log("[client] offer", peerConnectionRef.current);
-
-        // if (!peerConnectionRef.current) return;
-
-        if (!peerConnectionRef.current) {
-          await initializeMedia(); // 상대방이 Offer를 보내면 자동으로 초기화
-        }
-
-        await peerConnectionRef?.current?.setRemoteDescription(
-          new RTCSessionDescription(sdp),
-        );
-        const answer = await peerConnectionRef?.current?.createAnswer();
-        await peerConnectionRef?.current?.setLocalDescription(answer);
-
-        socket.emit("answer", {
-          sdp: answer,
-          chatId: dmInfo?.room_id,
-          userName: dmInfo?.other_name || "사용자", // 사용자 이름 추가
-        });
-      },
-    );
-
-    // 통화 요청 알림을 받는 이벤트 리스너 추가
-    socket.on("call-request", ({ userName }: { userName: string }) => {
-      // 기존 토스트 컴포넌트를 사용해 알림 표시
-      showToast(`${userName}님이 영상통화를 요청했습니다.`, "info", 5000);
-    });
-
-    socket.on("answer", async ({ sdp }: { sdp: RTCSessionDescriptionInit }) => {
-      console.log("[client] answer", peerConnectionRef.current);
-      if (!peerConnectionRef.current) return;
-      console.log("answer");
-      await peerConnectionRef.current.setRemoteDescription(
-        new RTCSessionDescription(sdp),
+      showToast(
+        `${type === "video" ? "카메라" : "마이크"} 설정이 변경되었습니다.`,
+        "success",
+        3000,
       );
-    });
+    } catch (error) {
+      console.error("디바이스 변경 실패:", error);
+      showToast("디바이스 변경에 실패했습니다.", "error", 3000);
+    }
+  };
 
-    socket.on(
-      "ice-candidate",
-      async ({ candidate }: { candidate: RTCIceCandidateInit }) => {
-        if (!peerConnectionRef.current) return;
-
-        await peerConnectionRef.current.addIceCandidate(
-          new RTCIceCandidate(candidate),
-        );
-      },
-    );
-
-    return () => {
-      // 컴포넌트 언마운트 시 이벤트 리스너 제거
-      socket.off("call-request");
-      socket.off("offer");
-      socket.off("answer");
-      socket.off("ice-candidate");
-    };
-  }, [socket, dmInfo, showToast]);
-  return (
-    <div className="flex items-center justify-center">
-      <video
-        ref={localVideoRef}
-        autoPlay
-        muted
-        style={isCallActive ? { width: "200px" } : { width: 0 }}
-      />
-      <video
-        ref={remoteVideoRef}
-        autoPlay
-        style={isCallActive ? { width: "200px" } : { width: 0 }}
-      />
-      {!isCallActive ? (
+  // 통화 시작 버튼
+  if (status === "idle") {
+    return (
+      <div className="flex flex-col items-center justify-center gap-4">
         <button
           onClick={async () => {
-            await initializeMedia();
-            setIsCallActive(true);
-            await startCall();
+            try {
+              await initializeMedia();
+              await handleCallRequest();
+            } catch (error) {
+              console.error("통화 시작 실패:", error);
+              showToast("통화 시작에 실패했습니다.", "error", 3000);
+              setStatus("idle");
+            }
           }}
+          className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-500 text-white transition-colors hover:bg-blue-600 focus:outline-none focus:ring-4 focus:ring-blue-300"
+          aria-label="영상통화 시작"
         >
-          <LucideVideo />
+          <LucideVideo className="h-5 w-5" />
         </button>
-      ) : (
-        <button onClick={endCall}>End Call</button>
+      </div>
+    );
+  }
+
+  // 비디오 화면 (requesting, incoming, connecting, connected 등)
+  const showVideoScreen = [
+    "requesting",
+    "incoming",
+    "connecting",
+    "connected",
+    "reconnecting",
+  ].includes(status);
+
+  if (!showVideoScreen) {
+    return null;
+  }
+
+  return (
+    <div className="relative h-full w-full bg-gray-900">
+      {/* 통화 요청/응답 UI */}
+      <CallRequestUI
+        status={status}
+        dmInfo={dmInfo}
+        onAccept={handleAcceptCall}
+        onReject={rejectCall}
+      />
+
+      {/* 비디오 그리드 */}
+      <div className="grid h-full w-full grid-cols-1 gap-4 p-4 lg:grid-cols-2">
+        {/* 로컬 비디오 */}
+        <div className="relative h-full w-full overflow-hidden rounded-xl bg-gray-800 shadow-lg">
+          <video
+            ref={localVideoRef}
+            autoPlay
+            playsInline
+            muted
+            className="h-full w-full object-cover"
+          />
+          <div className="absolute bottom-2 left-2 rounded-lg bg-black/50 px-2 py-1 text-sm text-white">
+            나
+          </div>
+        </div>
+
+        {/* 리모트 비디오 */}
+        <div className="relative h-full w-full overflow-hidden rounded-xl bg-gray-800 shadow-lg">
+          <video
+            ref={remoteVideoRef}
+            autoPlay
+            playsInline
+            className="h-full w-full object-cover"
+          />
+          <div className="absolute bottom-2 left-2 rounded-lg bg-black/50 px-2 py-1 text-sm text-white">
+            {dmInfo?.other_name || "상대방"}
+          </div>
+        </div>
+      </div>
+
+      {/* 비디오 컨트롤 - 화면 중앙 하단에 배치 */}
+      {status === "connected" && (
+        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 transform">
+          <VideoControls
+            isVideoEnabled={isVideoEnabled}
+            isAudioEnabled={isAudioEnabled}
+            isFullscreen={isFullscreen}
+            showDeviceSettings={showDeviceSettings}
+            onToggleVideo={async () => {
+              setVideoEnabled(!isVideoEnabled);
+              const stream = localVideoRef.current?.srcObject as MediaStream;
+              if (stream) {
+                stream.getVideoTracks().forEach((track) => {
+                  track.enabled = !isVideoEnabled;
+                });
+              }
+            }}
+            onToggleAudio={() => {
+              setAudioEnabled(!isAudioEnabled);
+              const stream = localVideoRef.current?.srcObject as MediaStream;
+              if (stream) {
+                stream.getAudioTracks().forEach((track) => {
+                  track.enabled = !isAudioEnabled;
+                });
+              }
+            }}
+            onToggleFullscreen={() => {
+              if (!videoContainerRef.current) return;
+              if (!document.fullscreenElement) {
+                videoContainerRef.current.requestFullscreen();
+              } else {
+                document.exitFullscreen();
+              }
+              setFullscreen(!isFullscreen);
+            }}
+            onToggleDeviceSettings={() =>
+              setShowDeviceSettings(!showDeviceSettings)
+            }
+            onEndCall={endCall}
+          />
+        </div>
+      )}
+
+      {/* 장치 설정 */}
+      {showDeviceSettings && (
+        <div className="absolute inset-0 flex items-center justify-center bg-black/50">
+          <DeviceSettings
+            onDeviceChange={onDeviceChange}
+            onClose={() => setShowDeviceSettings(false)}
+          />
+        </div>
       )}
     </div>
   );

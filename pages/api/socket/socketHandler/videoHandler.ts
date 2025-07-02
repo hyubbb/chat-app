@@ -1,50 +1,171 @@
 import { Socket } from "socket.io";
+import { Server } from "socket.io";
+import { logger } from "@/lib/logger";
+import {
+  VideoCallPayload,
+  IceCandidatePayload,
+  CallEventPayload,
+  DeviceSettingsPayload,
+  QualityMetricsPayload,
+} from "@/types";
 
-export const videoHandler = (socket: Socket, io: any) => {
-  socket.on("offer", (offer) => {
-    console.log("영상 걸다", offer);
-    const { roomId, userId, userName, sdp } = offer;
-    socket.to(`dm_${roomId}:${userId}`).emit("offer", { sdp, userName });
-  });
+export const videoHandler = (socket: Socket, io: Server) => {
+  const getRoomId = (roomId: string, callerId?: number) => {
+    return callerId ? `dm_${roomId}:${callerId}` : `dm_${roomId}`;
+  };
 
-  socket.on("answer", (answer) => {
-    console.log("영상 받다");
-    socket
-      .to(`dm_${answer.room_id}:${answer.other_user_id}`)
-      .emit("answer", answer);
-  });
-
-  socket.on("ice-candidate", (candidate) => {
-    console.log("영상 중간 전달");
-    socket.to(`dm_${candidate.chatId}`).emit("ice-candidate", candidate);
-  });
-
-  socket.on("call-rejected", (data) => {
-    console.log("영상 거절");
-    socket.to(`dm_${data.chatId}`).emit("call-rejected", {
-      userName: data.userName,
-      reason: data.reason,
+  const handleError = (event: string, error: any) => {
+    logger.error(`Video ${event} error:`, error);
+    socket.emit("video-error", {
+      event,
+      message: error.message || "알 수 없는 오류가 발생했습니다.",
     });
+  };
+
+  // 통화 요청
+  socket.on("offer", (payload: VideoCallPayload) => {
+    try {
+      const { roomId, callerId, callerName, sdp } = payload;
+      logger.info(`Video offer from ${callerName} in room ${roomId}`);
+
+      // 룸 ID 생성 및 검증
+      const targetRoomId = getRoomId(roomId, callerId);
+      const roomExists = io.sockets.adapter.rooms.has(targetRoomId);
+
+      if (!roomExists) {
+        logger.warn(
+          `Room ${targetRoomId} does not exist or target user is not connected`,
+        );
+        socket.emit("video-error", {
+          event: "offer",
+          message: "상대방이 오프라인 상태입니다.",
+        });
+        return;
+      }
+
+      socket.to(targetRoomId).emit("offer", payload);
+      logger.info(`Offer sent to room ${targetRoomId}`);
+    } catch (error) {
+      handleError("offer", error);
+    }
   });
 
-  socket.on("call-ended", (data) => {
-    console.log("영상 종료");
-    socket.to(`dm_${data.chatId}`).emit("call-ended", {
-      userName: data.userName,
-    });
+  // 통화 응답
+  socket.on("answer", (payload: VideoCallPayload) => {
+    try {
+      const { roomId, callerId, sdp } = payload;
+      const targetRoomId = getRoomId(roomId, callerId);
+
+      logger.info(`Video answer in room ${roomId}`);
+
+      if (!io.sockets.adapter.rooms.has(targetRoomId)) {
+        logger.warn(`Room ${targetRoomId} does not exist for answer`);
+        socket.emit("video-error", {
+          event: "answer",
+          message: "통화가 이미 종료되었습니다.",
+        });
+        return;
+      }
+
+      socket.to(targetRoomId).emit("answer", payload);
+      logger.info(`Answer sent to room ${targetRoomId}`);
+    } catch (error) {
+      handleError("answer", error);
+    }
   });
 
-  // socket.on("offer", ({ sdp, chatId }) => {
-  //   console.log("[SERVER] offer", chatId);
-  //   socket.to(`dm_${chatId}`).emit("offer", { sdp });
-  // });
+  // ICE candidate 교환
+  socket.on("ice-candidate", (payload: IceCandidatePayload) => {
+    try {
+      const { candidate, roomId } = payload;
+      logger.debug(`ICE candidate exchange in room ${roomId}`);
+      socket.to(getRoomId(roomId)).emit("ice-candidate", { candidate, roomId });
+    } catch (error) {
+      handleError("ice-candidate", error);
+    }
+  });
 
-  // socket.on("answer", ({ sdp, chatId }) => {
-  //   console.log("[SERVER] answer", chatId);
-  //   socket.to(`dm_${chatId}`).emit("answer", { sdp });
-  // });
+  // 통화 거절
+  socket.on("call-rejected", (payload: CallEventPayload) => {
+    try {
+      const { roomId, userName, reason } = payload;
+      logger.info(`Call rejected by ${userName} in room ${roomId}: ${reason}`);
+      socket.to(getRoomId(roomId)).emit("call-rejected", { roomId, reason });
+    } catch (error) {
+      handleError("call-rejected", error);
+    }
+  });
 
-  // socket.on("ice-candidate", ({ candidate, chatId }) => {
-  //   socket.to(`dm_${chatId}`).emit("ice-candidate", { candidate });
-  // });
+  // 통화 종료
+  socket.on("call-ended", (payload: CallEventPayload) => {
+    try {
+      const { roomId } = payload;
+      logger.info(`Call ended in room ${roomId}`);
+      socket.to(getRoomId(roomId)).emit("call-ended", { roomId });
+    } catch (error) {
+      handleError("call-ended", error);
+    }
+  });
+
+  // 장치 설정 변경
+  socket.on("device-settings-updated", (payload: DeviceSettingsPayload) => {
+    try {
+      const { roomId, settings } = payload;
+      logger.info(`Device settings updated in room ${roomId}:`, settings);
+      socket
+        .to(getRoomId(roomId))
+        .emit("device-settings-updated", { roomId, settings });
+    } catch (error) {
+      handleError("device-settings-updated", error);
+    }
+  });
+
+  // 통화 품질 메트릭
+  socket.on("call-quality-metrics", (payload: QualityMetricsPayload) => {
+    try {
+      const { roomId, metrics } = payload;
+      logger.debug(`Call quality metrics in room ${roomId}:`, metrics);
+
+      // 품질 문제 감지 및 알림
+      if (
+        metrics.packetLossRate > 5 ||
+        metrics.roundTripTime > 300 ||
+        metrics.jitter > 50
+      ) {
+        socket.to(getRoomId(roomId)).emit("call-quality-warning", {
+          roomId,
+          type:
+            metrics.packetLossRate > 5
+              ? "packet-loss"
+              : metrics.roundTripTime > 300
+                ? "latency"
+                : "jitter",
+          metrics,
+        });
+      }
+
+      socket
+        .to(getRoomId(roomId))
+        .emit("call-quality-metrics", { roomId, metrics });
+    } catch (error) {
+      handleError("call-quality-metrics", error);
+    }
+  });
+
+  // 연결 끊김 감지
+  socket.on("disconnect", () => {
+    try {
+      const rooms = Array.from(socket.rooms);
+      rooms.forEach((room) => {
+        if (room.startsWith("dm_")) {
+          logger.info(`User disconnected from video call in room ${room}`);
+          socket.to(room).emit("peer-disconnected", {
+            roomId: room.replace("dm_", "").split(":")[0],
+          });
+        }
+      });
+    } catch (error) {
+      handleError("disconnect", error);
+    }
+  });
 };

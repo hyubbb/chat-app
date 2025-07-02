@@ -153,7 +153,7 @@ SELECT * FROM (
         CONVERT(dr.room_id USING utf8mb4) COLLATE utf8mb4_unicode_ci = 
         CONVERT(m.chat_id USING utf8mb4) COLLATE utf8mb4_unicode_ci 
         AND (dr.user_id = u.user_id OR dr.other_user_id = u.user_id)
-    WHERE m.sent_at > dr.joined_at
+    WHERE m.sent_at >= dr.joined_at
       AND (dr.user_id = ?) 
       AND m.chat_id = ? 
     ORDER BY m.sent_at ASC  

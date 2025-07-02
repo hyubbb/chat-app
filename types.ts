@@ -89,3 +89,51 @@ export type useFormType = {
   password: string;
   photo: FileList | string | null;
 };
+
+// 영상통화 관련 타입
+export interface VideoCallPayload {
+  sdp: RTCSessionDescriptionInit;
+  roomId: string;
+  userId: number;
+  userName: string;
+}
+
+export interface IceCandidatePayload {
+  candidate: RTCIceCandidateInit;
+  roomId: string;
+}
+
+export interface CallEventPayload {
+  roomId: string;
+  reason?: string;
+}
+
+export interface DeviceSettingsPayload {
+  roomId: string;
+  settings: {
+    deviceType: "video" | "audio";
+    deviceId: string;
+  };
+}
+
+export interface QualityMetricsPayload {
+  roomId: string;
+  metrics: {
+    packetLossRate: number;
+    roundTripTime: number;
+    jitter: number;
+  };
+}
+
+export interface VideoCallInfo {
+  roomId: string;
+  userId: number;
+  userName: string;
+}
+
+export interface VideoDeviceSettings {
+  selectedVideoDevice: string | null;
+  selectedAudioDevice: string | null;
+  availableVideoDevices: MediaDeviceInfo[];
+  availableAudioDevices: MediaDeviceInfo[];
+}
