@@ -2,7 +2,7 @@
 
 socket.io를 이용한 실시간 채팅 사이트입니다.  
 
-- 배포 페이지 :  [채팅 사이트 URL](http://3.39.73.42/)
+- 배포 페이지 :  [채팅 사이트 URL](http://52.79.164.144/)
 - GITHUB :  https://github.com/hyubbb/chat-app
 
 ## 기술스택
@@ -23,7 +23,7 @@ S3 : 이미지 저장소
  
  <img width="741" alt="image" src="https://github.com/user-attachments/assets/3001ee49-e656-42f1-aea9-6c4ddaec2127">
 
-
+₩
 ## 대표 구현 내역 - 실시간채팅
 
  
